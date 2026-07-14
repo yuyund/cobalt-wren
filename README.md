@@ -194,25 +194,30 @@ Future wrapper order:
 
 - `settings` / environment variables hold secrets and deployment-level config.
 - `Workflow.definition_payload` holds workflow-level config such as model choice, allowed tools, and graph behavior.
+- `Workflow.definition_payload.graph.kind` selects the workflow graph. The current supported value is `llm_echo_summary`.
 - `Workflow.definition_payload.llm` is the minimal LLM schema.
 - `Workflow.definition_payload.tools.allowed` is the minimal tool allowlist schema.
 - Missing or empty `tools.allowed` means deny all.
 - `Run.input_payload` holds one-shot execution input.
 - `Run.input_payload` must not grant tool permissions.
 - `Run.input_payload` must not provide LLM credentials.
+- `Run.input_payload` must not provide `model`, `api_key`, `base_url`, `tools.allowed`, or `graph.kind`.
 - `Run.output_payload` holds safe summary only.
 - `RunEvent.payload`, `ExecutionSpan.metadata`, `ExecutionSpan.input_summary`, and `ExecutionSpan.output_summary` must not store secrets or raw provider payloads.
 - runtime factory reads settings, `Workflow`, and `Run` context to assemble dependencies.
 
-Workflow LLM schema:
+Workflow minimal config:
 
 ```json
 {
+  "graph": {
+    "kind": "llm_echo_summary"
+  },
   "llm": {
     "enabled": true,
-    "model": "gpt-4o-mini",
+    "model": "test-model",
     "temperature": 0.2,
-    "max_tokens": 1024
+    "max_tokens": 512
   },
   "tools": {
     "allowed": ["echo"]
@@ -229,6 +234,17 @@ Secret policy:
 - secrets must not be stored in `ExecutionSpan.metadata`
 - secrets must not be stored in `ExecutionSpan.input_summary`
 - secrets must not be stored in `ExecutionSpan.output_summary`
+
+## Minimal LLM Workflow
+
+- default graph: `llm_echo_summary`
+- input schema: `{"text": "..."}` or `{"prompt": "..."}`
+- execution flow: `Run.input_payload` -> EchoTool node -> LLM summary node -> final output candidate -> `services/runs.py` -> `safe_run_output_payload()` -> `Run.output_payload`
+- `GraphRuntime.require_llm_client()` and `GraphRuntime.require_tool_registry()` are the only dependency access points inside nodes.
+- nodes do not import Django ORM models, provider adapters, or concrete tool classes.
+- `ObservedLLMClient` records LLM spans and `ObservedToolRegistry` records tool spans.
+- full prompt, full response, and raw tool output are not persisted.
+- `LLMResult.raw` is not persisted.
 
 ## Artifact Store Semantics
 
@@ -249,7 +265,7 @@ Secret policy:
 
 ## Current Graph
 
-- The production graph is the minimal `planner -> summarizer` LangGraph flow.
+- The production graph is the minimal `llm_echo_summary` LangGraph flow.
 - `graphs/builders.py` builds and compiles the graph.
 - `graphs/runner.py` invokes the compiled graph.
 - `graphs/instrumentation.py` manages node span lifecycle.

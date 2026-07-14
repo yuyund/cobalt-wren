@@ -8,13 +8,22 @@ from typing import Any
 
 from langgraph_automation.core.summary import summarize_mapping
 
+MINIMAL_GRAPH_KIND = 'llm_echo_summary'
+
+
+@dataclass(frozen=True)
+class GraphWorkflowConfig:
+    """Normalized workflow-level graph configuration."""
+
+    kind: str = MINIMAL_GRAPH_KIND
+
 
 @dataclass(frozen=True)
 class LLMWorkflowConfig:
     """Normalized workflow-level LLM configuration."""
 
     enabled: bool = False
-    model: str = ""
+    model: str = ''
     temperature: float | None = None
     max_tokens: int | None = None
 
@@ -30,6 +39,7 @@ class ToolWorkflowConfig:
 class WorkflowRuntimeConfig:
     """Normalized runtime configuration extracted from Workflow.definition_payload."""
 
+    graph: GraphWorkflowConfig = field(default_factory=GraphWorkflowConfig)
     llm: LLMWorkflowConfig = field(default_factory=LLMWorkflowConfig)
     tools: ToolWorkflowConfig = field(default_factory=ToolWorkflowConfig)
 
@@ -39,7 +49,7 @@ class WorkflowConfigIssue:
     path: str
     code: str
     message: str
-    level: str = "error"
+    level: str = 'error'
 
 
 @dataclass(frozen=True)
@@ -88,6 +98,20 @@ def _is_positive_int(value: Any) -> bool:
     return isinstance(value, int) and not isinstance(value, bool) and value > 0
 
 
+def _parse_graph_config(definition_payload: Mapping[str, Any] | None) -> GraphWorkflowConfig:
+    if not isinstance(definition_payload, Mapping):
+        return GraphWorkflowConfig()
+    graph = definition_payload.get('graph')
+    if not isinstance(graph, Mapping):
+        return GraphWorkflowConfig()
+
+    kind_value = graph.get('kind', MINIMAL_GRAPH_KIND)
+    if not isinstance(kind_value, str):
+        return GraphWorkflowConfig()
+    kind = kind_value.strip() or MINIMAL_GRAPH_KIND
+    return GraphWorkflowConfig(kind=kind)
+
+
 def _parse_llm_config(definition_payload: Mapping[str, Any] | None) -> LLMWorkflowConfig:
     if not isinstance(definition_payload, Mapping):
         return LLMWorkflowConfig()
@@ -111,6 +135,7 @@ def parse_workflow_runtime_config(definition_payload: Mapping[str, Any] | None) 
     """Parse a workflow definition payload into normalized runtime config."""
 
     return WorkflowRuntimeConfig(
+        graph=_parse_graph_config(definition_payload),
         llm=_parse_llm_config(definition_payload),
         tools=ToolWorkflowConfig(allowed_tools=_extract_allowed_tool_names(definition_payload)),
     )
@@ -123,6 +148,19 @@ def validate_workflow_runtime_config(definition_payload: Mapping[str, Any] | Non
     if not isinstance(definition_payload, Mapping):
         issues.append(WorkflowConfigIssue(path='definition_payload', code='invalid_mapping', message='Workflow definition payload must be a mapping.', level='warning'))
         return WorkflowConfigValidation(issues=tuple(issues))
+
+    graph = definition_payload.get('graph')
+    if graph is not None:
+        if not isinstance(graph, Mapping):
+            issues.append(WorkflowConfigIssue(path='graph', code='invalid_graph_type', message='Graph configuration must be a mapping.', level='warning'))
+        else:
+            kind = graph.get('kind')
+            if kind is not None and not isinstance(kind, str):
+                issues.append(WorkflowConfigIssue(path='graph.kind', code='invalid_graph_kind_type', message='Graph kind must be a string.', level='warning'))
+            elif isinstance(kind, str):
+                normalized_kind = kind.strip()
+                if normalized_kind and normalized_kind != MINIMAL_GRAPH_KIND:
+                    issues.append(WorkflowConfigIssue(path='graph.kind', code='unknown_graph_kind', message=f'Unsupported graph kind: {normalized_kind}.', level='error'))
 
     llm = definition_payload.get('llm')
     if llm is None:

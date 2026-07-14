@@ -17,6 +17,7 @@ from langgraph_automation.apps.automation.services.workflow_config import (
     validate_workflow_runtime_config,
 )
 from langgraph_automation.config import settings as app_settings
+from langgraph_automation.graphs.builders import SUPPORTED_GRAPH_KINDS
 from langgraph_automation.graphs.runtime import GraphRuntime
 from langgraph_automation.integrations.artifact.base import ArtifactStore
 from langgraph_automation.integrations.artifact.memory_store import MemoryArtifactStore
@@ -133,10 +134,18 @@ def build_graph_runtime(run: Run) -> GraphRuntime:
     business logic.
     """
 
+    runtime_config = parse_workflow_runtime_config(run.workflow.definition_payload)
+    validation = validate_workflow_runtime_config(run.workflow.definition_payload)
+    if validation.has_errors:
+        raise WorkflowConfigurationError(_format_configuration_issues(validation.issues))
+    if runtime_config.graph.kind not in SUPPORTED_GRAPH_KINDS:
+        raise WorkflowConfigurationError(f'Unsupported graph kind: {runtime_config.graph.kind}')
+
     event_sink = build_event_sink(run)
     return GraphRuntime(
         logger=logging.getLogger(f'langgraph_automation.run.{run.pk}'),
         observability=ObservabilityContext(run_id=run.pk, thread_id=run.thread_id),
+        workflow_config=runtime_config,
         event_sink=event_sink,
         llm_client=build_llm_client(run, event_sink),
         tool_registry=build_tool_registry(run, event_sink),

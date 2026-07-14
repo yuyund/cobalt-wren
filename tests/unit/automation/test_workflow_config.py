@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 from langgraph_automation.apps.automation.services.workflow_config import (
+    GraphWorkflowConfig,
     LLMWorkflowConfig,
+    MINIMAL_GRAPH_KIND,
     ToolWorkflowConfig,
     WorkflowRuntimeConfig,
     extract_allowed_tool_names,
@@ -15,14 +17,18 @@ from langgraph_automation.apps.automation.services.workflow_config import (
 def test_parse_workflow_runtime_config_defaults_to_safe_values() -> None:
     config = parse_workflow_runtime_config(None)
 
-    assert config == WorkflowRuntimeConfig(llm=LLMWorkflowConfig(), tools=ToolWorkflowConfig())
+    assert config == WorkflowRuntimeConfig(graph=GraphWorkflowConfig(), llm=LLMWorkflowConfig(), tools=ToolWorkflowConfig())
+    assert config.graph.kind == MINIMAL_GRAPH_KIND
     assert config.llm.enabled is False
     assert config.tools.allowed_tools == ()
 
 
-def test_parse_workflow_runtime_config_normalizes_llm_and_tools() -> None:
+def test_parse_workflow_runtime_config_normalizes_graph_llm_and_tools() -> None:
     config = parse_workflow_runtime_config(
         {
+            'graph': {
+                'kind': 'llm_echo_summary',
+            },
             'llm': {
                 'enabled': True,
                 'model': 'gpt-4o-mini',
@@ -35,6 +41,7 @@ def test_parse_workflow_runtime_config_normalizes_llm_and_tools() -> None:
         }
     )
 
+    assert config.graph == GraphWorkflowConfig(kind='llm_echo_summary')
     assert config.llm.enabled is True
     assert config.llm.model == 'gpt-4o-mini'
     assert config.llm.temperature == 0.2
@@ -71,6 +78,9 @@ def test_extract_allowed_tool_names_defaults_to_deny_all() -> None:
 def test_validate_workflow_runtime_config_reports_expected_issues() -> None:
     validation = validate_workflow_runtime_config(
         {
+            'graph': {
+                'kind': 'unknown-kind',
+            },
             'llm': {
                 'enabled': 'yes',
                 'temperature': 'warm',
@@ -83,6 +93,7 @@ def test_validate_workflow_runtime_config_reports_expected_issues() -> None:
     )
 
     assert validation.has_errors is True
+    assert any(issue.path == 'graph.kind' for issue in validation.issues)
     assert any(issue.path == 'llm.enabled' for issue in validation.issues)
     assert any(issue.path == 'llm.temperature' for issue in validation.issues)
     assert any(issue.path == 'llm.max_tokens' for issue in validation.issues)

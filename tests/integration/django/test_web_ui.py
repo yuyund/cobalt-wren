@@ -7,6 +7,8 @@ from django.urls import reverse
 
 from langgraph_automation.apps.automation.models.run import Run, RunStatus
 from langgraph_automation.apps.automation.models.workflow import Workflow
+from langgraph_automation.apps.automation.services import runtime as runtime_module
+from tests.support.recording_event_sink import RecordingEventSink
 
 
 @pytest.mark.django_db
@@ -26,9 +28,40 @@ def test_dynamic_list_and_detail_views_are_registry_driven(client) -> None:
 
 
 @pytest.mark.django_db
-def test_dynamic_action_view_dispatches_registered_action(client) -> None:
-    workflow = Workflow.objects.create(name='wf-action')
-    run = Run.objects.create(workflow=workflow, name='run-action', status=RunStatus.PENDING)
+def test_dynamic_action_view_dispatches_registered_action(client, monkeypatch: pytest.MonkeyPatch) -> None:
+    def fake_completion(**_kwargs):
+        return {
+            'choices': [
+                {
+                    'message': {'content': 'final summary'},
+                    'finish_reason': 'stop',
+                }
+            ],
+            'usage': {
+                'prompt_tokens': 3,
+                'completion_tokens': 2,
+            },
+            'model': 'fake-provider-model',
+        }
+
+    sink = RecordingEventSink()
+    monkeypatch.setattr(runtime_module, 'build_event_sink', lambda _run: sink)
+    monkeypatch.setattr('langgraph_automation.integrations.llm.litellm_client.litellm.completion', fake_completion)
+
+    workflow = Workflow.objects.create(
+        name='wf-action',
+        definition_payload={
+            'graph': {'kind': 'llm_echo_summary'},
+            'llm': {
+                'enabled': True,
+                'model': 'test-model',
+            },
+            'tools': {
+                'allowed': ['echo'],
+            },
+        },
+    )
+    run = Run.objects.create(workflow=workflow, name='run-action', status=RunStatus.PENDING, input_payload={'text': 'summarize this'})
 
     response = client.post(reverse('dynamic-action', kwargs={'model_key': 'runs', 'object_id': run.pk, 'action_name': 'start'}))
     run.refresh_from_db()

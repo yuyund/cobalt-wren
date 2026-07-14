@@ -13,3 +13,5 @@ class AutomationState(TypedDict, total=False):
     current_node: str
     messages: list[dict[str, Any]]
     metadata: dict[str, Any]
+    echo: dict[str, Any]
+    llm: dict[str, Any]

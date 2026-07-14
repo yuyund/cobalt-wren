@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field, replace
 import logging
 
+from langgraph_automation.apps.automation.services.workflow_config import WorkflowRuntimeConfig
 from langgraph_automation.core.errors import MissingRuntimeDependencyError
 from langgraph_automation.integrations.artifact.base import ArtifactStore
 from langgraph_automation.integrations.checkpoint.base import CheckpointStore
@@ -21,6 +22,7 @@ class GraphRuntime:
 
     logger: logging.Logger
     observability: ObservabilityContext = field(default_factory=ObservabilityContext)
+    workflow_config: WorkflowRuntimeConfig = field(default_factory=WorkflowRuntimeConfig)
     event_sink: EventSink | None = None
     llm_client: LLMClient | None = None
     tool_registry: ToolRegistry | None = None

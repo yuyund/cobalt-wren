@@ -16,6 +16,7 @@ from langgraph_automation.apps.automation.services.runtime import (
     build_llm_client,
     build_tool_registry,
 )
+from langgraph_automation.apps.automation.services.workflow_config import MINIMAL_GRAPH_KIND
 from langgraph_automation.config import settings as app_settings
 from langgraph_automation.core.errors import MissingRuntimeDependencyError
 from langgraph_automation.graphs.runtime import GraphRuntime
@@ -39,6 +40,7 @@ def test_build_graph_runtime_returns_execution_bundle() -> None:
     assert runtime.tool_registry is not None
     assert isinstance(runtime.artifact_store, MemoryArtifactStore)
     assert isinstance(runtime.checkpoint_store, MemoryCheckpointStore)
+    assert runtime.workflow_config.graph.kind == MINIMAL_GRAPH_KIND
     assert runtime.observability.run_id == run.pk
     assert runtime.observability.thread_id == ''
     assert runtime.require_tool_registry() is runtime.tool_registry
@@ -46,6 +48,22 @@ def test_build_graph_runtime_returns_execution_bundle() -> None:
     assert build_tool_registry(run, runtime.event_sink) is not None
     assert isinstance(build_artifact_store(run, runtime.event_sink), MemoryArtifactStore)
     assert isinstance(build_checkpoint_store(run, runtime.event_sink), MemoryCheckpointStore)
+
+
+@pytest.mark.django_db
+def test_build_graph_runtime_rejects_unknown_graph_kind() -> None:
+    workflow = Workflow.objects.create(
+        name='wf-runtime-unknown-graph',
+        definition_payload={
+            'graph': {'kind': 'unknown-kind'},
+            'llm': {'enabled': True, 'model': 'gpt-4o-mini'},
+            'tools': {'allowed': ['echo']},
+        },
+    )
+    run = Run.objects.create(workflow=workflow, name='run-runtime-unknown-graph')
+
+    with pytest.raises(WorkflowConfigurationError, match='Unsupported graph kind'):
+        build_graph_runtime(run)
 
 
 @pytest.mark.django_db
@@ -139,7 +157,6 @@ def test_build_llm_client_builds_observed_lite_llm_client_when_enabled(monkeypat
     assert client.inner.base_url == 'https://llm.example.invalid'
     assert client.inner.temperature == 0.25
     assert client.inner.max_tokens == 256
-    assert runtime.llm_client is not None
     assert isinstance(runtime.llm_client, ObservedLLMClient)
     assert isinstance(runtime.llm_client.inner, LiteLLMClient)
     assert runtime.llm_client.inner.model == 'gpt-4o-mini'
