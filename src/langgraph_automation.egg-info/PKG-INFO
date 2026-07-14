@@ -1,0 +1,16 @@
+Metadata-Version: 2.4
+Name: langgraph-automation
+Version: 0.1.0
+Requires-Python: >=3.12
+Requires-Dist: django
+Requires-Dist: psycopg
+Requires-Dist: langgraph
+Requires-Dist: litellm
+Requires-Dist: django-environ
+Provides-Extra: dev
+Requires-Dist: pytest; extra == "dev"
+Requires-Dist: pytest-django; extra == "dev"
+Requires-Dist: ruff; extra == "dev"
+Requires-Dist: mypy; extra == "dev"
+Provides-Extra: postgres
+Requires-Dist: psycopg[binary]>=3.2; extra == "postgres"

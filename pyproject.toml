@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "langgraph-automation"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+  "django",
+  "psycopg",
+  "langgraph",
+  "litellm",
+  "django-environ",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest",
+  "pytest-django",
+  "ruff",
+  "mypy",
+]
+postgres = [
+  "psycopg[binary]>=3.2",
+]
+
+[dependency-groups]
+dev = [
+  "pytest",
+  "pytest-django",
+  "ruff",
+  "mypy",
+]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "langgraph_automation.config.settings"
+pythonpath = ["src"]

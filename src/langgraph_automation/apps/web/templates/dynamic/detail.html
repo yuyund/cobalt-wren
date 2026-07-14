@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block title %}{{ page.title }}{% endblock %}
+{% block content %}
+<h1>{{ page.title }}</h1>
+<section>
+  {% for field in page.fields %}
+  <div>
+    <strong>{{ field.label }}:</strong> {{ field.display_value }}
+  </div>
+  {% endfor %}
+</section>
+<section>
+  {% for action in page.actions %}
+  <form method=post action={{ action.url }}>
+    {% csrf_token %}
+    <button type=submit {% if not action.enabled %}disabled{% endif %}>{{ action.label }}</button>
+  </form>
+  {% endfor %}
+</section>
+<section>
+  {% for section in page.related_sections %}
+  <h2>{{ section.title }}</h2>
+  {% if section.table.rows %}
+  <table>
+    <thead>
+      <tr>
+        {% for column in section.table.columns %}
+        <th>{{ column.label }}</th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in section.table.rows %}
+      <tr>
+        {% for field in row %}
+        <td>{{ field.display_value }}</td>
+        {% endfor %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p>{{ section.table.empty_message }}</p>
+  {% endif %}
+  {% endfor %}
+</section>
+{% endblock %}

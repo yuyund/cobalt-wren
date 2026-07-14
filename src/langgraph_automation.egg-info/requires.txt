@@ -1,0 +1,14 @@
+django
+psycopg
+langgraph
+litellm
+django-environ
+
+[dev]
+pytest
+pytest-django
+ruff
+mypy
+
+[postgres]
+psycopg[binary]>=3.2
