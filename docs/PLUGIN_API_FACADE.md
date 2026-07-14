@@ -19,6 +19,8 @@ Current implemented public facade:
 - `langgraph_automation.api.tools`
 - `langgraph_automation.api.stores`
 - `langgraph_automation.api.events`
+- `langgraph_automation.api.errors`
+- `langgraph_automation.api.plugins`
 
 Roles:
 
@@ -26,13 +28,13 @@ Roles:
 - `api.tools`: `ToolRegistry`, `ToolResult`, `ToolPolicy`, `ToolPolicyContext`, `ToolPolicyDecision`
 - `api.stores`: `ArtifactStore`, `CheckpointStore`
 - `api.events`: `EventSink`
+- `api.errors`: `FrameworkError`, `ConfigError`, `PluginRegistrationError`, `PluginResolutionError`, `PluginValidationError`, `RuntimeAssemblyError`, `SafetyBoundaryError`
+- `api.plugins`: `Plugin`, `PluginMetadata`, `PluginContributions`, `ToolContribution`, `ProviderContribution`, `StoreContribution`, `EventSinkContribution`
 
 Not implemented yet:
 
-- `langgraph_automation.api.plugins`
 - `langgraph_automation.api.workflow`
 - `langgraph_automation.api.runtime`
-- `langgraph_automation.api.errors`
 
 ## Facade hierarchy
 
@@ -42,25 +44,22 @@ langgraph_automation.api
   ├─ tools.py      # implemented
   ├─ stores.py     # implemented
   ├─ events.py     # implemented
-  ├─ plugins.py    # future
+  ├─ plugins.py    # implemented
   ├─ workflow.py   # future
   ├─ runtime.py    # future
-  └─ errors.py     # future
+  └─ errors.py     # implemented
 ```
 
 Stages:
 
-- Current: `api.llm`, `api.tools`, `api.stores`, `api.events`
-- Next public candidate: `api.plugins`
-- Still deferred: `api.workflow`, `api.runtime`, `api.errors`
+- Current: `api.llm`, `api.tools`, `api.stores`, `api.events`, `api.errors`, `api.plugins`
+- Still deferred: `api.workflow`, `api.runtime`
 
 ## api.plugins staging
 
-`api.plugins` is the next public candidate, but it is not implemented in P3-D.
+`api.plugins` minimal public facade is now implemented.
 
-### Public candidate
-
-`api.plugins` public candidate:
+### Implemented in MVP
 
 - `Plugin`
 - `PluginMetadata`
@@ -70,44 +69,14 @@ Stages:
 - `StoreContribution`
 - `EventSinkContribution`
 
-Why these are public candidates:
-
-- they form the core vocabulary for plugin packages and contributions
-- they connect naturally to the current public facades for tools, llm, stores, and events
-- they are more stable than worker / UI / workflow / runtime surfaces
-
-### Provisional
-
-`api.plugins` provisional:
+### Deferred from api.plugins
 
 - `WorkflowContribution`
+- `WorkerContribution`
+- `UIContribution`
 - `ValidationContext`
 - `FactoryContext`
 - `SecretResolver`
-
-Why provisional:
-
-- `WorkflowDefinition` and `WorkflowRequirements` are not defined as public facades yet
-- `ConfigValidator` does not exist yet, so validation context shape may move
-- `RuntimeAssembly` does not exist yet, so factory context shape may move
-- `SecretResolver` is a security boundary and should be staged carefully
-
-### Future
-
-`api.plugins` future:
-
-- `WorkerContribution`
-- `UIContribution`
-
-Why future:
-
-- worker / queue / outbox / long-running semantics are not implemented
-- UI registry and permission / visibility boundaries are not implemented
-
-### Deferred
-
-Deferred from `api.plugins`:
-
 - `PluginRegistry`
 - `ConfigValidator`
 - `RuntimeAssembly`
@@ -117,9 +86,20 @@ Deferred from `api.plugins`:
 
 Why deferred:
 
+- `WorkflowDefinition` and `WorkflowRequirements` are not defined as public facades yet
+- `ConfigValidator` does not exist yet, so validation context shape may move
+- `RuntimeAssembly` does not exist yet, so factory context shape may move
+- `SecretResolver` is a security boundary and should be staged carefully
+- worker / queue / outbox / long-running semantics are not implemented
+- UI registry and permission / visibility boundaries are not implemented
 - implementation boundaries are not verified yet
 - exposing them too early would freeze internal structure
 - registry / validator / runtime assembly are close to package internals
+
+### Internal mechanism
+
+- `PluginRegistry` remains internal at `langgraph_automation.plugins.registry`
+- `api.plugins` does not export `PluginRegistry`
 
 ## Why PluginRegistry is not public yet
 
@@ -260,13 +240,10 @@ Future facade:
 
 `api.plugins` public candidate:
 
-- `Plugin`
-- `PluginMetadata`
-- `PluginContributions`
-- `ToolContribution`
-- `ProviderContribution`
-- `StoreContribution`
-- `EventSinkContribution`
+- `WorkflowContribution`
+- `ValidationContext`
+- `FactoryContext`
+- `SecretResolver`
 
 `api.plugins` provisional:
 

@@ -106,11 +106,14 @@ Current:
 
 Current:
 
-- Package P3-E Minimal api.plugins facade implementation
+- Package Extension Core Block A
+- api.plugins facade + internal manual PluginRegistry MVP
 
 Next:
 
-- then Package P1-C Config loader / normalizer MVP
+- P1-C Config loader / normalizer MVP
+- then P1-D ConfigValidator MVP
+- then RuntimeAssembly MVP
 
 ## 6. Recommended Execution Order
 

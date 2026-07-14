@@ -23,6 +23,7 @@ In Package MVP, application or bootstrap code registers plugin objects directly 
 Config does not name import paths. Config only activates already-registered plugins and supplies behavior parameters.
 Manual registration registers plugin objects and their contributions. Plugin object and contribution shapes are defined in `docs/PLUGIN_API_SHAPE.md`.
 Public facade staging for plugin API types is defined in `docs/PLUGIN_API_FACADE.md`.
+Manual PluginRegistry MVP is implemented internally, but it remains outside the public facade.
 
 Conceptual example only:
 

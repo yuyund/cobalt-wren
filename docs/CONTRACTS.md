@@ -58,13 +58,22 @@ These contracts describe the current internal foundation surface. If parts of th
 - `RuntimeAssembly` resolves names to concrete dependencies.
 - `GraphRuntimeConfig` contains only graph-local safe config.
 
-## Plugin Contract
+## api.plugins Contract
+
+- plugin objects are metadata + contributions only
+- contributions hold definitions / hooks, not concrete runtime instances
+- registry stores plugin definitions, not runtime dependencies
+- registry raises `PluginRegistrationError` for registration conflicts
+- registry raises `PluginResolutionError` for unknown lookups
+- registry does not call validation hooks or factory hooks
+
+## Plugin API Contract
 
 - plugin code must not depend on internal modules
 - plugin-specific config validation is owned by the plugin type
 - core schema keeps plugin-specific config opaque
 - tool plugins remain subject to ToolPolicy
-- provider / store / event / worker plugins are resolved by name through registry boundaries
+- provider / store / event plugins are resolved by name through registry boundaries
 
 ## Plugin Registration Contract
 
@@ -72,7 +81,8 @@ These contracts describe the current internal foundation surface. If parts of th
 - override is denied by default
 - config does not import plugins
 - `plugins.enabled` references registered plugin names
-- registry provides lookup, validator orchestrates validation, runtime assembly constructs dependencies
+- registry provides lookup and duplicate detection only
+- validator orchestrates validation and runtime assembly constructs dependencies later
 
 ## Plugin API Shape Contract
 
@@ -84,9 +94,8 @@ These contracts describe the current internal foundation surface. If parts of th
 
 ## Plugin API Facade Contract
 
-- implemented public facade remains `api.llm`, `api.tools`, `api.stores`, and `api.events`
-- `api.plugins` is not yet implemented in P3-D
-- `api.workflow`, `api.runtime`, and `api.errors` are not yet implemented in P3-D
+- implemented public facade remains `api.llm`, `api.tools`, `api.stores`, `api.events`, `api.errors`, and `api.plugins`
+- `api.workflow` and `api.runtime` are not yet implemented in P3-D
 - `GraphRuntime` and `GraphDefinition` remain outside the public facade
 - PluginRegistry, ConfigValidator, and RuntimeAssembly are not public facade types in P3-D
 

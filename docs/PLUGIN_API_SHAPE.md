@@ -29,6 +29,25 @@ Coupling goals:
 - one plugin package may provide multiple contributions
 - contribution-specific factory and validation shapes should be separate so changes do not fan out across all contribution types
 
+## Implemented in MVP
+
+- `Plugin`
+- `PluginMetadata`
+- `PluginContributions`
+- `ToolContribution`
+- `ProviderContribution`
+- `StoreContribution`
+- `EventSinkContribution`
+
+Deferred from MVP:
+
+- `WorkflowContribution`
+- `WorkerContribution`
+- `UIContribution`
+- `ValidationContext`
+- `FactoryContext`
+- `SecretResolver`
+
 ## Plugin object
 
 Conceptual shape only:

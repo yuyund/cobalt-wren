@@ -119,9 +119,11 @@ Application workflows are future layers and should not be pulled into `graphs`.
 
 ## Plugin Boundary
 
-- plugins depend on the public API facade rather than internal modules.
-- plugin registration resolves names to implementations.
-- runtime assembly consumes resolved config and registered plugins.
+- `api.plugins` is a public facade for plugin vocabulary.
+- `PluginRegistry` is an internal manual registration mechanism.
+- `api.plugins` does not depend on `PluginRegistry`.
+- `PluginRegistry` depends on `api.plugins` and `api.errors` only.
+- `ConfigLoader`, `ConfigValidator`, and `RuntimeAssembly` are later layers.
 - plugin taxonomy and responsibility boundaries are defined in `docs/PLUGINS.md`.
 - manual registration, enabled plugins, and registry conflict policy are defined in `docs/PLUGIN_REGISTRATION.md`.
 - validation hooks and factory hooks are defined in `docs/PLUGIN_API_SHAPE.md`.

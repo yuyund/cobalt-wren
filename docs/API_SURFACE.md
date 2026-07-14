@@ -21,19 +21,21 @@ The goal is to keep the package small on the outside, flexible on the inside, an
 - Internal implementation may continue to use `graph` vocabulary.
 - Config may adjust behavior, but it must not allow arbitrary imports or safety bypasses.
 
-## Future public module layout
+## Public module layout
 
-The following layout is a candidate for later phases.
+Current implemented public facade:
 
-- `langgraph_automation.api`
-- `langgraph_automation.api.plugins`
-- `langgraph_automation.api.workflow`
-- `langgraph_automation.api.runtime`
-- `langgraph_automation.api.tools`
 - `langgraph_automation.api.llm`
+- `langgraph_automation.api.tools`
 - `langgraph_automation.api.stores`
 - `langgraph_automation.api.events`
 - `langgraph_automation.api.errors`
+- `langgraph_automation.api.plugins`
+
+Future public surfaces:
+
+- `langgraph_automation.api.workflow`
+- `langgraph_automation.api.runtime`
 
 Package P0-B implements the minimal facade described below.
 
@@ -201,6 +203,38 @@ Current guidance:
 - The minimal public error facade is intentionally smaller than the full taxonomy.
 - `FrameworkError`, `ConfigError`, `PluginRegistrationError`, `PluginResolutionError`, `PluginValidationError`, `RuntimeAssemblyError`, and `SafetyBoundaryError` were the minimal candidates and are now implemented.
 
+## Plugin API surface
+
+Implemented:
+
+- `langgraph_automation.api.plugins`
+
+Exports:
+
+- `Plugin`
+- `PluginMetadata`
+- `PluginContributions`
+- `ToolContribution`
+- `ProviderContribution`
+- `StoreContribution`
+- `EventSinkContribution`
+
+Not exported:
+
+- `PluginRegistry`
+- `WorkflowContribution`
+- `WorkerContribution`
+- `UIContribution`
+- `ValidationContext`
+- `FactoryContext`
+- `SecretResolver`
+
+Guidance:
+
+- `api.plugins` is the public vocabulary for plugin packages and contributions.
+- `PluginRegistry` remains an internal mechanism under `langgraph_automation.plugins.registry`.
+- `api.plugins` does not expose registry, config validator, runtime assembly, or concrete runtime dependencies.
+
 ## Implemented public facade in P0-B
 
 - `langgraph_automation.api.llm`
@@ -213,9 +247,7 @@ These modules re-export selected stable interfaces only. They do not expose work
 ## Deferred public surfaces
 
 - `langgraph_automation.api.workflow`
-- `langgraph_automation.api.plugins`
 - `langgraph_automation.api.runtime`
-- `langgraph_automation.api.errors`
 - `WorkflowPlugin`
 - `ToolPlugin`
 - plugin loader
