@@ -2,6 +2,11 @@
 
 This document defines the minimal public facade policy for `langgraph_automation.api.errors`.
 
+Implementation status:
+
+- minimal facade is implemented
+- public error classes are exported from `src/langgraph_automation/api/errors.py`
+
 Purpose:
 
 - map the framework-wide error taxonomy into a minimal public facade
@@ -31,6 +36,20 @@ Coupling rules:
 - `RuntimeAssembly` uses `RuntimeAssemblyError`.
 - safety boundary violations use `SafetyBoundaryError`.
 - provider, tool, store, and event sink execution errors remain taxonomy members, but are deferred from the initial public facade.
+
+## Implemented public facade
+
+Implemented public facade:
+
+- `FrameworkError`
+- `ConfigError`
+- `PluginRegistrationError`
+- `PluginResolutionError`
+- `PluginValidationError`
+- `RuntimeAssemblyError`
+- `SafetyBoundaryError`
+
+`__all__` exports the same set.
 
 ## Public minimal candidates
 
@@ -157,6 +176,8 @@ Field guidance:
 - `cause`: original exception for chaining, not for direct UI/API exposure
 
 `diagnostic_message` is not part of the initial stable public field set. If it appears later, it should remain internal-only and redacted/bounded.
+
+`metadata` sanitizer is not implemented yet; the contract remains redacted / bounded only.
 
 ## Category / code as subclass alternatives
 

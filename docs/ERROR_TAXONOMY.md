@@ -10,7 +10,7 @@ Purpose:
 - ensure EventSink / observability failures never overwrite the primary failure
 - wrap arbitrary exceptions from plugin hooks into framework error categories
 - fix error boundaries before `ConfigLoader`, `PluginRegistry`, `ConfigValidator`, and `RuntimeAssembly` exist
-- keep `api.errors` as a future facade
+- keep `api.errors` as a future facade for the broader taxonomy
 - the staged public facade for minimal `api.errors` is defined in `docs/API_ERRORS_FACADE.md`
 
 ## Design principles
@@ -22,7 +22,7 @@ Purpose:
 - Raw exception messages must not be copied directly into UI, API, or `Run.error_message`.
 - Diagnostics must also be bounded and redacted.
 - Error taxonomy should not be frozen into the public API too early.
-- `api.errors` is a future facade and is not implemented in this phase.
+- `api.errors` minimal facade is implemented, but the broader taxonomy remains staged.
 - `ErrorCode` enum / `ErrorCategory` enum are not implemented in this phase.
 
 Coupling rules:
@@ -551,18 +551,10 @@ The framework owns safe message construction.
 
 ## api.errors
 
-`api.errors` is a future facade.
+The minimal public facade is implemented in `src/langgraph_automation/api/errors.py` and staged in `docs/API_ERRORS_FACADE.md`.
+The broader taxonomy remains staged here for future extensions.
 
-This phase does not create:
-
-- `src/langgraph_automation/api/errors.py`
-- `FrameworkError`
-- `ConfigError`
-- `PluginRegistrationError`
-- `PluginValidationError`
-- `RuntimeAssemblyError`
-
-Future public candidates may include:
+Implemented public facade:
 
 - `FrameworkError`
 - `ConfigError`
@@ -572,12 +564,15 @@ Future public candidates may include:
 - `RuntimeAssemblyError`
 - `SafetyBoundaryError`
 
-Potentially internal or staged candidates:
+Deferred or internal candidates:
 
-- `ProviderExecutionError`
+- `ExecutionError`
+- `ToolPolicyError`
 - `ToolExecutionError`
+- `ToolOutputSafetyError`
+- `ProviderExecutionError`
 - `StoreError`
 - `EventSinkError`
 - `InternalInvariantError`
 
-`docs/ERROR_TAXONOMY.md` is the source of truth for the future `api.errors` staging policy.
+`ErrorCode` enum / `ErrorCategory` enum are not implemented in this phase.

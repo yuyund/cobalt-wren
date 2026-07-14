@@ -6,4 +6,5 @@ Prefer importing from grouped submodules:
 - langgraph_automation.api.tools
 - langgraph_automation.api.stores
 - langgraph_automation.api.events
+- langgraph_automation.api.errors
 """

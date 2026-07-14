@@ -167,10 +167,21 @@ Guidance:
 
 ## Errors API surface
 
-Error taxonomy is not being implemented in this phase.
-`api.errors` remains a future facade, and error taxonomy is documented in `docs/ERROR_TAXONOMY.md`.
-`api.errors` minimal facade design is defined in `docs/API_ERRORS_FACADE.md`.
-`api.errors` remains unimplemented in this phase.
+Implemented:
+
+- `langgraph_automation.api.errors`
+
+Exports:
+
+- `FrameworkError`
+- `ConfigError`
+- `PluginRegistrationError`
+- `PluginResolutionError`
+- `PluginValidationError`
+- `RuntimeAssemblyError`
+- `SafetyBoundaryError`
+
+The full error taxonomy remains documented in `docs/ERROR_TAXONOMY.md`, and the staging policy remains in `docs/API_ERRORS_FACADE.md`.
 
 Future public candidates may include:
 
@@ -188,7 +199,7 @@ Current guidance:
 - A future public facade may map graph vocabulary to workflow vocabulary.
 - No error classes are exported yet.
 - The minimal public error facade is intentionally smaller than the full taxonomy.
-- `FrameworkError`, `ConfigError`, `PluginRegistrationError`, `PluginResolutionError`, `PluginValidationError`, `RuntimeAssemblyError`, and `SafetyBoundaryError` are the current minimal candidates.
+- `FrameworkError`, `ConfigError`, `PluginRegistrationError`, `PluginResolutionError`, `PluginValidationError`, `RuntimeAssemblyError`, and `SafetyBoundaryError` were the minimal candidates and are now implemented.
 
 ## Implemented public facade in P0-B
 

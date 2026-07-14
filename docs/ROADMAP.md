@@ -99,12 +99,17 @@ Current:
 - 状態: 完了
 
 - api.errors minimal facade design docs
-- 状態: 実装中または完了確認中
+- 状態: 完了
+
+- api.errors minimal facade implementation
+- 状態: 完了
+
+Current:
+
+- Package P3-E Minimal api.plugins facade implementation
 
 Next:
 
-- api.errors minimal facade implementation
-- then Package P3-E Minimal api.plugins facade implementation
 - then Package P1-C Config loader / normalizer MVP
 
 ## 6. Recommended Execution Order

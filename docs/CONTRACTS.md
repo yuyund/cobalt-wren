@@ -101,6 +101,12 @@ These contracts describe the current internal foundation surface. If parts of th
 
 ## api.errors Facade Contract
 
+- `str(error)` is `safe_message`
+- `to_safe_dict()` excludes `cause`, traceback, and `diagnostic_message`
+- `metadata` must be redacted and bounded
+- subclass category is fixed
+- `code` and `category` remain strings in MVP
+- `ErrorCode` and `ErrorCategory` enums are not implemented
 - the public error surface starts minimal
 - fine-grained reasons are represented by category / code rather than subclass explosion
 - `safe_message` is the only user-facing message
