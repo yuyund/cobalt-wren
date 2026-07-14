@@ -62,15 +62,20 @@ The repository should remain ready for application workflows, but application fe
 Foundation Roadmap:
 
 - C5 Workflow registry composition boundary
-- 状態: 実装中または完了確認中
+- 状態: 完了
+
+Foundation D0:
+
+- Stabilization checkpoint
+- 状態: 完了
 
 Next:
 
-- D0 Stabilization checkpoint
+- Package P0-A Public / internal API surface design docs
 
 After that:
 
-- Package P0 Public / internal API surface design
+- Package P0-B Minimal public facade design / implementation candidate
 
 ## 6. Recommended Execution Order
 

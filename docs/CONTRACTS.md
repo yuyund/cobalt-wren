@@ -2,6 +2,8 @@
 
 This document fixes the boundaries between execution foundation, workflows, and services.
 
+These contracts describe the current internal foundation surface. If parts of this surface become public later, they should do so through a facade, alias, or protocol rather than by exposing internal modules directly.
+
 ## Node Contract
 
 - node は state patch dict を返す
@@ -44,6 +46,8 @@ This document fixes the boundaries between execution foundation, workflows, and 
 - secret や raw input を入れない
 - API key / base URL / provider raw object を入れない
 - workflow config を runtime 用の安全な最小面へ変換する
+
+`GraphRuntime` is currently a public candidate but still provisional. `GraphDefinition` is also internal foundation vocabulary for now; a future public facade may expose `WorkflowDefinition` as an alias or wrapper.
 
 ## Tool Contract
 

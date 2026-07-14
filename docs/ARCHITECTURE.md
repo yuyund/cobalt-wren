@@ -88,3 +88,10 @@ Concrete workflow definitions live in workflow packages and are composed through
 Reference workflows exist to verify wiring and safety.
 
 Application workflows are future layers and should not be pulled into `graphs`.
+
+## Public API Direction
+
+- A future public facade is expected under `langgraph_automation.api.*`.
+- Plugin authors should not depend on internal modules directly.
+- `workflows/catalog.py` is package composition internal / semi-internal, not a public entry point.
+- Internal graph vocabulary may remain in foundation code, but public-facing vocabulary should move toward workflow terms.
