@@ -1,200 +1,42 @@
-# langgraph-automation
+# LangGraph Automation
 
-`langgraph-automation` is a Django control plane with a LangGraph execution plane for automation.
+This repository contains a Django-based control plane around LangGraph execution. The app is organized to keep workflow selection, runtime assembly, and node execution loosely coupled.
 
-## Project Overview
+Detailed design documents live under `docs/`:
 
-The project is centered on LangGraph-based automation execution.
+- `docs/CODEX_WORKFLOW.md`
+- `docs/ROADMAP.md`
+- `docs/ARCHITECTURE.md`
+- `docs/CONTRACTS.md`
+- `docs/adr/`
 
-Django is responsible for:
+## Architecture Overview
 
-- DB schema
-- migrations
-- admin
-- CRUD
-- dynamic Web UI
-- auth / session / CSRF
-- Run / Workflow / Event / Span / Artifact / Checkpoint metadata
-- policy / service / selector boundaries
+- `apps/automation/services` owns lifecycle and configuration validation.
+- `graphs` owns execution foundation code: graph selection mechanics, registry mechanics, runner, runtime helpers, and graph-local state contracts.
+- `integrations` owns concrete adapters for LLMs, tools, artifact stores, checkpoint stores, and observability.
+- `workflows` owns concrete workflow composition and reference/application workflow boundaries.
+- `core` owns safety and summary helpers used across layers.
+- `ui` owns presentation-only views and templates.
 
-LangGraph is responsible for:
+## Runtime Config Boundary
 
-- graph state
-- nodes
-- routing
-- builder
-- runner
-- runtime context
-- LLM / tool / artifact / checkpoint execution
-
-Django Model is the center of the control plane, not the center of the LangGraph execution plane.
-
-## Current Source of Truth Models
-
-- `Workflow`
-- `Run`
-- `RunEvent`
-- `ExecutionSpan`
-- `Artifact`
-- `CheckpointMetadata`
-
-## Architecture
-
-### Django control plane
-
-- DB schema
-- migrations
-- admin
-- CRUD
-- dynamic Web UI
-- auth / session / CSRF
-- Run lifecycle orchestration
-- metadata persistence
-- policy / service / selector layers
-
-### LangGraph execution plane
-
-- graph state
-- nodes
-- routing
-- builder
-- runner
-- runtime context
-- LLM / tool / artifact / checkpoint execution
-
-### Integrations
-
-- LLM
-- tools
-- artifact store
-- checkpoint store
-- observability
-
-### Preferred dependency direction
-
-- `apps/web/views` -> `apps/automation/ui` -> `apps/automation/selectors` -> `apps/automation/policies` -> `apps/automation/services`
-- `apps/automation/services` -> `apps/automation/models` -> `apps/automation/policies` -> `apps/automation/services/runtime.py` -> `graphs/runner` -> `integrations`
-- `graphs/runner` / `graphs/nodes` -> `graphs/runtime` -> `integrations` interfaces
-- `integrations` -> external libraries / backend implementations
-
-## Source of Truth
-
-- `Run`: execution unit truth
-- `Workflow`: automation definition truth
-- `RunEvent`: append-only timeline / audit log truth
-- `ExecutionSpan`: execution step summary / trace tree truth
-- `Artifact`: artifact metadata truth
-- `ArtifactStore`: artifact body truth
-- `CheckpointMetadata`: checkpoint metadata / index / safe summary truth
-- `CheckpointStore`: checkpoint body truth
-- `Policy`: action eligibility truth
-- `Service`: run lifecycle update truth
-- `GraphRunner`: LangGraph execution entrypoint
-- `GraphRuntime`: dependency bundle for the execution plane
-- `EventSink`: observability write boundary
-- `SpanRef`: opaque span handle passed through the execution plane
-- `UI Registry`: Web UI allowlist
-- `PageSpec`: UI presentation derivative
-
-## Rules
-
-- Django models stay in the control plane.
-- Graph execution logic stays out of Django models.
-- Graph nodes must not query the Django ORM directly.
-- `graphs/runner.py` must not update `Run.status` directly.
-- Web views must not call LLMs, tools, or checkpoint backends directly.
-- Dynamic UI should be driven by registry and page-spec objects, not by model introspection in templates.
-- `PageSpec` is derived data and must not be stored in the database.
-- `CheckpointMetadata` must never store checkpoint bodies.
-- `Artifact.storage_key` must be an opaque relative key, not a raw filesystem path.
-- `Artifact` must not expose real file paths directly.
-- `ExecutionSpan` is summary data only; do not store full prompts, full responses, or raw checkpoint bodies there.
-
-## Observability
-
-- `RunEvent` is the timeline / audit log.
-- `ExecutionSpan` is the execution step summary / trace tree.
-- `EventSink` is the observability write boundary.
-- `span_started` / `span_completed` / `span_failed` are the primary EventSink APIs.
-- `node_*` / `llm_*` / `tool_*` are thin convenience methods that must not split the write path.
-- `semantic_event` is the node-level semantic event entrypoint.
-- Semantic events use the `semantic.<name>` event type prefix.
-
-Current EventSink failure policy:
-
-- `span_started` failure is not suppressed.
-- `span_completed` failure after successful primary execution is not suppressed yet.
-- `span_failed` failure after a primary exception is suppressed and logged so the primary failure is preserved.
-- `span_failed` failure after a failed `ToolResult` is suppressed and logged so the failed `ToolResult` is preserved.
-- graph failure handling suppresses observability failures so `ExecutionResult(status='failed')` is preserved.
-
-Future TODO:
-
-- ResilientEventSink
-- fallback sink
-- async observability
-- DB retry / outbox
-- worker-safe observability
-
-## Checkpoints
-
-- `CheckpointStore` stores checkpoint bodies.
-- `CheckpointMetadata` stores checkpoint metadata, index, and a bounded safe summary.
-- `state_summary` must be redacted and bounded.
-- `state_summary` must not contain the full checkpoint state.
-
-## Summary / Redaction
-
-- `core/redaction.py` is the source of truth for secret, path, and nested payload redaction.
-- `core/summary.py` is the source of truth for bounded summaries, previews, and hashes.
-- UI, checkpoint, observability, and future integration wrappers must reuse the core helpers.
-- Raw prompts, raw responses, raw stdout, raw stderr, raw graph state, and raw filesystem paths must not be stored directly in the database.
-
-## Run Result Safety and Resume Semantics
-
-- `Run.output_payload` stores a bounded, redacted summary only.
-- `Run.error_message` stores a bounded, redacted error summary only.
-- `services/runs.py` is the final write-time safety boundary for `Run` persistence.
-- `ExecutionResult` is an execution candidate returned by the runner; services normalize it before persisting to `Run`.
-- `retry_run` means re-execution from the current run input, not checkpoint continuation.
-- `resume_run` and `resume_graph_once` are unsupported until true checkpoint resume semantics exist.
-- The current UI should not present checkpoint resume as a working flow.
-
-## Runtime Composition
-
-`apps/automation/services/runtime.py` is the dependency assembly boundary for the execution plane.
-
-It composes concrete dependencies only:
-
-- `build_event_sink()` -> `DjangoEventSink`
-- `build_llm_client()` -> `LiteLLMClient -> ObservedLLMClient` when enabled, otherwise `None`
-- `build_tool_registry()` -> `InMemoryToolRegistry -> PolicyAwareToolRegistry -> ObservedToolRegistry`
-- `build_artifact_store()` -> `MemoryArtifactStore`
-- `build_checkpoint_store()` -> `MemoryCheckpointStore`
-
-`build_tool_registry()` currently registers a single safe toy tool:
-
-- `echo` -> safe bounded preview echo tool
-
-It must not:
-
-- execute graphs
-- update `Run` lifecycle state
-- contain workflow business logic
-- call LLMs or tools directly
-
-Future wrapper order:
-
-- LLM: `ConcreteLLMClient -> ObservedLLMClient`
-- Tool: `ConcreteToolRegistry -> PolicyAwareToolRegistry -> ObservedToolRegistry`
-- Artifact: `ConcreteArtifactStore -> ObservedArtifactStore?` future
-- Checkpoint: `ConcreteCheckpointStore -> ObservedCheckpointStore?` future
+- `WorkflowRuntimeConfig` is the normalized representation of `Workflow.definition_payload` in the application service layer.
+- `GraphRuntimeConfig` is the execution-plane config consumed by `GraphRuntime` and lives in `graphs/config.py`.
+- `apps/automation/services/runtime.py` maps `WorkflowRuntimeConfig -> GraphRuntimeConfig` in one place during runtime assembly.
+- `graphs/runtime.py` consumes `GraphRuntimeConfig` only and does not import `apps/automation/services/workflow_config.py`.
+- `workflow_config.py` stays focused on parse, normalization, and validation of workflow definition payloads.
 
 ## Configuration Boundary
 
 - `settings` / environment variables hold secrets and deployment-level config.
 - `Workflow.definition_payload` holds workflow-level config such as model choice, allowed tools, and graph behavior.
-- `Workflow.definition_payload.graph.kind` selects the workflow graph. The current supported value is `llm_echo_summary`.
+- `Workflow.definition_payload.graph.kind` selects the workflow graph. The current default and supported value is `llm_echo_summary`.
+- Missing or empty `graph.kind` defaults to `llm_echo_summary` and is reported as a validation warning.
+- Unknown `graph.kind` is a validation error.
+- `llm_echo_summary` carries dependency metadata: `requires_llm = true` and `required_tools = ["echo"]`.
+- `llm_echo_summary` requires `llm.enabled = true` and a non-empty `llm.model`.
+- `llm_echo_summary` with `tools.allowed` missing `echo` is currently a validation warning so the policy-deny path remains observable.
 - `Workflow.definition_payload.llm` is the minimal LLM schema.
 - `Workflow.definition_payload.tools.allowed` is the minimal tool allowlist schema.
 - Missing or empty `tools.allowed` means deny all.
@@ -205,8 +47,9 @@ Future wrapper order:
 - `Run.output_payload` holds safe summary only.
 - `RunEvent.payload`, `ExecutionSpan.metadata`, `ExecutionSpan.input_summary`, and `ExecutionSpan.output_summary` must not store secrets or raw provider payloads.
 - runtime factory reads settings, `Workflow`, and `Run` context to assemble dependencies.
+- execution-plane config is graph-local and must not carry API keys, base URLs, or raw `Run.input_payload`.
 
-Workflow minimal config:
+Reference diagnostic workflow minimal config:
 
 ```json
 {
@@ -235,41 +78,56 @@ Secret policy:
 - secrets must not be stored in `ExecutionSpan.input_summary`
 - secrets must not be stored in `ExecutionSpan.output_summary`
 
-## Minimal LLM Workflow
+## Graph Registry
 
+- `graphs/registry.py` is the foundation registry mechanism.
+- `GraphRegistry` stores `GraphDefinition` entries and dependency metadata.
+- `DEFAULT_GRAPH_KIND` is `llm_echo_summary`.
+- `workflows/catalog.py` composes the built-in workflow catalog and returns a registry instance.
+- `supported_graph_kinds()` and `graph_requirements()` come from the composed registry instance.
+- `build_graph()` does registry lookup only; it does not import concrete workflows or branch on `graph.kind` inline.
+
+## Workflow Catalog
+
+- `workflows/catalog.py` is the composition boundary for built-in workflow definitions.
+- It collects reference workflows and will be the registration point for future application workflows.
+- `graphs/registry.py` stays free of concrete workflow imports.
+
+## Reference Diagnostic Workflow
+
+- current implementation: `src/langgraph_automation/workflows/reference/llm_echo_summary/`
 - default graph: `llm_echo_summary`
+- positioning: reference / diagnostic / smoke-test workflow for runtime wiring
 - input schema: `{"text": "..."}` or `{"prompt": "..."}`
-- execution flow: `Run.input_payload` -> EchoTool node -> LLM summary node -> final output candidate -> `services/runs.py` -> `safe_run_output_payload()` -> `Run.output_payload`
+- execution flow: `Run.input_payload` -> EchoTool node -> LLM summary node -> output candidate -> `services/runs.py` -> `safe_run_output_payload()` -> `Run.output_payload`
 - `GraphRuntime.require_llm_client()` and `GraphRuntime.require_tool_registry()` are the only dependency access points inside nodes.
 - nodes do not import Django ORM models, provider adapters, or concrete tool classes.
 - `ObservedLLMClient` records LLM spans and `ObservedToolRegistry` records tool spans.
 - full prompt, full response, and raw tool output are not persisted.
 - `LLMResult.raw` is not persisted.
 
-## Artifact Store Semantics
+## Execution Input Boundary
 
-- `MemoryArtifactStore` is the current in-memory artifact store used by the runtime factory.
-- It stores normalized artifact metadata in process memory only.
-- It does not persist artifact bodies.
-- `ARTIFACT_ROOT` is reserved for a future filesystem-backed `LocalFileArtifactStore`.
-- `LocalFileArtifactStore` is not implemented yet.
-- `S3ArtifactStore` is not implemented yet.
+- `Run.input_payload` is the user input source of truth.
+- `GraphRuntime.execution_input` is transient execution input for nodes.
+- graph state is checkpoint-safe and must not copy raw `Run.input_payload` wholesale.
+- nodes should read input through `GraphRuntime.require_execution_input()`.
+- graph state may retain `input_summary` and other bounded safe metadata.
+- raw prompt, raw response, raw tool output, and secrets must stay out of checkpointable state.
 
-## Dynamic UI
+## Failure Masking
 
-- `UI Registry` is the allowlist of public models, fields, actions, and related sections.
-- `PageSpec` is the derived render model for generic templates.
-- `TableSpec` and `RelatedSectionSpec` carry related data for list/detail rendering.
-- Templates do not introspect Django model `_meta` directly.
-- `apps/web` should stay thin and render `PageSpec` objects.
+- service-layer `run_failed()` observability calls are best-effort only.
+- if `run_failed()` fails while handling a primary execution failure, the primary failure is preserved.
+- observability failures in failure paths are suppressed and logged as warnings through the shared failure policy helper.
 
 ## Current Graph
 
-- The production graph is the minimal `llm_echo_summary` LangGraph flow.
-- `graphs/builders.py` builds and compiles the graph.
+- The reference diagnostic graph is the minimal `llm_echo_summary` LangGraph flow.
+- `graphs/builders.py` builds and compiles the graph from the registry.
 - `graphs/runner.py` invokes the compiled graph.
 - `graphs/instrumentation.py` manages node span lifecycle.
-- `graphs/nodes` contains execution logic only; nodes do not emit lifecycle events directly.
+- workflow-specific nodes live in `workflows/reference/llm_echo_summary`; foundation helpers in `graphs/nodes` do not own concrete workflow logic.
 
 ## Runtime Dependency Policy
 
@@ -338,58 +196,21 @@ Future TODO:
 - add shell/file/network policy types
 - add filesystem path policy
 - add network domain policy
-- add more safe toy tools
-- connect additional concrete tool registries later
 
-## Dependencies
+## Boundary Contracts
 
-Core runtime:
+- LangGraph nodes return state patch dicts.
+- Graph state is checkpoint-safe and only carries summaries, metadata, and bounded execution markers.
+- The runner returns an output candidate to the service layer.
+- The service layer normalizes that candidate with `safe_run_output_payload()` before persisting `Run.output_payload`.
+- `Run.output_payload` is the safe summary intended for UI/API display.
+- Graph state, output candidates, and `Run.output_payload` must not contain raw `input_payload`, full prompts/messages, full raw LLM responses, `LLMResult.raw`, raw `ToolResult.output`, provider raw objects, `api_key`, tokens, authorization headers, passwords, absolute local file paths, or full tracebacks.
 
-- Django
-- LangGraph
+## Boundary Plan
 
-Runtime integrations:
-
-- psycopg
-- django-environ
-
-Development:
-
-- pytest
-- pytest-django
-- ruff
-- mypy
-
-Not used in the current design:
-
-- FastAPI
-- Uvicorn
-- SQLAlchemy
-- Alembic
-- Celery
-- Redis
-- OpenTelemetry
-- Prometheus
-- Streamlit
-- Gradio
-- Chainlit
-
-## Repository Layout
-
-```text
-langgraph-automation/
-|-- README.md
-|-- manage.py
-|-- pyproject.toml
-|-- src/
-|   \-- langgraph_automation/
-|       |-- config/
-|       |-- core/
-|       |-- apps/
-|       |   |-- automation/
-|       |   \-- web/
-|       |-- graphs/
-|       |-- integrations/
-|       \-- entrypoints/
-\-- tests/
-```
+- `graphs/` is the execution foundation layer.
+- `graphs/registry.py` is the registry mechanism only.
+- `workflows/catalog.py` composes built-in workflow definitions.
+- `llm_echo_summary` is a reference diagnostic workflow used to verify wiring.
+- planner / reviewer / executor workflows are future application workflows and should live outside the foundation package.
+- `workflows/reference/` and `workflows/applications/` are the future split points for concrete workflow code.
