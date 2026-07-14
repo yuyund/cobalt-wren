@@ -80,6 +80,15 @@ These contracts describe the current internal foundation surface. If parts of th
 - raw input / raw response / raw output を保存しない
 - true resume は別途 contract が固まるまで未実装
 
+## P0-B Public Facade Contract
+
+- `langgraph_automation.api.llm`
+- `langgraph_automation.api.tools`
+- `langgraph_automation.api.stores`
+- `langgraph_automation.api.events`
+
+These modules re-export selected foundation interfaces. They do not expose workflow definition, runtime concrete implementation, plugin loader, config loader, or public error taxonomy yet.
+
 ## OutputCandidate / NodeResult
 
 現時点の判断:

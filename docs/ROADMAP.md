@@ -72,10 +72,12 @@ Foundation D0:
 Next:
 
 - Package P0-A Public / internal API surface design docs
+- Package P0-B minimal public facade module
+- 状態: 完了
 
 After that:
 
-- Package P0-B Minimal public facade design / implementation candidate
+- P0-B facade 範囲レビュー
 
 ## 6. Recommended Execution Order
 

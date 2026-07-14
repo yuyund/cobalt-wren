@@ -34,7 +34,7 @@ The following layout is a candidate for later phases.
 - `langgraph_automation.api.events`
 - `langgraph_automation.api.errors`
 
-Package P0-A is docs only. Minimal facade or re-export modules may be considered in Package P0-B.
+Package P0-B implements the minimal facade described below.
 
 ## Workflow API surface
 
@@ -67,7 +67,7 @@ Current candidates:
 
 Guidance:
 
-- `GraphRuntime` is a provisional candidate, not a frozen public contract.
+- `GraphRuntime` is not yet exposed through the public facade and remains provisional.
 - A future `WorkflowRuntime` protocol or facade may replace direct reliance on the concrete class.
 - `GraphExecutionInput` is the transient raw input boundary and may later be renamed toward `WorkflowExecutionInput`.
 - `GraphRuntimeConfig` is graph-local runtime configuration and must never carry secrets or raw input.
@@ -179,6 +179,25 @@ Current guidance:
 - Do not rename internal graph error classes now.
 - `UnknownGraphKindError` remains the internal graph vocabulary for this phase.
 - A future public facade may map graph vocabulary to workflow vocabulary.
+
+## Implemented public facade in P0-B
+
+- `langgraph_automation.api.llm`
+- `langgraph_automation.api.tools`
+- `langgraph_automation.api.stores`
+- `langgraph_automation.api.events`
+
+These modules re-export selected stable interfaces only. They do not expose workflow definition, runtime concrete implementation, plugin loader, config loader, or public error taxonomy.
+
+## Deferred public surfaces
+
+- `langgraph_automation.api.workflow`
+- `langgraph_automation.api.runtime`
+- `langgraph_automation.api.errors`
+- `WorkflowPlugin`
+- `ToolPlugin`
+- plugin loader
+- config loader
 
 ## Internal-only modules
 

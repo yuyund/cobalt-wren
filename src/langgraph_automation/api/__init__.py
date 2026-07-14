@@ -1,0 +1,9 @@
+"""Public API facade for langgraph-automation.
+
+Prefer importing from grouped submodules:
+
+- langgraph_automation.api.llm
+- langgraph_automation.api.tools
+- langgraph_automation.api.stores
+- langgraph_automation.api.events
+"""

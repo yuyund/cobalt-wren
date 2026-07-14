@@ -3,7 +3,10 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Protocol, runtime_checkable
+from typing import Any, Protocol, TypeAlias, runtime_checkable
+
+
+LLMRequest: TypeAlias = list[dict[str, Any]]
 
 
 @dataclass(slots=True, frozen=True)
@@ -21,4 +24,4 @@ class LLMResult:
 
 @runtime_checkable
 class LLMClient(Protocol):
-    def complete(self, messages: list[dict[str, Any]], **kwargs: Any) -> LLMResult: ...
+    def complete(self, messages: LLMRequest, **kwargs: Any) -> LLMResult: ...
