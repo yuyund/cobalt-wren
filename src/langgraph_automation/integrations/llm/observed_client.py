@@ -8,7 +8,7 @@ from typing import Any
 
 from langgraph_automation.core.redaction import redact_text
 from langgraph_automation.core.summary import preview_text, summarize_messages
-from langgraph_automation.integrations.llm.base import LLMClient, LLMResult
+from langgraph_automation.integrations.llm.base import LLMClient, LLMRequest, LLMResult
 from langgraph_automation.integrations.observability.base import EventSink
 from langgraph_automation.integrations.observability.events import SPAN_LLM
 from langgraph_automation.integrations.observability.failure_policy import suppress_observability_failure
@@ -52,7 +52,7 @@ class ObservedLLMClient:
     event_sink: EventSink | None
     observability: ObservabilityContext
 
-    def complete(self, messages: list[dict[str, Any]], **kwargs: Any) -> LLMResult:
+    def complete(self, messages: LLMRequest, **kwargs: Any) -> LLMResult:
         input_summary = summarize_messages(messages)
         start_metadata = {
             'provider': getattr(self.inner, 'provider', '') or 'unknown',

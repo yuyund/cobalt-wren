@@ -7,7 +7,7 @@ from typing import Any
 
 import litellm
 
-from langgraph_automation.integrations.llm.base import LLMResult
+from langgraph_automation.integrations.llm.base import LLMRequest, LLMResult
 
 
 class LiteLLMClient:
@@ -48,7 +48,7 @@ class LiteLLMClient:
             return payload.get(name, default)
         return getattr(payload, name, default)
 
-    def complete(self, messages: list[dict[str, Any]], **kwargs: Any) -> LLMResult:
+    def complete(self, messages: LLMRequest, **kwargs: Any) -> LLMResult:
         completion_kwargs = self._completion_kwargs()
         completion_kwargs['messages'] = messages
         completion_kwargs.update(kwargs)

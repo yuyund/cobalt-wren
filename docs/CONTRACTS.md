@@ -87,7 +87,7 @@ These contracts describe the current internal foundation surface. If parts of th
 - `langgraph_automation.api.stores`
 - `langgraph_automation.api.events`
 
-These modules re-export selected foundation interfaces. They do not expose workflow definition, runtime concrete implementation, plugin loader, config loader, or public error taxonomy yet.
+These modules re-export selected foundation interfaces. They do not expose workflow definition, runtime concrete implementation, plugin loader, config loader, or public error taxonomy yet. `LLMRequest` is a provisional loose alias for request shape, not a provider-specific contract.
 
 ## OutputCandidate / NodeResult
 

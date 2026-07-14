@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from collections.abc import Mapping, Sequence
 from typing import Any, Protocol, TypeAlias, runtime_checkable
 
 
-LLMRequest: TypeAlias = list[dict[str, Any]]
+LLMRequest: TypeAlias = Sequence[Mapping[str, Any]]
 
 
 @dataclass(slots=True, frozen=True)

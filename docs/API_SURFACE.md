@@ -106,11 +106,14 @@ Current candidates:
 - `LLMRequest`
 - `LLMResult`
 
+`LLMRequest` is intentionally a loose, provisional request-shape alias. It should not be narrowed to a provider-specific message schema.
+
 Internal-only handling:
 
 - concrete `LiteLLMClient`
 - provider-specific raw payload handling
 - settings / env secret resolution
+- request-shape narrowing to a single provider format
 
 Guidance:
 
