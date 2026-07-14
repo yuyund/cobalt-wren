@@ -168,6 +168,7 @@ Guidance:
 ## Errors API surface
 
 Error taxonomy is not being implemented in this phase.
+`api.errors` remains a future facade, and error taxonomy is documented in `docs/ERROR_TAXONOMY.md`.
 
 Future public candidates may include:
 
@@ -183,6 +184,7 @@ Current guidance:
 - Do not rename internal graph error classes now.
 - `UnknownGraphKindError` remains the internal graph vocabulary for this phase.
 - A future public facade may map graph vocabulary to workflow vocabulary.
+- No error classes are exported yet.
 
 ## Implemented public facade in P0-B
 

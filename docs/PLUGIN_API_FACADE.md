@@ -181,6 +181,7 @@ Future direction:
 ## Why api.errors is deferred
 
 `api.errors` is deferred.
+Error taxonomy and future error facade candidates are defined in `docs/ERROR_TAXONOMY.md`.
 
 Reasons:
 

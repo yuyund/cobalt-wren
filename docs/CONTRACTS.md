@@ -90,6 +90,15 @@ These contracts describe the current internal foundation surface. If parts of th
 - `GraphRuntime` and `GraphDefinition` remain outside the public facade
 - PluginRegistry, ConfigValidator, and RuntimeAssembly are not public facade types in P3-D
 
+## Error Taxonomy Contract
+
+- `Run.error_message` stores safe message only
+- `diagnostic_message` is internal and must be redacted and bounded
+- secondary failure must not replace primary failure
+- plugin hook exceptions are wrapped into framework error categories
+- `EventSinkError` does not override primary failure
+- `SafetyBoundaryError` never includes unsafe values themselves
+
 ## GraphRuntimeConfig Contract
 
 - execution-plane config は graph-local

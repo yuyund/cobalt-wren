@@ -93,11 +93,13 @@ Current:
 - 状態: 完了
 
 - Package P3-D Plugin API facade design docs
+- 状態: 完了
+
+- Error taxonomy design docs
 - 状態: 実装中または完了確認中
 
 Next:
 
-- Package Error taxonomy design docs
 - then Package P3-E Minimal api.plugins facade implementation
 - then Package P1-C Config loader / normalizer MVP
 

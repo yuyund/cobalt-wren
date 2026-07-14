@@ -370,6 +370,8 @@ Plugin-specific validation must stay out of the core schema.
 The plugin-specific validation rules for workflow, tool, provider, store, worker, and UI config are defined in `docs/PLUGINS.md`.
 Plugin-specific validation hooks are defined conceptually in `docs/PLUGIN_API_SHAPE.md`.
 Config validation invokes those hooks after raw schema, security, and semantic validation.
+Configuration and plugin-specific validation failures are categorized in `docs/ERROR_TAXONOMY.md`.
+Config validation errors must not expose raw config, secret-like literals, env var values, or full tracebacks.
 
 ## Normalized config flow
 

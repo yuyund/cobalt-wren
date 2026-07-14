@@ -126,6 +126,7 @@ Application workflows are future layers and should not be pulled into `graphs`.
 - manual registration, enabled plugins, and registry conflict policy are defined in `docs/PLUGIN_REGISTRATION.md`.
 - validation hooks and factory hooks are defined in `docs/PLUGIN_API_SHAPE.md`.
 - plugin API facade staging is defined in `docs/PLUGIN_API_FACADE.md`.
+- error categories and primary failure preservation are defined in `docs/ERROR_TAXONOMY.md`.
 - ConfigValidator calls contribution validation hooks.
 - RuntimeAssembly calls contribution factory hooks.
 - GraphRuntime and GraphDefinition remain outside the public facade.
@@ -136,3 +137,5 @@ Application workflows are future layers and should not be pulled into `graphs`.
 - Plugin authors should not depend on internal modules directly.
 - `workflows/catalog.py` is package composition internal / semi-internal, not a public entry point.
 - Internal graph vocabulary may remain in foundation code, but public-facing vocabulary should move toward workflow terms.
+- ConfigValidator, PluginRegistry, RuntimeAssembly, GraphRuntime, and EventSink have separate error boundaries.
+- primary failure preservation is a framework-wide invariant.
