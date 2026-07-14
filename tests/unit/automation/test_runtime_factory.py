@@ -19,6 +19,7 @@ from langgraph_automation.apps.automation.services.runtime import (
 from langgraph_automation.apps.automation.services.workflow_config import MINIMAL_GRAPH_KIND
 from langgraph_automation.config import settings as app_settings
 from langgraph_automation.core.errors import MissingRuntimeDependencyError
+from langgraph_automation.graphs.config import GraphRuntimeConfig
 from langgraph_automation.graphs.runtime import GraphRuntime
 from langgraph_automation.integrations.artifact.memory_store import MemoryArtifactStore
 from langgraph_automation.integrations.checkpoint.memory_store import MemoryCheckpointStore
@@ -30,21 +31,33 @@ from tests.support.recording_event_sink import RecordingEventSink
 
 @pytest.mark.django_db
 def test_build_graph_runtime_returns_execution_bundle() -> None:
-    workflow = Workflow.objects.create(name='wf-runtime', definition_payload={'tools': {'allowed': ['echo']}})
+    workflow = Workflow.objects.create(
+        name='wf-runtime',
+        definition_payload={
+            'llm': {'enabled': True, 'model': 'test-model'},
+            'tools': {'allowed': ['echo']},
+        },
+    )
     run = Run.objects.create(workflow=workflow, name='run-runtime')
 
     runtime = build_graph_runtime(run)
 
     assert runtime.event_sink is not None
-    assert runtime.llm_client is None
+    assert runtime.llm_client is not None
     assert runtime.tool_registry is not None
+    assert runtime.graph_registry is not None
+    assert runtime.graph_registry.supported_graph_kinds() == (MINIMAL_GRAPH_KIND,)
     assert isinstance(runtime.artifact_store, MemoryArtifactStore)
     assert isinstance(runtime.checkpoint_store, MemoryCheckpointStore)
+    assert isinstance(runtime.workflow_config, GraphRuntimeConfig)
     assert runtime.workflow_config.graph.kind == MINIMAL_GRAPH_KIND
+    assert runtime.workflow_config.llm.enabled is True
+    assert runtime.workflow_config.llm.model == 'test-model'
+    assert runtime.workflow_config.tools.allowed_tools == ('echo',)
     assert runtime.observability.run_id == run.pk
     assert runtime.observability.thread_id == ''
     assert runtime.require_tool_registry() is runtime.tool_registry
-    assert build_llm_client(run, runtime.event_sink) is None
+    assert build_llm_client(run, runtime.event_sink) is not None
     assert build_tool_registry(run, runtime.event_sink) is not None
     assert isinstance(build_artifact_store(run, runtime.event_sink), MemoryArtifactStore)
     assert isinstance(build_checkpoint_store(run, runtime.event_sink), MemoryCheckpointStore)
@@ -64,6 +77,43 @@ def test_build_graph_runtime_rejects_unknown_graph_kind() -> None:
 
     with pytest.raises(WorkflowConfigurationError, match='Unsupported graph kind'):
         build_graph_runtime(run)
+
+
+@pytest.mark.django_db
+def test_build_graph_runtime_rejects_disabled_llm_for_minimal_graph() -> None:
+    workflow = Workflow.objects.create(
+        name='wf-runtime-llm-disabled',
+        definition_payload={
+            'llm': {'enabled': False},
+            'tools': {'allowed': ['echo']},
+        },
+    )
+    run = Run.objects.create(workflow=workflow, name='run-runtime-llm-disabled')
+
+    with pytest.raises(WorkflowConfigurationError, match='requires llm.enabled=true'):
+        build_graph_runtime(run)
+
+
+@pytest.mark.django_db
+def test_build_graph_runtime_warns_when_echo_is_missing_but_still_assembles() -> None:
+    workflow = Workflow.objects.create(
+        name='wf-runtime-echo-missing',
+        definition_payload={
+            'llm': {'enabled': True, 'model': 'test-model'},
+            'tools': {'allowed': []},
+        },
+    )
+    run = Run.objects.create(workflow=workflow, name='run-runtime-echo-missing', thread_id='thread-1')
+
+    runtime = build_graph_runtime(run)
+
+    assert runtime.llm_client is not None
+    assert runtime.tool_registry is not None
+    assert runtime.graph_registry is not None
+    assert runtime.graph_registry.supported_graph_kinds() == (MINIMAL_GRAPH_KIND,)
+    result = runtime.tool_registry.run('echo', text='hello')
+    assert result.exit_code == POLICY_DENIED_EXIT_CODE
+    assert result.metadata['policy_denied'] is True
 
 
 @pytest.mark.django_db
@@ -132,6 +182,7 @@ def test_build_llm_client_builds_observed_lite_llm_client_when_enabled(monkeypat
                 'temperature': 0.25,
                 'max_tokens': 256,
             },
+            'tools': {'allowed': ['echo']},
         },
     )
     run = Run.objects.create(
@@ -161,6 +212,17 @@ def test_build_llm_client_builds_observed_lite_llm_client_when_enabled(monkeypat
     assert isinstance(runtime.llm_client.inner, LiteLLMClient)
     assert runtime.llm_client.inner.model == 'gpt-4o-mini'
     assert runtime.tool_registry is not None
+    assert runtime.graph_registry is not None
+    assert runtime.graph_registry.supported_graph_kinds() == (MINIMAL_GRAPH_KIND,)
+    assert isinstance(runtime.workflow_config, GraphRuntimeConfig)
+    assert runtime.workflow_config.graph.kind == MINIMAL_GRAPH_KIND
+    assert runtime.workflow_config.llm.model == 'gpt-4o-mini'
+    assert runtime.workflow_config.llm.enabled is True
+    assert runtime.workflow_config.tools.allowed_tools == ('echo',)
+    assert not hasattr(runtime.workflow_config.llm, 'api_key')
+    assert not hasattr(runtime.workflow_config.llm, 'base_url')
+    assert runtime.workflow_config.llm.model != 'ignored-model'
+    assert runtime.workflow_config.tools.allowed_tools != ('ignored-secret',)
 
 
 def test_graph_runtime_requires_optional_dependencies_fail_fast() -> None:

@@ -13,11 +13,18 @@ from langgraph_automation.apps.automation.models.run import Run
 from langgraph_automation.apps.automation.services.errors import WorkflowConfigurationError
 from langgraph_automation.apps.automation.services.workflow_config import (
     WorkflowConfigIssue,
+    WorkflowRuntimeConfig,
     parse_workflow_runtime_config,
     validate_workflow_runtime_config,
 )
 from langgraph_automation.config import settings as app_settings
-from langgraph_automation.graphs.builders import SUPPORTED_GRAPH_KINDS
+from langgraph_automation.graphs.config import (
+    GraphRuntimeConfig,
+    GraphRuntimeGraphConfig,
+    GraphRuntimeLLMConfig,
+    GraphRuntimeToolConfig,
+)
+from langgraph_automation.graphs.registry import GraphRegistry, default_graph_kind
 from langgraph_automation.graphs.runtime import GraphRuntime
 from langgraph_automation.integrations.artifact.base import ArtifactStore
 from langgraph_automation.integrations.artifact.memory_store import MemoryArtifactStore
@@ -38,6 +45,7 @@ from langgraph_automation.integrations.tools import (
     ToolPolicyContext,
     ToolRegistry,
 )
+from langgraph_automation.workflows.catalog import build_builtin_graph_registry
 
 
 def build_event_sink(run: Run) -> EventSink:
@@ -57,20 +65,50 @@ def _format_configuration_issues(issues: tuple[WorkflowConfigIssue, ...]) -> str
     return '; '.join(parts)
 
 
-def build_llm_client(run: Run, event_sink: EventSink | None = None) -> LLMClient | None:
+def _runtime_config(run: Run) -> WorkflowRuntimeConfig:
+    return parse_workflow_runtime_config(run.workflow.definition_payload, default_graph_kind=default_graph_kind())
+
+
+def _to_graph_runtime_config(workflow_config: WorkflowRuntimeConfig) -> GraphRuntimeConfig:
+    return GraphRuntimeConfig(
+        graph=GraphRuntimeGraphConfig(kind=workflow_config.graph.kind),
+        llm=GraphRuntimeLLMConfig(
+            enabled=workflow_config.llm.enabled,
+            model=workflow_config.llm.model,
+            temperature=workflow_config.llm.temperature,
+            max_tokens=workflow_config.llm.max_tokens,
+        ),
+        tools=GraphRuntimeToolConfig(allowed_tools=workflow_config.tools.allowed_tools),
+    )
+
+
+def _validate_runtime_config(run: Run, graph_registry: GraphRegistry) -> tuple[WorkflowRuntimeConfig, tuple[WorkflowConfigIssue, ...]]:
+    runtime_config = _runtime_config(run)
+    validation = validate_workflow_runtime_config(
+        run.workflow.definition_payload,
+        default_graph_kind=default_graph_kind(),
+        supported_graph_kinds=graph_registry.supported_graph_kinds(),
+        graph_requirements=graph_registry.graph_requirements(),
+    )
+    return runtime_config, validation.issues
+
+
+def build_llm_client(
+    run: Run,
+    event_sink: EventSink | None = None,
+    runtime_config: WorkflowRuntimeConfig | None = None,
+) -> LLMClient | None:
     """Build the optional LLM client dependency.
 
     The runtime reads the normalized workflow config, then composes a concrete
     LiteLLMClient wrapped by ObservedLLMClient when LLM is enabled.
     """
 
-    runtime_config = parse_workflow_runtime_config(run.workflow.definition_payload)
-    validation = validate_workflow_runtime_config(run.workflow.definition_payload)
-
+    runtime_config = runtime_config or _runtime_config(run)
     if not runtime_config.llm.enabled:
         return None
     if not runtime_config.llm.model:
-        raise WorkflowConfigurationError(_format_configuration_issues(validation.issues) or 'LLM model is required when llm.enabled is true.')
+        raise WorkflowConfigurationError('LLM model is required when llm.enabled is true.')
 
     concrete = LiteLLMClient(
         model=runtime_config.llm.model,
@@ -86,7 +124,11 @@ def build_llm_client(run: Run, event_sink: EventSink | None = None) -> LLMClient
     )
 
 
-def build_tool_registry(run: Run, event_sink: EventSink | None = None) -> ToolRegistry:
+def build_tool_registry(
+    run: Run,
+    event_sink: EventSink | None = None,
+    runtime_config: WorkflowRuntimeConfig | None = None,
+) -> ToolRegistry:
     """Build the tool registry dependency stack.
 
     The production stack currently exposes a single safe toy tool (echo), wrapped
@@ -94,11 +136,11 @@ def build_tool_registry(run: Run, event_sink: EventSink | None = None) -> ToolRe
     composition; tool policy evaluation and observability stay in their own layers.
     """
 
+    runtime_config = runtime_config or _runtime_config(run)
     concrete = InMemoryToolRegistry()
     concrete.register(ECHO_TOOL_NAME, EchoTool())
 
-    allowed_tools = parse_workflow_runtime_config(run.workflow.definition_payload).tools.allowed_tools
-    policy = AllowlistToolPolicy(allowed_tools=frozenset(allowed_tools))
+    policy = AllowlistToolPolicy(allowed_tools=frozenset(runtime_config.tools.allowed_tools))
     context = ToolPolicyContext(run_id=run.pk, workflow_id=run.workflow_id, thread_id=run.thread_id)
     policy_registry = PolicyAwareToolRegistry(inner=concrete, policy=policy, context=context)
     return ObservedToolRegistry(
@@ -134,21 +176,21 @@ def build_graph_runtime(run: Run) -> GraphRuntime:
     business logic.
     """
 
-    runtime_config = parse_workflow_runtime_config(run.workflow.definition_payload)
-    validation = validate_workflow_runtime_config(run.workflow.definition_payload)
-    if validation.has_errors:
-        raise WorkflowConfigurationError(_format_configuration_issues(validation.issues))
-    if runtime_config.graph.kind not in SUPPORTED_GRAPH_KINDS:
-        raise WorkflowConfigurationError(f'Unsupported graph kind: {runtime_config.graph.kind}')
+    graph_registry = build_builtin_graph_registry()
+    runtime_config, issues = _validate_runtime_config(run, graph_registry)
+    validation = tuple(issue for issue in issues if issue.level == 'error')
+    if validation:
+        raise WorkflowConfigurationError(_format_configuration_issues(tuple(validation)))
 
     event_sink = build_event_sink(run)
     return GraphRuntime(
         logger=logging.getLogger(f'langgraph_automation.run.{run.pk}'),
         observability=ObservabilityContext(run_id=run.pk, thread_id=run.thread_id),
-        workflow_config=runtime_config,
+        workflow_config=_to_graph_runtime_config(runtime_config),
+        graph_registry=graph_registry,
         event_sink=event_sink,
-        llm_client=build_llm_client(run, event_sink),
-        tool_registry=build_tool_registry(run, event_sink),
+        llm_client=build_llm_client(run, event_sink, runtime_config),
+        tool_registry=build_tool_registry(run, event_sink, runtime_config),
         artifact_store=build_artifact_store(run, event_sink),
         checkpoint_store=build_checkpoint_store(run, event_sink),
     )
