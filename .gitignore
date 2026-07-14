@@ -7,3 +7,4 @@ venv/
 .env
 artifacts/
 db.sqlite3
+*.egg-info/
