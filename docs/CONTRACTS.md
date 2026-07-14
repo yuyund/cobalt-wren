@@ -40,6 +40,14 @@ These contracts describe the current internal foundation surface. If parts of th
 - checkpointable state には入れない
 - state には `input_summary` のみ入れる
 
+## Configuration Contract
+
+- Package-level config, `Workflow.definition_payload`, and `Run.input_payload` are different layers.
+- Package-level config holds deployment / provider / plugin / policy / store / observability defaults.
+- `Workflow.definition_payload` is database-backed workflow instance-specific config.
+- `Run.input_payload` is a single execution input, not runtime config.
+- Normalized runtime config is package config plus validated `Workflow.definition_payload`.
+- `Run.input_payload` must not be used to read model, `api_key`, `base_url`, or `tools.allowed`.
 ## GraphRuntimeConfig Contract
 
 - execution-plane config は graph-local

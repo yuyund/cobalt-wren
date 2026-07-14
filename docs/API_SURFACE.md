@@ -224,6 +224,9 @@ Notes:
 
 ## Config-facing concepts
 
+Configuration taxonomy is defined in `docs/CONFIGURATION.md`.
+API surface remains separate from config-facing concepts.
+
 These concepts are controlled by config rather than arbitrary imports:
 
 - workflow enabled / disabled

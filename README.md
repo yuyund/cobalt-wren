@@ -9,6 +9,7 @@ Detailed design documents live under `docs/`:
 - `docs/ARCHITECTURE.md`
 - `docs/CONTRACTS.md`
 - `docs/API_SURFACE.md`
+- `docs/CONFIGURATION.md`
 - `docs/adr/`
 
 ## Architecture Overview

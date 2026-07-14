@@ -89,6 +89,14 @@ Reference workflows exist to verify wiring and safety.
 
 Application workflows are future layers and should not be pulled into `graphs`.
 
+
+## Configuration Boundary
+
+- Config must not depend on internal module paths.
+- Workflow structure belongs in plugin code.
+- Workflow behavior parameters belong in config.
+- Runtime assembly must use validated normalized config, not raw config sources.
+
 ## Public API Direction
 
 - A future public facade is expected under `langgraph_automation.api.*`.
