@@ -8,7 +8,7 @@ import pytest
 
 from langgraph_automation.graphs.instrumentation import run_observed_node
 from langgraph_automation.graphs.runtime import GraphRuntime
-from langgraph_automation.graphs.states import AutomationState
+from langgraph_automation.workflows.reference.llm_echo_summary.state import LlmEchoSummaryState
 from langgraph_automation.integrations.observability.types import ObservabilityContext
 from tests.support.recording_event_sink import RecordingEventSink
 
@@ -23,12 +23,12 @@ def test_run_observed_node_creates_node_span_and_returns_result() -> None:
     )
     seen = {}
 
-    def node_func(state: AutomationState, node_runtime: GraphRuntime) -> AutomationState:
+    def node_func(state: LlmEchoSummaryState, node_runtime: GraphRuntime) -> LlmEchoSummaryState:
         seen["parent_span_id"] = None if node_runtime.observability.parent_span is None else node_runtime.observability.parent_span.span_id
         seen["node_name"] = node_runtime.observability.node_name
         return {"current_node": "planner", "metadata": {"ok": True}}
 
-    result = run_observed_node("planner", node_func, {"input_payload": {"x": 1}}, runtime)
+    result = run_observed_node("planner", node_func, {"input_summary": {"keys": ["x"]}}, runtime)
 
     assert result["current_node"] == "planner"
     assert seen["node_name"] == "planner"
@@ -49,11 +49,11 @@ def test_run_observed_node_marks_failure() -> None:
         event_sink=sink,
     )
 
-    def node_func(_: AutomationState, __: GraphRuntime) -> AutomationState:
+    def node_func(_: LlmEchoSummaryState, __: GraphRuntime) -> LlmEchoSummaryState:
         raise ValueError("boom")
 
     with pytest.raises(ValueError):
-        run_observed_node("planner", node_func, {"input_payload": {}}, runtime)
+        run_observed_node("planner", node_func, {"input_summary": {}}, runtime)
 
     node_span = next(span for span in sink.spans.values() if span.name == "planner")
     assert node_span.status == "failed"
