@@ -11,6 +11,7 @@ Purpose:
 - wrap arbitrary exceptions from plugin hooks into framework error categories
 - fix error boundaries before `ConfigLoader`, `PluginRegistry`, `ConfigValidator`, and `RuntimeAssembly` exist
 - keep `api.errors` as a future facade
+- the staged public facade for minimal `api.errors` is defined in `docs/API_ERRORS_FACADE.md`
 
 ## Design principles
 
@@ -22,6 +23,7 @@ Purpose:
 - Diagnostics must also be bounded and redacted.
 - Error taxonomy should not be frozen into the public API too early.
 - `api.errors` is a future facade and is not implemented in this phase.
+- `ErrorCode` enum / `ErrorCategory` enum are not implemented in this phase.
 
 Coupling rules:
 

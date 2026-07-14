@@ -99,6 +99,15 @@ These contracts describe the current internal foundation surface. If parts of th
 - `EventSinkError` does not override primary failure
 - `SafetyBoundaryError` never includes unsafe values themselves
 
+## api.errors Facade Contract
+
+- the public error surface starts minimal
+- fine-grained reasons are represented by category / code rather than subclass explosion
+- `safe_message` is the only user-facing message
+- `diagnostic` is internal-only, redacted, and bounded
+- `metadata` must not contain raw config, secret, prompt, provider response, tool output, Django model object, or absolute local path
+- `cause` is not user-facing
+
 ## GraphRuntimeConfig Contract
 
 - execution-plane config は graph-local

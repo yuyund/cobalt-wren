@@ -96,10 +96,14 @@ Current:
 - 状態: 完了
 
 - Error taxonomy design docs
+- 状態: 完了
+
+- api.errors minimal facade design docs
 - 状態: 実装中または完了確認中
 
 Next:
 
+- api.errors minimal facade implementation
 - then Package P3-E Minimal api.plugins facade implementation
 - then Package P1-C Config loader / normalizer MVP
 

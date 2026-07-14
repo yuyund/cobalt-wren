@@ -16,6 +16,7 @@ Detailed design documents live under `docs/`:
 - `docs/PLUGIN_API_SHAPE.md`
 - `docs/PLUGIN_API_FACADE.md`
 - `docs/ERROR_TAXONOMY.md`
+- `docs/API_ERRORS_FACADE.md`
 - `docs/adr/`
 
 ## Architecture Overview

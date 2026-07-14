@@ -169,6 +169,8 @@ Guidance:
 
 Error taxonomy is not being implemented in this phase.
 `api.errors` remains a future facade, and error taxonomy is documented in `docs/ERROR_TAXONOMY.md`.
+`api.errors` minimal facade design is defined in `docs/API_ERRORS_FACADE.md`.
+`api.errors` remains unimplemented in this phase.
 
 Future public candidates may include:
 
@@ -185,6 +187,8 @@ Current guidance:
 - `UnknownGraphKindError` remains the internal graph vocabulary for this phase.
 - A future public facade may map graph vocabulary to workflow vocabulary.
 - No error classes are exported yet.
+- The minimal public error facade is intentionally smaller than the full taxonomy.
+- `FrameworkError`, `ConfigError`, `PluginRegistrationError`, `PluginResolutionError`, `PluginValidationError`, `RuntimeAssemblyError`, and `SafetyBoundaryError` are the current minimal candidates.
 
 ## Implemented public facade in P0-B
 

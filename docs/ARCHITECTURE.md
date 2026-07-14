@@ -131,6 +131,13 @@ Application workflows are future layers and should not be pulled into `graphs`.
 - RuntimeAssembly calls contribution factory hooks.
 - GraphRuntime and GraphDefinition remain outside the public facade.
 
+## Error Boundary
+
+- `api.errors` is a public facade boundary, not an implementation boundary.
+- `ConfigLoader`, `PluginRegistry`, `ConfigValidator`, and `RuntimeAssembly` should share framework error categories without depending on each other's internals.
+- provider, tool, store, and event sink execution errors remain internal or deferred until those boundaries are implemented.
+- error taxonomy and `api.errors` staging are defined in `docs/ERROR_TAXONOMY.md` and `docs/API_ERRORS_FACADE.md`.
+
 ## Public API Direction
 
 - A future public facade is expected under `langgraph_automation.api.*`.
