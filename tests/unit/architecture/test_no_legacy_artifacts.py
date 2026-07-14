@@ -14,6 +14,14 @@ def test_legacy_notes_and_placeholder_models_are_removed() -> None:
     assert not Path('src/langgraph_automation/integrations/llm/not_configured_client.py').exists()
     assert not Path('src/langgraph_automation/integrations/observability/llm_observer.py').exists()
     assert not Path('src/langgraph_automation/graphs/nodes/executor.py').exists()
+    assert not Path('src/langgraph_automation/graphs/llm_echo_summary.py').exists()
+    assert not Path('src/langgraph_automation/graphs/nodes/minimal.py').exists()
+    assert not Path('src/langgraph_automation/graphs/states.py').exists()
+    assert not Path('src/langgraph_automation/graphs/nodes/planner.py').exists()
+    assert not Path('src/langgraph_automation/graphs/nodes/summarizer.py').exists()
+    assert not Path('src/langgraph_automation/graphs/llm_echo_summary.py').exists()
+    assert not Path('src/langgraph_automation/graphs/nodes/minimal.py').exists()
+    assert not Path('src/langgraph_automation/graphs/states.py').exists()
     assert not Path('src/langgraph_automation/graphs/nodes/reviewer.py').exists()
     assert not Path('src/langgraph_automation/graphs/routing.py').exists()
     assert not Path('src/langgraph_automation/entrypoints/run_worker.py').exists()
@@ -88,3 +96,11 @@ def test_shell_and_file_tool_placeholders_do_not_reappear() -> None:
         'src/langgraph_automation/integrations/tools/shell_tool.py',
     ]:
         assert not Path(relpath).exists()
+
+
+def test_reference_diagnostic_workflow_nodes_are_not_application_placeholders() -> None:
+    assert not Path('src/langgraph_automation/graphs/nodes/planner.py').exists()
+    assert not Path('src/langgraph_automation/graphs/nodes/summarizer.py').exists()
+    assert not Path('src/langgraph_automation/graphs/llm_echo_summary.py').exists()
+    assert not Path('src/langgraph_automation/graphs/nodes/minimal.py').exists()
+    assert not Path('src/langgraph_automation/graphs/states.py').exists()
