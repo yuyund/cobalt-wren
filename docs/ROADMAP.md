@@ -77,13 +77,16 @@ Next:
 
 Current:
 
-- Package P1-A Config taxonomy design docs
-- 状態: 実装中または完了確認中
+- Package P1-A Config taxonomy docs
+- 状態: 完了
+
+- Package P1-B Config schema boundary design docs
+- 状態: 完了
 
 Next:
 
-- Package P1-B Config schema design docs
-- or Package P3-A Plugin taxonomy design docs
+- Package P3-A Plugin taxonomy design docs
+- or Package P1-C Config loader MVP after plugin taxonomy
 
 ## 6. Recommended Execution Order
 

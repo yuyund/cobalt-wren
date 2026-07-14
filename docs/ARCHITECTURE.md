@@ -97,6 +97,13 @@ Application workflows are future layers and should not be pulled into `graphs`.
 - Workflow behavior parameters belong in config.
 - Runtime assembly must use validated normalized config, not raw config sources.
 
+## Configuration Schema Boundary
+
+- runtime does not read raw config sources.
+- config source handling is isolated behind loader / normalizer / validator boundaries.
+- provider / store / worker / observability implementations are resolved by name through registries.
+- workflow-specific config is validated by workflow plugin schema, not core schema.
+
 ## Public API Direction
 
 - A future public facade is expected under `langgraph_automation.api.*`.

@@ -535,6 +535,8 @@ The workflow kind is resolved by plugin registration, not by importing an arbitr
 
 ## Config source and normalized config
 
+See `docs/CONFIG_SCHEMA.md` for the raw/validated/resolved boundary and validation layering.
+
 Future config sources may include:
 
 - `config.yaml`

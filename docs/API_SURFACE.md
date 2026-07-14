@@ -225,6 +225,7 @@ Notes:
 ## Config-facing concepts
 
 Configuration taxonomy is defined in `docs/CONFIGURATION.md`.
+Schema boundaries, validation layering, and source precedence are defined in `docs/CONFIG_SCHEMA.md`.
 API surface remains separate from config-facing concepts.
 
 These concepts are controlled by config rather than arbitrary imports:

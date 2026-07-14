@@ -48,6 +48,16 @@ These contracts describe the current internal foundation surface. If parts of th
 - `Run.input_payload` is a single execution input, not runtime config.
 - Normalized runtime config is package config plus validated `Workflow.definition_payload`.
 - `Run.input_payload` must not be used to read model, `api_key`, `base_url`, or `tools.allowed`.
+
+## Configuration Schema Contract
+
+- `RawPackageConfig` is source-facing and is not consumed by runtime assembly directly.
+- `ValidatedPackageConfig` is package-level normalized config and contains no secret values or concrete runtime objects.
+- `ResolvedWorkflowConfig` is workflow-specific resolved config and does not include `Run.input_payload`.
+- `Run.input_payload` is execution input, not config override.
+- `RuntimeAssembly` resolves names to concrete dependencies.
+- `GraphRuntimeConfig` contains only graph-local safe config.
+
 ## GraphRuntimeConfig Contract
 
 - execution-plane config は graph-local
