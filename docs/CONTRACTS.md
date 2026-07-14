@@ -74,6 +74,14 @@ These contracts describe the current internal foundation surface. If parts of th
 - `plugins.enabled` references registered plugin names
 - registry provides lookup, validator orchestrates validation, runtime assembly constructs dependencies
 
+## Plugin API Shape Contract
+
+- plugin objects contain metadata and contributions
+- contribution validation hooks do not create runtime dependencies
+- contribution factory hooks are called by RuntimeAssembly
+- registry does not hold concrete runtime instances
+- ValidationContext and FactoryContext must not contain raw config source, Run object, Django ORM object, or secret values unless mediated by SecretResolver
+
 ## GraphRuntimeConfig Contract
 
 - execution-plane config は graph-local

@@ -26,6 +26,7 @@ The goal is to keep the package small on the outside, flexible on the inside, an
 The following layout is a candidate for later phases.
 
 - `langgraph_automation.api`
+- `langgraph_automation.api.plugins`
 - `langgraph_automation.api.workflow`
 - `langgraph_automation.api.runtime`
 - `langgraph_automation.api.tools`
@@ -195,6 +196,7 @@ These modules re-export selected stable interfaces only. They do not expose work
 ## Deferred public surfaces
 
 - `langgraph_automation.api.workflow`
+- `langgraph_automation.api.plugins`
 - `langgraph_automation.api.runtime`
 - `langgraph_automation.api.errors`
 - `WorkflowPlugin`
@@ -228,6 +230,7 @@ Notes:
 - Plugins should depend on `langgraph_automation.api.*` public facade modules, not internal implementation modules.
 - `api.workflow`, `api.runtime`, and `api.errors` remain future surfaces and are not implemented yet.
 - Manual registration and registry boundaries are defined in `docs/PLUGIN_REGISTRATION.md`.
+- Plugin API shapes are documented in `docs/PLUGIN_API_SHAPE.md`.
 
 ## Config-facing concepts
 

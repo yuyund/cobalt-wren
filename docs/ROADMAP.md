@@ -88,11 +88,13 @@ Current:
 
 - Package P3-B Manual plugin registration design docs
 - 状態: 完了
+- Package P3-C Plugin API shape design docs
+- 状態: 実装中または完了確認中
 
 Next:
 
-- Package P3-C Plugin API shape design docs
-- or Package P1-C Config loader MVP after plugin registration/API boundaries
+- Package P3-D Plugin API facade design docs
+- or Package P1-C Config loader MVP after plugin API shape is reviewed
 
 ## 6. Recommended Execution Order
 

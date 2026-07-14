@@ -58,6 +58,7 @@
 - lookup and registration boundary
 - not a runtime assembly boundary
 - does not load config sources or create plugin instances
+- stores contribution definitions, factories, and metadata, not concrete runtime instances
 
 ### core
 
@@ -123,6 +124,9 @@ Application workflows are future layers and should not be pulled into `graphs`.
 - runtime assembly consumes resolved config and registered plugins.
 - plugin taxonomy and responsibility boundaries are defined in `docs/PLUGINS.md`.
 - manual registration, enabled plugins, and registry conflict policy are defined in `docs/PLUGIN_REGISTRATION.md`.
+- validation hooks and factory hooks are defined in `docs/PLUGIN_API_SHAPE.md`.
+- ConfigValidator calls contribution validation hooks.
+- RuntimeAssembly calls contribution factory hooks.
 
 ## Public API Direction
 

@@ -12,6 +12,7 @@ Purpose:
 - distinguish Package MVP manual registration from Package Complete discovery
 
 Manual registration, conflict policy, enabled plugin handling, and registry boundaries are defined in `docs/PLUGIN_REGISTRATION.md`.
+Plugin object shape, contribution shape, validation hooks, and factory hooks are defined in `docs/PLUGIN_API_SHAPE.md`.
 
 ## System principles
 
