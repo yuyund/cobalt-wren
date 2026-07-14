@@ -82,6 +82,14 @@ These contracts describe the current internal foundation surface. If parts of th
 - registry does not hold concrete runtime instances
 - ValidationContext and FactoryContext must not contain raw config source, Run object, Django ORM object, or secret values unless mediated by SecretResolver
 
+## Plugin API Facade Contract
+
+- implemented public facade remains `api.llm`, `api.tools`, `api.stores`, and `api.events`
+- `api.plugins` is not yet implemented in P3-D
+- `api.workflow`, `api.runtime`, and `api.errors` are not yet implemented in P3-D
+- `GraphRuntime` and `GraphDefinition` remain outside the public facade
+- PluginRegistry, ConfigValidator, and RuntimeAssembly are not public facade types in P3-D
+
 ## GraphRuntimeConfig Contract
 
 - execution-plane config は graph-local

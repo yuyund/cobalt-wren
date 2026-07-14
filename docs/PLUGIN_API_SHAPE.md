@@ -528,3 +528,5 @@ P3-C does not create `api.errors` or any error classes.
 - registry keeps no concrete runtime instances
 - RuntimeAssembly and ConfigValidator boundaries are fixed
 - public API facades are not prematurely frozen
+
+Plugin API facade staging is defined in `docs/PLUGIN_API_FACADE.md`.

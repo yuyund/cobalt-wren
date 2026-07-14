@@ -13,6 +13,8 @@ Detailed design documents live under `docs/`:
 - `docs/CONFIG_SCHEMA.md`
 - `docs/PLUGINS.md`
 - `docs/PLUGIN_REGISTRATION.md`
+- `docs/PLUGIN_API_SHAPE.md`
+- `docs/PLUGIN_API_FACADE.md`
 - `docs/adr/`
 
 ## Architecture Overview

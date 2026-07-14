@@ -125,8 +125,10 @@ Application workflows are future layers and should not be pulled into `graphs`.
 - plugin taxonomy and responsibility boundaries are defined in `docs/PLUGINS.md`.
 - manual registration, enabled plugins, and registry conflict policy are defined in `docs/PLUGIN_REGISTRATION.md`.
 - validation hooks and factory hooks are defined in `docs/PLUGIN_API_SHAPE.md`.
+- plugin API facade staging is defined in `docs/PLUGIN_API_FACADE.md`.
 - ConfigValidator calls contribution validation hooks.
 - RuntimeAssembly calls contribution factory hooks.
+- GraphRuntime and GraphDefinition remain outside the public facade.
 
 ## Public API Direction
 

@@ -231,6 +231,16 @@ Notes:
 - `api.workflow`, `api.runtime`, and `api.errors` remain future surfaces and are not implemented yet.
 - Manual registration and registry boundaries are defined in `docs/PLUGIN_REGISTRATION.md`.
 - Plugin API shapes are documented in `docs/PLUGIN_API_SHAPE.md`.
+- Plugin API facade staging is defined in `docs/PLUGIN_API_FACADE.md`.
+
+## Plugin facade staging
+
+- Implemented public facade remains `api.llm`, `api.tools`, `api.stores`, and `api.events`.
+- `api.plugins` remains future.
+- `api.workflow` remains future.
+- `api.runtime` remains future.
+- `api.errors` remains future.
+- `GraphRuntime` and `GraphDefinition` remain outside the public facade.
 
 ## Config-facing concepts
 
