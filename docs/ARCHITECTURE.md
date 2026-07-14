@@ -47,6 +47,12 @@
 - external I/O boundary
 - LLM / tool / artifact / checkpoint / observability
 
+### plugins
+
+- extension points outside the foundation core
+- plugin registration and name-based resolution
+- plugin-specific validation and metadata
+
 ### core
 
 - redaction / result safety / summary helpers
@@ -103,6 +109,13 @@ Application workflows are future layers and should not be pulled into `graphs`.
 - config source handling is isolated behind loader / normalizer / validator boundaries.
 - provider / store / worker / observability implementations are resolved by name through registries.
 - workflow-specific config is validated by workflow plugin schema, not core schema.
+
+## Plugin Boundary
+
+- plugins depend on the public API facade rather than internal modules.
+- plugin registration resolves names to implementations.
+- runtime assembly consumes resolved config and registered plugins.
+- plugin taxonomy and responsibility boundaries are defined in `docs/PLUGINS.md`.
 
 ## Public API Direction
 

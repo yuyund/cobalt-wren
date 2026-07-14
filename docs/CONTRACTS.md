@@ -58,6 +58,14 @@ These contracts describe the current internal foundation surface. If parts of th
 - `RuntimeAssembly` resolves names to concrete dependencies.
 - `GraphRuntimeConfig` contains only graph-local safe config.
 
+## Plugin Contract
+
+- plugin code must not depend on internal modules
+- plugin-specific config validation is owned by the plugin type
+- core schema keeps plugin-specific config opaque
+- tool plugins remain subject to ToolPolicy
+- provider / store / event / worker plugins are resolved by name through registry boundaries
+
 ## GraphRuntimeConfig Contract
 
 - execution-plane config は graph-local

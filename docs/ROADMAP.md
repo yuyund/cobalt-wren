@@ -83,10 +83,13 @@ Current:
 - Package P1-B Config schema boundary design docs
 - 状態: 完了
 
+- Package P3-A Plugin taxonomy design docs
+- 状態: 完了
+
 Next:
 
-- Package P3-A Plugin taxonomy design docs
-- or Package P1-C Config loader MVP after plugin taxonomy
+- Package P3-B Manual plugin registration design docs
+- or Package P1-C Config loader MVP after plugin registration boundaries
 
 ## 6. Recommended Execution Order
 

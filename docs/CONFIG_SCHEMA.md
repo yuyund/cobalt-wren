@@ -365,6 +365,7 @@ policies:
 - plugin-specific config
 
 Plugin-specific validation must stay out of the core schema.
+The plugin-specific validation rules for workflow, tool, provider, store, worker, and UI config are defined in `docs/PLUGINS.md`.
 
 ## Normalized config flow
 

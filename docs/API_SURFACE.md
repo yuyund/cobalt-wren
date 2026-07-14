@@ -222,6 +222,12 @@ Notes:
 - `workflows/catalog.py` is package composition internal / semi-internal.
 - A future registration API should become the supported path for extending workflows.
 
+## Plugin taxonomy
+
+- Plugin taxonomy is defined in `docs/PLUGINS.md`.
+- Plugins should depend on `langgraph_automation.api.*` public facade modules, not internal implementation modules.
+- `api.workflow`, `api.runtime`, and `api.errors` remain future surfaces and are not implemented yet.
+
 ## Config-facing concepts
 
 Configuration taxonomy is defined in `docs/CONFIGURATION.md`.

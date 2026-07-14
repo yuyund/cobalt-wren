@@ -238,6 +238,7 @@ Future implementation note:
 
 - Package MVP should use explicit / manual registration
 - Package Complete may consider Python entry points or other discovery mechanisms
+- Plugin-specific config validation is defined by the plugin type in `docs/PLUGINS.md`.
 
 Example:
 
@@ -564,6 +565,7 @@ RuntimeAssembly
 ```
 
 P1-A defines the taxonomy only. It does not implement the loader, normalizer, schema, or parser.
+Plugin-specific validation stays with plugin types and is described in `docs/PLUGINS.md`.
 
 ## Relation to existing payloads
 
