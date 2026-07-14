@@ -2,29 +2,29 @@
 
 from __future__ import annotations
 
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 import json
-from typing import TypeAlias
+from typing import Any, TypeAlias
 
 from langgraph_automation.core.summary import summarize_mapping
 from langgraph_automation.graphs.runtime import GraphRuntime
-from langgraph_automation.graphs.states import AutomationState
 from langgraph_automation.integrations.observability import events as obs_events
 from langgraph_automation.integrations.observability.failure_policy import suppress_observability_failure
 
-NodeFunc: TypeAlias = Callable[[AutomationState, GraphRuntime], AutomationState]
+NodeState: TypeAlias = Mapping[str, Any]
+NodeFunc: TypeAlias = Callable[[NodeState, GraphRuntime], NodeState]
 
 
-def _summarize_result(result: AutomationState) -> str:
-    return json.dumps(summarize_mapping(result), ensure_ascii=False, sort_keys=True, default=str)
+def _summarize_result(result: NodeState) -> str:
+    return json.dumps(summarize_mapping(dict(result)), ensure_ascii=False, sort_keys=True, default=str)
 
 
 def run_observed_node(
     node_name: str,
     node_func: NodeFunc,
-    state: AutomationState,
+    state: NodeState,
     runtime: GraphRuntime,
-) -> AutomationState:
+) -> NodeState:
     """Run a node while emitting span lifecycle events through the EventSink."""
 
     sink = runtime.event_sink
@@ -62,10 +62,10 @@ def run_observed_node(
     return result
 
 
-def wrap_observed_node(node_name: str, node_func: NodeFunc, runtime: GraphRuntime) -> Callable[[AutomationState], AutomationState]:
+def wrap_observed_node(node_name: str, node_func: NodeFunc, runtime: GraphRuntime) -> Callable[[NodeState], NodeState]:
     """Wrap a node for direct registration with StateGraph.add_node()."""
 
-    def wrapped(state: AutomationState) -> AutomationState:
+    def wrapped(state: NodeState) -> NodeState:
         return run_observed_node(node_name, node_func, state, runtime)
 
     return wrapped

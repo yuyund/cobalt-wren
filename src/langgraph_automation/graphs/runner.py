@@ -9,6 +9,7 @@ import json
 from langgraph_automation.core.result_safety import safe_run_error_message
 from langgraph_automation.core.summary import summarize_mapping
 from langgraph_automation.graphs.builders import build_graph
+from langgraph_automation.graphs.inputs import GraphExecutionInput
 from langgraph_automation.graphs.runtime import GraphRuntime
 from langgraph_automation.integrations.observability import events as obs_events
 from langgraph_automation.integrations.observability.failure_policy import suppress_observability_failure
@@ -46,8 +47,10 @@ class LangGraphRunner:
     def _invoke_graph(self, *, run_id: int, runtime: GraphRuntime, phase: str, input_payload: Mapping[str, object] | None) -> ExecutionResult:
         sink = runtime.event_sink
         normalized_input = dict(input_payload or {})
+        execution_input = GraphExecutionInput.from_mapping(normalized_input)
+        input_summary = summarize_mapping(normalized_input)
         graph_span = None
-        observed_runtime = runtime
+        observed_runtime = runtime.with_execution_input(execution_input)
 
         try:
             if sink is not None:
@@ -60,18 +63,18 @@ class LangGraphRunner:
                     parent=runtime.observability.parent_span,
                     metadata={'phase': phase},
                 )
-                observed_runtime = runtime.with_parent_span(graph_span, node_name='graph')
+                observed_runtime = observed_runtime.with_parent_span(graph_span, node_name='graph')
 
             graph = build_graph(observed_runtime)
             initial_state = {
-                'input_payload': normalized_input,
+                'input_summary': input_summary,
                 'output_payload': {},
                 'current_node': 'graph',
-                'messages': [],
                 'metadata': {
                     'phase': phase,
                     'run_id': run_id,
                     'thread_id': runtime.observability.thread_id,
+                    'input_summary': input_summary,
                 },
             }
             final_state = graph.invoke(initial_state)
@@ -138,6 +141,6 @@ class LangGraphRunner:
 
 
 def build_graph_runner() -> GraphRunner:
-    """Return the production graph runner."""
+    """Return the graph runner."""
 
     return LangGraphRunner()

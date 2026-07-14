@@ -7,14 +7,20 @@ import pytest
 from langgraph_automation.apps.automation.models.run import Run, RunStatus
 from langgraph_automation.apps.automation.models.workflow import Workflow
 from langgraph_automation.apps.automation.services import runs as run_services
-from langgraph_automation.graphs.runner import ExecutionResult
-from langgraph_automation.core.result_safety import safe_run_error_message, safe_run_output_payload
 from langgraph_automation.core.redaction import REDACTED_VALUE
+from langgraph_automation.core.result_safety import safe_run_error_message, safe_run_output_payload
+from langgraph_automation.graphs.runner import ExecutionResult
 
 
 @pytest.mark.django_db
 def test_start_run_saves_safe_output_payload(monkeypatch: pytest.MonkeyPatch) -> None:
-    workflow = Workflow.objects.create(name='wf-safe-output')
+    workflow = Workflow.objects.create(
+        name='wf-safe-output',
+        definition_payload={
+            'llm': {'enabled': True, 'model': 'test-model'},
+            'tools': {'allowed': ['echo']},
+        },
+    )
     run = Run.objects.create(workflow=workflow, name='run-safe-output', input_payload={'prompt': 'hello'})
 
     def fake_dispatch(*_args, **_kwargs):
@@ -48,7 +54,13 @@ def test_start_run_saves_safe_output_payload(monkeypatch: pytest.MonkeyPatch) ->
 
 @pytest.mark.django_db
 def test_retry_run_saves_safe_failed_error_message(monkeypatch: pytest.MonkeyPatch) -> None:
-    workflow = Workflow.objects.create(name='wf-safe-error')
+    workflow = Workflow.objects.create(
+        name='wf-safe-error',
+        definition_payload={
+            'llm': {'enabled': True, 'model': 'test-model'},
+            'tools': {'allowed': ['echo']},
+        },
+    )
     run = Run.objects.create(workflow=workflow, name='run-safe-error', status=RunStatus.FAILED)
 
     def fake_dispatch(*_args, **_kwargs):
@@ -74,7 +86,13 @@ def test_retry_run_saves_safe_failed_error_message(monkeypatch: pytest.MonkeyPat
 
 @pytest.mark.django_db
 def test_start_run_exception_path_saves_safe_error_message(monkeypatch: pytest.MonkeyPatch) -> None:
-    workflow = Workflow.objects.create(name='wf-exception')
+    workflow = Workflow.objects.create(
+        name='wf-exception',
+        definition_payload={
+            'llm': {'enabled': True, 'model': 'test-model'},
+            'tools': {'allowed': ['echo']},
+        },
+    )
     run = Run.objects.create(workflow=workflow, name='run-exception')
 
     def fake_dispatch(*_args, **_kwargs):
