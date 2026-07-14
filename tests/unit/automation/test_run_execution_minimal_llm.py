@@ -1,6 +1,8 @@
-"""Service-level tests for the minimal LLM + EchoTool workflow."""
+"""Service-level tests for the llm_echo_summary reference diagnostic workflow."""
 
 from __future__ import annotations
+
+import logging
 
 import pytest
 
@@ -8,8 +10,22 @@ from langgraph_automation.apps.automation.models.run import Run, RunStatus
 from langgraph_automation.apps.automation.models.workflow import Workflow
 from langgraph_automation.apps.automation.services import runs as run_services
 from langgraph_automation.apps.automation.services import runtime as runtime_module
-from langgraph_automation.core.result_safety import safe_run_error_message, safe_run_output_payload
+from langgraph_automation.apps.automation.services.workflow_config import GraphWorkflowConfig, MINIMAL_GRAPH_KIND, WorkflowRuntimeConfig
+from langgraph_automation.core.result_safety import safe_run_output_payload
+from langgraph_automation.graphs.runtime import GraphRuntime
+from langgraph_automation.workflows.catalog import build_builtin_graph_registry
+from langgraph_automation.integrations.llm.base import LLMResult
+from langgraph_automation.integrations.llm.observed_client import ObservedLLMClient
+from langgraph_automation.integrations.observability.types import ObservabilityContext
+from langgraph_automation.integrations.tools.base import ToolResult
+from langgraph_automation.integrations.tools.observed_registry import ObservedToolRegistry
+from langgraph_automation.integrations.tools.policy import AllowlistToolPolicy, ToolPolicyContext
+from langgraph_automation.integrations.tools.policy_registry import PolicyAwareToolRegistry
+from langgraph_automation.integrations.tools.registry import InMemoryToolRegistry
+from langgraph_automation.integrations.tools.safe_tools import ECHO_TOOL_NAME
+from tests.support.llm_doubles import RecordingLLMClient
 from tests.support.recording_event_sink import RecordingEventSink
+from tests.support.tool_doubles import RecordingToolCallable
 
 
 def _fake_litellm_completion(**_kwargs):
@@ -75,28 +91,48 @@ def test_start_run_executes_minimal_llm_workflow_and_saves_safe_output(monkeypat
 
 
 @pytest.mark.django_db
-def test_start_run_keeps_workflow_running_when_echo_is_policy_denied(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_start_run_continues_when_echo_is_policy_denied() -> None:
     sink = RecordingEventSink()
-    monkeypatch.setattr(runtime_module, 'build_event_sink', lambda _run: sink)
-    monkeypatch.setattr('langgraph_automation.integrations.llm.litellm_client.litellm.completion', _fake_litellm_completion)
-
-    workflow = Workflow.objects.create(
-        name='wf-minimal-llm-denied',
-        definition_payload={
-            'graph': {'kind': 'llm_echo_summary'},
-            'llm': {
-                'enabled': True,
-                'model': 'test-model',
-            },
-        },
+    inner_llm_client = RecordingLLMClient(
+        result=LLMResult(content='final summary', provider='fake-provider', model='fake-model', input_tokens=1, output_tokens=1, raw={'provider_response': 'hidden'})
     )
-    run = Run.objects.create(
-        workflow=workflow,
-        name='run-minimal-llm-denied',
-        input_payload={'prompt': 'summarize this /tmp/secret.txt'},
+    inner_registry = InMemoryToolRegistry()
+    inner_registry.register(
+        ECHO_TOOL_NAME,
+        RecordingToolCallable(
+            result=ToolResult(
+                output='raw echo output /tmp/secret.txt',
+                output_summary='echo summary',
+                exit_code=0,
+                metadata={'tool_name': ECHO_TOOL_NAME},
+            )
+        ),
     )
+    runtime = GraphRuntime(
+        logger=logging.getLogger('test.graph.minimal.denied'),
+        observability=ObservabilityContext(run_id=2, thread_id='thread-2'),
+        workflow_config=WorkflowRuntimeConfig(graph=GraphWorkflowConfig(kind=MINIMAL_GRAPH_KIND)),
+        graph_registry=build_builtin_graph_registry(),
+        event_sink=sink,
+        llm_client=ObservedLLMClient(
+            inner=inner_llm_client,
+            event_sink=sink,
+            observability=ObservabilityContext(run_id=2, thread_id='thread-2'),
+        ),
+        tool_registry=ObservedToolRegistry(
+            inner=PolicyAwareToolRegistry(
+                inner=inner_registry,
+                policy=AllowlistToolPolicy(allowed_tools=frozenset()),
+                context=ToolPolicyContext(run_id=2, workflow_id=99, thread_id='thread-2'),
+            ),
+            event_sink=sink,
+            observability=ObservabilityContext(run_id=2, thread_id='thread-2'),
+        ),
+    )
+    workflow = Workflow.objects.create(name='wf-minimal-denied')
+    run = Run.objects.create(workflow=workflow, name='run-minimal-denied', input_payload={'text': 'summarize this'})
 
-    result = run_services.start_run(run=run)
+    result = run_services.start_run(run=run, runtime=runtime)
     result.run.refresh_from_db()
 
     assert result.run.status == RunStatus.SUCCEEDED
@@ -133,8 +169,8 @@ def test_start_run_fails_when_llm_is_disabled(monkeypatch: pytest.MonkeyPatch) -
     result.run.refresh_from_db()
 
     assert result.run.status == RunStatus.FAILED
-    assert result.run.error_message == safe_run_error_message(result.execution_result.error_message)
-    assert 'LLM client is not configured' in result.run.error_message
-    assert result.run.output_payload == safe_run_output_payload(result.execution_result.output_payload)
-    assert any(span.span_type == 'node' and span.name == 'llm_summary' and span.status == 'failed' for span in sink.spans.values())
-    assert any(span.span_type == 'graph' and span.status == 'failed' for span in sink.spans.values())
+    assert result.execution_result is not None
+    assert 'requires llm.enabled=true' in result.run.error_message
+    assert result.run.output_payload == {}
+    assert sink.run_events[-1].kind == 'run.failed'
+    assert result.execution_result.details['reason'] == 'workflow_configuration_error'

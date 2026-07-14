@@ -1,24 +1,20 @@
-"""Minimal execution nodes for the LLM + EchoTool workflow."""
+"""Execution nodes for the llm_echo_summary reference diagnostic workflow."""
 
 from __future__ import annotations
 
 from typing import Any
 
 from langgraph_automation.graphs.runtime import GraphRuntime
-from langgraph_automation.graphs.states import AutomationState
 from langgraph_automation.integrations.tools.policy import POLICY_DENIED_EXIT_CODE
+
+from .state import LlmEchoSummaryState
 
 ECHO_TOOL_NAME = 'echo'
 
 
-def _input_text(state: AutomationState) -> str:
-    input_payload = dict(state.get('input_payload', {}))
-    text = input_payload.get('text')
-    if not isinstance(text, str) or not text.strip():
-        text = input_payload.get('prompt')
-    if not isinstance(text, str):
-        return ''
-    return text.strip()
+def _input_text(runtime: GraphRuntime) -> str:
+    execution_input = runtime.require_execution_input()
+    return execution_input.primary_text
 
 
 def _echo_status(exit_code: int) -> str:
@@ -29,10 +25,9 @@ def _echo_status(exit_code: int) -> str:
     return 'failed'
 
 
-def echo_tool_node(state: AutomationState, runtime: GraphRuntime) -> AutomationState:
+def echo_tool_node(state: LlmEchoSummaryState, runtime: GraphRuntime) -> LlmEchoSummaryState:
     tool_registry = runtime.require_tool_registry()
-    input_payload = dict(state.get('input_payload', {}))
-    input_text = _input_text(state)
+    input_text = _input_text(runtime)
     result = tool_registry.run(ECHO_TOOL_NAME, text=input_text)
     status = _echo_status(result.exit_code)
     echo = {
@@ -45,17 +40,15 @@ def echo_tool_node(state: AutomationState, runtime: GraphRuntime) -> AutomationS
     output_payload['echo'] = echo
     return {
         'current_node': 'echo',
-        'input_payload': input_payload,
         'metadata': metadata,
         'output_payload': output_payload,
         'echo': echo,
     }
 
 
-def llm_summary_node(state: AutomationState, runtime: GraphRuntime) -> AutomationState:
+def llm_summary_node(state: LlmEchoSummaryState, runtime: GraphRuntime) -> LlmEchoSummaryState:
     llm_client = runtime.require_llm_client()
-    input_payload = dict(state.get('input_payload', {}))
-    input_text = _input_text(state)
+    input_text = _input_text(runtime)
     echo = dict(state.get('echo', {}))
     echo_summary = echo.get('output_summary', '')
     messages: list[dict[str, Any]] = [
@@ -92,7 +85,6 @@ def llm_summary_node(state: AutomationState, runtime: GraphRuntime) -> Automatio
     metadata['llm'] = output_payload['llm']
     return {
         'current_node': 'llm_summary',
-        'input_payload': input_payload,
         'metadata': metadata,
         'output_payload': output_payload,
         'llm': output_payload['llm'],

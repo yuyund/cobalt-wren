@@ -1,5 +1,6 @@
-"""Execution nodes for LangGraph workflows."""
+"""Legacy graphs.nodes package placeholder.
 
-from .minimal import echo_tool_node, llm_summary_node
-
-__all__ = ['echo_tool_node', 'llm_summary_node']
+Concrete reference diagnostic nodes live under
+``langgraph_automation.workflows.reference.llm_echo_summary`` so the execution
+foundation package stays free of workflow-specific implementation.
+"""

@@ -1,4 +1,4 @@
-"""Unit tests for the minimal LLM + EchoTool workflow nodes."""
+"""Unit tests for the llm_echo_summary reference diagnostic workflow nodes."""
 
 from __future__ import annotations
 
@@ -8,7 +8,8 @@ import pytest
 
 from langgraph_automation.apps.automation.services.workflow_config import WorkflowRuntimeConfig
 from langgraph_automation.core.errors import MissingRuntimeDependencyError
-from langgraph_automation.graphs.nodes.minimal import echo_tool_node, llm_summary_node
+from langgraph_automation.graphs.inputs import GraphExecutionInput
+from langgraph_automation.workflows.reference.llm_echo_summary.nodes import echo_tool_node, llm_summary_node
 from langgraph_automation.graphs.runtime import GraphRuntime
 from langgraph_automation.integrations.llm.base import LLMResult
 from langgraph_automation.integrations.llm.observed_client import ObservedLLMClient
@@ -43,9 +44,10 @@ def test_echo_tool_node_uses_runtime_tool_registry_and_saves_summary() -> None:
         workflow_config=WorkflowRuntimeConfig(),
         event_sink=sink,
         tool_registry=ObservedToolRegistry(inner=inner_registry, event_sink=sink, observability=ObservabilityContext(run_id=1, thread_id='thread-1')),
+        execution_input=GraphExecutionInput(text='summarize this /tmp/secret.txt'),
     )
 
-    result = echo_tool_node({'input_payload': {'text': 'summarize this /tmp/secret.txt'}}, runtime)
+    result = echo_tool_node({'input_summary': {'keys': ['text']}}, runtime)
 
     assert calls == [{'text': 'summarize this /tmp/secret.txt'}]
     assert result['current_node'] == 'echo'
@@ -73,11 +75,12 @@ def test_llm_summary_node_uses_runtime_llm_client_and_returns_safe_summary() -> 
         workflow_config=WorkflowRuntimeConfig(),
         event_sink=sink,
         llm_client=ObservedLLMClient(inner=inner_client, event_sink=sink, observability=ObservabilityContext(run_id=2, thread_id='thread-2')),
+        execution_input=GraphExecutionInput(prompt='summarize /tmp/secret.txt Authorization: Bearer secret-token'),
     )
 
     result = llm_summary_node(
         {
-            'input_payload': {'prompt': 'summarize /tmp/secret.txt Authorization: Bearer secret-token'},
+            'input_summary': {'keys': ['prompt']},
             'echo': {'status': 'succeeded', 'output_summary': 'bounded summary'},
         },
         runtime,
@@ -101,7 +104,7 @@ def test_nodes_require_runtime_dependencies() -> None:
     runtime = GraphRuntime(logger=logging.getLogger('test.nodes.missing'), workflow_config=WorkflowRuntimeConfig())
 
     with pytest.raises(MissingRuntimeDependencyError):
-        echo_tool_node({'input_payload': {'text': 'hello'}}, runtime)
+        echo_tool_node({'input_summary': {'keys': ['text']}}, runtime)
 
     with pytest.raises(MissingRuntimeDependencyError):
-        llm_summary_node({'input_payload': {'text': 'hello'}}, runtime)
+        llm_summary_node({'input_summary': {'keys': ['text']}}, runtime)

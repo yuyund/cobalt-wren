@@ -1,4 +1,4 @@
-"""Integration tests for the minimal LLM + EchoTool LangGraph workflow."""
+"""Integration tests for the llm_echo_summary reference diagnostic workflow."""
 
 from __future__ import annotations
 
@@ -6,6 +6,7 @@ import logging
 
 from langgraph_automation.apps.automation.services.workflow_config import GraphWorkflowConfig, WorkflowRuntimeConfig, MINIMAL_GRAPH_KIND
 from langgraph_automation.graphs.runner import LangGraphRunner
+from langgraph_automation.workflows.catalog import build_builtin_graph_registry
 from langgraph_automation.graphs.runtime import GraphRuntime
 from langgraph_automation.integrations.llm.base import LLMResult
 from langgraph_automation.integrations.llm.observed_client import ObservedLLMClient
@@ -49,6 +50,7 @@ def test_minimal_llm_workflow_runs_end_to_end_and_records_spans() -> None:
         logger=logging.getLogger('test.graph.minimal'),
         observability=ObservabilityContext(run_id=1, thread_id='thread-1'),
         workflow_config=WorkflowRuntimeConfig(graph=GraphWorkflowConfig(kind=MINIMAL_GRAPH_KIND)),
+        graph_registry=build_builtin_graph_registry(),
         event_sink=sink,
         llm_client=ObservedLLMClient(inner=inner_llm_client, event_sink=sink, observability=ObservabilityContext(run_id=1, thread_id='thread-1')),
         tool_registry=ObservedToolRegistry(inner=inner_registry, event_sink=sink, observability=ObservabilityContext(run_id=1, thread_id='thread-1')),
@@ -107,6 +109,7 @@ def test_minimal_llm_workflow_continues_when_echo_is_policy_denied() -> None:
         logger=logging.getLogger('test.graph.minimal.denied'),
         observability=ObservabilityContext(run_id=2, thread_id='thread-2'),
         workflow_config=WorkflowRuntimeConfig(graph=GraphWorkflowConfig(kind=MINIMAL_GRAPH_KIND)),
+        graph_registry=build_builtin_graph_registry(),
         event_sink=sink,
         llm_client=ObservedLLMClient(inner=inner_llm_client, event_sink=sink, observability=ObservabilityContext(run_id=2, thread_id='thread-2')),
         tool_registry=ObservedToolRegistry(

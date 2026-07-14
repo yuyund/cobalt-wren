@@ -1,17 +1,10 @@
-"""Graph execution package."""
+"""Graph execution package.
 
-from .builders import build_graph
-from .runner import ExecutionResult, GraphRunResult, GraphRunner, LangGraphRunner, build_graph_runner
-from .runtime import GraphRuntime
-from .states import AutomationState
+This package intentionally avoids eager re-exports to prevent import cycles
+between graph selection metadata, runtime wiring, and concrete graph builders.
+It is the execution foundation layer, not an application workflow package.
+"""
 
-__all__ = [
-    "AutomationState",
-    "ExecutionResult",
-    "GraphRunResult",
-    "GraphRunner",
-    "GraphRuntime",
-    "LangGraphRunner",
-    "build_graph",
-    "build_graph_runner",
-]
+from __future__ import annotations
+
+__all__: list[str] = []
