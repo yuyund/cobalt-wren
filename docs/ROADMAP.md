@@ -86,10 +86,13 @@ Current:
 - Package P3-A Plugin taxonomy design docs
 - 状態: 完了
 
+- Package P3-B Manual plugin registration design docs
+- 状態: 完了
+
 Next:
 
-- Package P3-B Manual plugin registration design docs
-- or Package P1-C Config loader MVP after plugin registration boundaries
+- Package P3-C Plugin API shape design docs
+- or Package P1-C Config loader MVP after plugin registration/API boundaries
 
 ## 6. Recommended Execution Order
 

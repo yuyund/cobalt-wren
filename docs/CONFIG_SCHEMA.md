@@ -10,6 +10,7 @@ Purpose:
 - fix secret / env var reference handling before runtime assembly exists
 - require name-based resolution for provider / plugin / store / worker
 - keep workflow-specific config out of the core schema
+- `plugins.enabled` selects from manually registered plugins and does not trigger imports or discovery
 
 ## 3-layer config model
 
@@ -53,6 +54,7 @@ Characteristics:
 - safety bypasses have been rejected
 - secret values are not present
 - provider / plugin / store / worker entries are name-based only
+- `plugins.enabled` is a list of registered plugin names that become active for the config
 - no concrete runtime objects are included
 
 `ValidatedPackageConfig` holds names and validated parameters only. It does not hold provider, store, or plugin instances.
@@ -389,6 +391,8 @@ RuntimeDependencies + GraphRuntimeConfig
 
 Runtime must not read raw config sources.
 Runtime must consume validated / resolved config and runtime dependencies only.
+
+`ValidatedPackageConfig.plugins.enabled` is an activation list for manually registered plugins, not an import or install mechanism.
 
 ## Relationship to existing payloads
 

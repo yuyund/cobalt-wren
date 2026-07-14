@@ -227,6 +227,7 @@ Notes:
 - Plugin taxonomy is defined in `docs/PLUGINS.md`.
 - Plugins should depend on `langgraph_automation.api.*` public facade modules, not internal implementation modules.
 - `api.workflow`, `api.runtime`, and `api.errors` remain future surfaces and are not implemented yet.
+- Manual registration and registry boundaries are defined in `docs/PLUGIN_REGISTRATION.md`.
 
 ## Config-facing concepts
 

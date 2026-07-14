@@ -66,6 +66,14 @@ These contracts describe the current internal foundation surface. If parts of th
 - tool plugins remain subject to ToolPolicy
 - provider / store / event / worker plugins are resolved by name through registry boundaries
 
+## Plugin Registration Contract
+
+- duplicate registration is rejected in Package MVP
+- override is denied by default
+- config does not import plugins
+- `plugins.enabled` references registered plugin names
+- registry provides lookup, validator orchestrates validation, runtime assembly constructs dependencies
+
 ## GraphRuntimeConfig Contract
 
 - execution-plane config は graph-local

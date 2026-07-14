@@ -239,6 +239,7 @@ Future implementation note:
 - Package MVP should use explicit / manual registration
 - Package Complete may consider Python entry points or other discovery mechanisms
 - Plugin-specific config validation is defined by the plugin type in `docs/PLUGINS.md`.
+- `plugins.enabled` selects from manually registered plugins and is not an import path, install instruction, or discovery mechanism.
 
 Example:
 
@@ -580,6 +581,7 @@ Do not mix these layers:
 - `Workflow.definition_payload` must not contain secret values
 - `Run.input_payload` is not runtime config
 - `Run.input_payload` must not be read for model / api_key / base_url / tools.allowed
+- `plugins.enabled` references registered plugin names only; enabled but unregistered plugins are validation errors.
 
 ## P1-A done when
 

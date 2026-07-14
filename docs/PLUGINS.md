@@ -11,6 +11,8 @@ Purpose:
 - separate config schema, plugin-specific validation, and runtime assembly
 - distinguish Package MVP manual registration from Package Complete discovery
 
+Manual registration, conflict policy, enabled plugin handling, and registry boundaries are defined in `docs/PLUGIN_REGISTRATION.md`.
+
 ## System principles
 
 - plugin is an extension point of the package core
