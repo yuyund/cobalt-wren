@@ -8,4 +8,5 @@ Prefer importing from grouped submodules:
 - langgraph_automation.api.events
 - langgraph_automation.api.errors
 - langgraph_automation.api.plugins
+- langgraph_automation.api.workflow
 """

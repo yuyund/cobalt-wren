@@ -31,10 +31,10 @@ Current implemented public facade:
 - `langgraph_automation.api.events`
 - `langgraph_automation.api.errors`
 - `langgraph_automation.api.plugins`
+- `langgraph_automation.api.workflow`
 
 Future public surfaces:
 
-- `langgraph_automation.api.workflow`
 - `langgraph_automation.api.runtime`
 
 Package P0-B implements the minimal facade described below.
@@ -47,7 +47,7 @@ Current internal foundation names remain graph-oriented:
 - `GraphRuntimeRequirements`
 - `UnknownGraphKindError`
 
-Future public vocabulary may be workflow-oriented:
+Implemented public workflow vocabulary:
 
 - `WorkflowDefinition`
 - `WorkflowRequirements`
@@ -56,9 +56,11 @@ Future public vocabulary may be workflow-oriented:
 Decisions:
 
 - Do not rename `GraphDefinition` now.
-- A future public facade may introduce `WorkflowDefinition` as an alias or wrapper.
+- `api.workflow` exposes `WorkflowDefinition` directly.
 - `workflows/catalog.py` is package composition, not a public API surface.
 - Plugin authors should move toward a future registration API rather than editing catalog internals directly.
+
+`GraphDefinition` remains internal foundation vocabulary and is not exported from `api.workflow`.
 
 ## Runtime API surface
 
@@ -199,7 +201,7 @@ Current guidance:
 - Do not rename internal graph error classes now.
 - `UnknownGraphKindError` remains the internal graph vocabulary for this phase.
 - A future public facade may map graph vocabulary to workflow vocabulary.
-- No error classes are exported yet.
+- No additional error classes are exported beyond the minimal facade.
 - The minimal public error facade is intentionally smaller than the full taxonomy.
 - `FrameworkError`, `ConfigError`, `PluginRegistrationError`, `PluginResolutionError`, `PluginValidationError`, `RuntimeAssemblyError`, and `SafetyBoundaryError` were the minimal candidates and are now implemented.
 
@@ -222,7 +224,6 @@ Exports:
 Not exported:
 
 - `PluginRegistry`
-- `WorkflowContribution`
 - `WorkerContribution`
 - `UIContribution`
 - `ValidationContext`
@@ -232,6 +233,7 @@ Not exported:
 Guidance:
 
 - `api.plugins` is the public vocabulary for plugin packages and contributions.
+- `PluginContributions.workflows` aggregates workflow contributions, but `WorkflowContribution` itself is owned by `api.workflow`.
 - `PluginRegistry` remains an internal mechanism under `langgraph_automation.plugins.registry`.
 - `api.plugins` does not expose registry, config validator, runtime assembly, or concrete runtime dependencies.
 
@@ -241,12 +243,12 @@ Guidance:
 - `langgraph_automation.api.tools`
 - `langgraph_automation.api.stores`
 - `langgraph_automation.api.events`
+- `langgraph_automation.api.workflow`
 
-These modules re-export selected stable interfaces only. They do not expose workflow definition, runtime concrete implementation, plugin loader, config loader, or public error taxonomy.
+These modules re-export selected stable interfaces only. They do not expose runtime concrete implementation, plugin loader, config loader, or public error taxonomy.
 
 ## Deferred public surfaces
 
-- `langgraph_automation.api.workflow`
 - `langgraph_automation.api.runtime`
 - `WorkflowPlugin`
 - `ToolPlugin`
@@ -282,11 +284,17 @@ Notes:
 - Plugin API shapes are documented in `docs/PLUGIN_API_SHAPE.md`.
 - Plugin API facade staging is defined in `docs/PLUGIN_API_FACADE.md`.
 
+## Workflow facade staging
+
+- `api.workflow` is implemented and defines `WorkflowMetadata`, `WorkflowRequirements`, `WorkflowDefinition`, and `WorkflowContribution`.
+- `api.plugins` aggregates workflow contributions through `PluginContributions.workflows`.
+- `GraphDefinition`, `GraphRuntime`, and `GraphRuntimeConfig` remain outside the public facade.
+
 ## Plugin facade staging
 
 - Implemented public facade remains `api.llm`, `api.tools`, `api.stores`, and `api.events`.
-- `api.plugins` remains future.
-- `api.workflow` remains future.
+- `api.plugins` remains implemented.
+- `api.workflow` remains implemented.
 - `api.runtime` remains future.
 - `api.errors` remains future.
 - `GraphRuntime` and `GraphDefinition` remain outside the public facade.

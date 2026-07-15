@@ -87,15 +87,28 @@ These contracts describe the current internal foundation surface. If parts of th
 ## Plugin API Shape Contract
 
 - plugin objects contain metadata and contributions
+- workflow contributions are declared through `api.workflow`
 - contribution validation hooks do not create runtime dependencies
 - contribution factory hooks are called by RuntimeAssembly
 - registry does not hold concrete runtime instances
 - ValidationContext and FactoryContext must not contain raw config source, Run object, Django ORM object, or secret values unless mediated by SecretResolver
 
+## Workflow API Contract
+
+- `api.workflow` is the public workflow vocabulary facade
+- `WorkflowContribution` is declarative and does not execute workflows
+- `WorkflowDefinition.build` is retained on the definition shape, but `PluginRegistry` does not call it
+- `GraphDefinition` and `GraphRuntime` remain internal foundation vocabulary
+- `PluginRegistry` stores workflow contributions only
+- `PluginRegistry` does not build or execute workflows
+- `ConfigValidator` does not validate workflow configs yet
+- `RuntimeAssembler` does not execute workflows
+- `api.runtime` is not part of `api.workflow`
+
 ## Plugin API Facade Contract
 
-- implemented public facade remains `api.llm`, `api.tools`, `api.stores`, `api.events`, `api.errors`, and `api.plugins`
-- `api.workflow` and `api.runtime` are not yet implemented in P3-D
+- implemented public facade remains `api.llm`, `api.tools`, `api.stores`, `api.events`, `api.errors`, `api.plugins`, and `api.workflow`
+- `api.runtime` remains deferred
 - `GraphRuntime` and `GraphDefinition` remain outside the public facade
 - PluginRegistry, ConfigValidator, and RuntimeAssembly are not public facade types in P3-D
 

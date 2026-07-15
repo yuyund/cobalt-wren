@@ -116,12 +116,17 @@ Current:
 Current:
 
 - Runtime Assembly Block D
-- RuntimeAssembler + RuntimeDependencies + SecretResolver
+- 状態: 完了
+
+Current:
+
+- Workflow Extension Block E
+- api.workflow + WorkflowContribution support
+- 状態: 完了
 
 Next:
 
-- Workflow Extension Block E
-- then Built-in Wiring Block F
+- Built-in Wiring Block F
 
 ## 6. Recommended Execution Order
 

@@ -21,6 +21,7 @@ Current implemented public facade:
 - `langgraph_automation.api.events`
 - `langgraph_automation.api.errors`
 - `langgraph_automation.api.plugins`
+- `langgraph_automation.api.workflow`
 
 Roles:
 
@@ -30,10 +31,10 @@ Roles:
 - `api.events`: `EventSink`
 - `api.errors`: `FrameworkError`, `ConfigError`, `PluginRegistrationError`, `PluginResolutionError`, `PluginValidationError`, `RuntimeAssemblyError`, `SafetyBoundaryError`
 - `api.plugins`: `Plugin`, `PluginMetadata`, `PluginContributions`, `ToolContribution`, `ProviderContribution`, `StoreContribution`, `EventSinkContribution`
+- `api.workflow`: `WorkflowMetadata`, `WorkflowRequirements`, `WorkflowDefinition`, `WorkflowContribution`
 
 Not implemented yet:
 
-- `langgraph_automation.api.workflow`
 - `langgraph_automation.api.runtime`
 
 ## Facade hierarchy
@@ -45,15 +46,15 @@ langgraph_automation.api
   ├─ stores.py     # implemented
   ├─ events.py     # implemented
   ├─ plugins.py    # implemented
-  ├─ workflow.py   # future
+  ├─ workflow.py   # implemented
   ├─ runtime.py    # future
   └─ errors.py     # implemented
 ```
 
 Stages:
 
-- Current: `api.llm`, `api.tools`, `api.stores`, `api.events`, `api.errors`, `api.plugins`
-- Still deferred: `api.workflow`, `api.runtime`
+- Current: `api.llm`, `api.tools`, `api.stores`, `api.events`, `api.errors`, `api.plugins`, `api.workflow`
+- Still deferred: `api.runtime`
 
 ## api.plugins staging
 
@@ -69,9 +70,10 @@ Stages:
 - `StoreContribution`
 - `EventSinkContribution`
 
+`PluginContributions` aggregates workflow contributions via `workflows`, but `WorkflowContribution` itself is defined in `langgraph_automation.api.workflow`.
+
 ### Deferred from api.plugins
 
-- `WorkflowContribution`
 - `WorkerContribution`
 - `UIContribution`
 - `ValidationContext`
@@ -80,18 +82,15 @@ Stages:
 - `PluginRegistry`
 - `ConfigValidator`
 - `RuntimeAssembly`
-- `WorkflowDefinition`
 - `RuntimeDependencies`
 - plugin error taxonomy
 
 Why deferred:
 
-- `WorkflowDefinition` and `WorkflowRequirements` are not defined as public facades yet
-- `ConfigValidator` does not exist yet, so validation context shape may move
-- `RuntimeAssembly` does not exist yet, so factory context shape may move
-- `SecretResolver` is a security boundary and should be staged carefully
 - worker / queue / outbox / long-running semantics are not implemented
 - UI registry and permission / visibility boundaries are not implemented
+- `ConfigValidator` and `RuntimeAssembly` are later layers and still own their own context shapes
+- `SecretResolver` is a security boundary and should be staged carefully
 - implementation boundaries are not verified yet
 - exposing them too early would freeze internal structure
 - registry / validator / runtime assembly are close to package internals
@@ -109,7 +108,7 @@ Reasons:
 
 - registration API shape is still unimplemented
 - conflict, duplicate, and enabled plugin enforcement are still unverified
-- `EffectivePluginSet` is not implemented
+- `EffectivePluginSet` is not part of the workflow facade
 - connection to `ConfigValidator` and `RuntimeAssembly` is not implemented
 - exposing it too early would freeze registry internals
 - the design should avoid service-locator behavior
@@ -118,21 +117,17 @@ Future direction:
 
 - if exposed, prefer a thin protocol or registration API over a concrete class-shaped public contract
 
-## Why WorkflowContribution is provisional
+## Workflow facade staging
 
-`WorkflowContribution` is a provisional public candidate.
+`api.workflow` is now the public workflow vocabulary facade.
 
-Reasons:
+`WorkflowContribution`, `WorkflowDefinition`, `WorkflowRequirements`, and `WorkflowMetadata` are implemented there.
 
-- `WorkflowDefinition` facade is not defined yet
-- `WorkflowRequirements` facade is not defined yet
-- internal `GraphDefinition` and `GraphRuntimeRequirements` should not leak
-- `api.workflow` is not designed yet
-- workflow shape is tightly coupled to graph/runtime capability
+Reasons for keeping workflow vocabulary in a dedicated facade:
 
-Future direction:
-
-- `api.workflow` may eventually include `WorkflowDefinition`, `WorkflowRequirements`, `WorkflowBuildContext`, and `WorkflowMetadata`
+- workflow is the user-facing term that plugin authors should import
+- `api.plugins` can aggregate workflow contributions without owning workflow-specific vocabulary
+- internal graph vocabulary remains free to evolve separately
 
 ## Why api.runtime is deferred
 
@@ -141,9 +136,9 @@ Future direction:
 Reasons:
 
 - `GraphRuntime` remains provisional
-- `RuntimeDependencies` are not implemented
-- `RuntimeAssembly` is not implemented
-- `FactoryContext` is not fixed
+- `RuntimeDependencies` are internal runtime plumbing
+- `RuntimeAssembly` is already internal/provisional
+- `FactoryContext` is not a public facade type
 - runtime is close to internal foundation concerns
 
 Still not exposed:
@@ -158,35 +153,14 @@ Future direction:
 
 - if `api.runtime` exists later, it should likely expose minimal capability protocols rather than concrete runtime classes
 
-## Why api.errors is deferred
+## Why api.errors is no longer deferred
 
-`api.errors` is deferred.
-Error taxonomy and future error facade candidates are defined in `docs/ERROR_TAXONOMY.md`.
-
-Reasons:
-
-- error mapping to UI/API is not yet designed
-- safe error message policy and plugin/runtime error mapping need alignment
-- config validation and plugin validation error domains are not unified yet
-- recoverable vs fatal classification is not established
-
-Future candidate errors:
-
-- `PluginRegistrationError`
-- `PluginConflictError`
-- `DuplicatePluginError`
-- `UnknownPluginError`
-- `PluginValidationError`
-- `IncompatiblePluginError`
-- `ConfigValidationError`
-- `UnsafeConfigError`
-- `RuntimeAssemblyError`
-
-P3-D does not create error classes.
+`api.errors` is implemented as the minimal public error facade.
+The error taxonomy and facade staging are defined in `docs/ERROR_TAXONOMY.md` and `docs/API_ERRORS_FACADE.md`.
 
 ## Tool / Provider / Store / EventSink contributions
 
-These are public candidates, but not implemented in P3-D.
+These are public candidates and are implemented in `api.plugins`.
 
 - `ToolContribution`: public candidate, connects to `api.tools`
 - `ProviderContribution`: public candidate, connects to `api.llm`
@@ -201,7 +175,7 @@ Notes:
 
 ## Worker / UI contributions
 
-These are future and should not be exposed in P3-D.
+These remain future and should not be exposed in P3-D.
 
 - `WorkerContribution`: future
 - `UIContribution`: future
@@ -213,12 +187,11 @@ Reasons:
 
 ## Premature fixation policy
 
-P3-D does not implement `api.plugins`, `api.workflow`, `api.runtime`, or `api.errors`.
+P3-D does not implement `api.runtime`.
 
 Reason:
 
-- `PluginRegistry`, `ConfigValidator`, and `RuntimeAssembly` are not implemented
-- `WorkflowDefinition`, `RuntimeDependencies`, and error taxonomy are not fixed
+- `RuntimeDependencies`, and runtime execution shapes are not fixed
 - once a public facade is shipped, changing it later is expensive
 - docs should classify candidates before code exists
 
@@ -230,46 +203,10 @@ Implemented public facade:
 - `api.tools`
 - `api.stores`
 - `api.events`
+- `api.errors`
+- `api.plugins`
+- `api.workflow`
 
 Future facade:
 
-- `api.plugins`
-- `api.workflow`
 - `api.runtime`
-- `api.errors`
-
-`api.plugins` public candidate:
-
-- `WorkflowContribution`
-- `ValidationContext`
-- `FactoryContext`
-- `SecretResolver`
-
-`api.plugins` provisional:
-
-- `WorkflowContribution`
-- `ValidationContext`
-- `FactoryContext`
-- `SecretResolver`
-
-`api.plugins` future:
-
-- `WorkerContribution`
-- `UIContribution`
-
-Deferred:
-
-- `PluginRegistry`
-- `ConfigValidator`
-- `RuntimeAssembly`
-- `WorkflowDefinition`
-- `RuntimeDependencies`
-- plugin error taxonomy
-
-## P3-D done when
-
-- current facade and future facade are classified
-- `api.plugins` candidate boundaries are staged
-- `api.workflow`, `api.runtime`, and `api.errors` remain deferred
-- internal GraphRuntime and GraphDefinition remain outside the public facade
-- premature public API fixation is avoided

@@ -12,6 +12,7 @@ from langgraph_automation.api.plugins import (
     StoreContribution,
     ToolContribution,
 )
+from langgraph_automation.api.workflow import WorkflowContribution
 
 _PLUGIN_REGISTRY_COMPONENT = 'plugin_registry'
 
@@ -19,6 +20,7 @@ _PLUGIN_REGISTRY_COMPONENT = 'plugin_registry'
 class PluginRegistry:
     def __init__(self, plugins: Iterable[Plugin] | None = None) -> None:
         self._plugins: dict[str, Plugin] = {}
+        self._workflows: dict[str, WorkflowContribution] = {}
         self._tools: dict[str, ToolContribution] = {}
         self._providers: dict[str, ProviderContribution] = {}
         self._stores: dict[tuple[str, str], StoreContribution] = {}
@@ -34,9 +36,23 @@ class PluginRegistry:
             raise self._duplicate_plugin_error(plugin_name)
 
         seen_tools: set[str] = set()
+        seen_workflows: set[str] = set()
         seen_providers: set[str] = set()
         seen_stores: set[tuple[str, str]] = set()
         seen_event_sinks: set[str] = set()
+
+        for workflow in plugin.contributions.workflows:
+            if workflow.kind in seen_workflows or workflow.kind in self._workflows:
+                raise self._duplicate_contribution_error(
+                    contribution_scope='workflows',
+                    contribution_name=workflow.kind,
+                    metadata={
+                        'plugin_name': plugin_name,
+                        'contribution_scope': 'workflows',
+                        'contribution_name': workflow.kind,
+                    },
+                )
+            seen_workflows.add(workflow.kind)
 
         for tool in plugin.contributions.tools:
             if tool.name in seen_tools or tool.name in self._tools:
@@ -84,6 +100,8 @@ class PluginRegistry:
             seen_event_sinks.add(event_sink.backend_name)
 
         self._plugins[plugin_name] = plugin
+        for workflow in plugin.contributions.workflows:
+            self._workflows[workflow.kind] = workflow
         for tool in plugin.contributions.tools:
             self._tools[tool.name] = tool
         for provider in plugin.contributions.providers:
@@ -104,6 +122,12 @@ class PluginRegistry:
             return self._tools[name]
         except KeyError as exc:
             raise self._unknown_tool_error(name) from exc
+
+    def get_workflow(self, kind: str) -> WorkflowContribution:
+        try:
+            return self._workflows[kind]
+        except KeyError as exc:
+            raise self._unknown_workflow_error(kind) from exc
 
     def get_provider(self, name: str) -> ProviderContribution:
         try:
@@ -175,6 +199,15 @@ class PluginRegistry:
             code='PLUGIN_UNKNOWN_TOOL',
             component=_PLUGIN_REGISTRY_COMPONENT,
             metadata={'tool_name': name},
+        )
+
+    @staticmethod
+    def _unknown_workflow_error(kind: str) -> PluginResolutionError:
+        return PluginResolutionError(
+            f"Plugin resolution failed: workflow kind '{kind}' is not registered.",
+            code='PLUGIN_UNKNOWN_WORKFLOW',
+            component=_PLUGIN_REGISTRY_COMPONENT,
+            metadata={'workflow_kind': kind},
         )
 
     @staticmethod

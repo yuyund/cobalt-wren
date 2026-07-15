@@ -4,7 +4,10 @@ from __future__ import annotations
 
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass, field
-from typing import Any
+from typing import Any, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from langgraph_automation.api.workflow import WorkflowContribution
 
 __all__ = [
     'Plugin',
@@ -120,12 +123,14 @@ class EventSinkContribution:
 
 @dataclass(frozen=True, slots=True)
 class PluginContributions:
+    workflows: tuple[WorkflowContribution, ...] = ()
     tools: tuple[ToolContribution, ...] = ()
     providers: tuple[ProviderContribution, ...] = ()
     stores: tuple[StoreContribution, ...] = ()
     event_sinks: tuple[EventSinkContribution, ...] = ()
 
     def __post_init__(self) -> None:
+        object.__setattr__(self, 'workflows', tuple(self.workflows))
         object.__setattr__(self, 'tools', tuple(self.tools))
         object.__setattr__(self, 'providers', tuple(self.providers))
         object.__setattr__(self, 'stores', tuple(self.stores))

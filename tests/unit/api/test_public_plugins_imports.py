@@ -4,6 +4,8 @@ from __future__ import annotations
 
 
 def test_public_plugins_api_exports() -> None:
+    import langgraph_automation.api.plugins as plugins_api
+
     from langgraph_automation.api.plugins import (
         EventSinkContribution,
         Plugin,
@@ -21,6 +23,7 @@ def test_public_plugins_api_exports() -> None:
     assert ProviderContribution is not None
     assert StoreContribution is not None
     assert EventSinkContribution is not None
+    assert 'WorkflowContribution' not in plugins_api.__all__
 
 
 def test_public_plugins_api_all() -> None:

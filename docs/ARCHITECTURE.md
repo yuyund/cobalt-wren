@@ -131,12 +131,13 @@ Application workflows are future layers and should not be pulled into `graphs`.
 - `api.plugins` is a public facade for plugin vocabulary.
 - `PluginRegistry` is an internal manual registration mechanism.
 - `api.plugins` does not depend on `PluginRegistry`.
-- `PluginRegistry` depends on `api.plugins` and `api.errors` only.
+- `PluginRegistry` depends on `api.plugins`, `api.workflow`, and `api.errors` only.
 - `ConfigLoader`, `ConfigValidator`, and `RuntimeAssembly` are later layers.
 - plugin taxonomy and responsibility boundaries are defined in `docs/PLUGINS.md`.
 - manual registration, enabled plugins, and registry conflict policy are defined in `docs/PLUGIN_REGISTRATION.md`.
 - validation hooks and factory hooks are defined in `docs/PLUGIN_API_SHAPE.md`.
 - plugin API facade staging is defined in `docs/PLUGIN_API_FACADE.md`.
+- workflow API facade staging is defined in `docs/API_SURFACE.md`.
 - error categories and primary failure preservation are defined in `docs/ERROR_TAXONOMY.md`.
 - ConfigValidator calls contribution validation hooks.
 - RuntimeAssembly calls contribution factory hooks.
@@ -163,6 +164,7 @@ Application workflows are future layers and should not be pulled into `graphs`.
 
 - `langgraph_automation.config.validator` is the first config layer allowed to depend on `langgraph_automation.plugins.registry`
 - `langgraph_automation.config.models`, `loader`, `normalizer`, and `security` remain free of registry and plugin facade dependencies
+- `api.workflow` defines the public workflow vocabulary for plugin contributions
 - `ConfigValidator` turns `NormalizedPackageConfig` into `ValidatedPackageConfig`
 - `EffectivePluginSet` is a validation-time projection of enabled plugins, not the full registry
 - `RuntimeAssembly` remains a later layer and still does not exist yet

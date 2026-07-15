@@ -46,7 +46,7 @@ Provides:
 
 Public API dependency:
 
-- future public candidate: `langgraph_automation.api.workflow`
+- implemented public facade: `langgraph_automation.api.workflow`
 - current public surfaces that a workflow plugin may depend on: `langgraph_automation.api.llm`, `langgraph_automation.api.tools`, `langgraph_automation.api.stores`, `langgraph_automation.api.events`
 
 Config relation:

@@ -11,6 +11,7 @@ from langgraph_automation.api.plugins import (
     StoreContribution,
     ToolContribution,
 )
+from langgraph_automation.api.workflow import WorkflowContribution, WorkflowDefinition, WorkflowMetadata, WorkflowRequirements
 
 
 def test_plugin_metadata_normalizes_and_copies_mappings() -> None:
@@ -43,6 +44,7 @@ def test_plugin_metadata_normalizes_and_copies_mappings() -> None:
 def test_plugin_contributions_defaults_to_empty_tuples() -> None:
     contributions = PluginContributions()
 
+    assert contributions.workflows == ()
     assert contributions.tools == ()
     assert contributions.providers == ()
     assert contributions.stores == ()
@@ -50,18 +52,29 @@ def test_plugin_contributions_defaults_to_empty_tuples() -> None:
 
 
 def test_plugin_contributions_normalize_iterables_to_tuples() -> None:
+    workflow = WorkflowContribution(
+        kind='company_agent',
+        definition=WorkflowDefinition(
+            kind='company_agent',
+            metadata=WorkflowMetadata(name='company_agent'),
+            requirements=WorkflowRequirements(),
+            build=lambda *args, **kwargs: object(),
+        ),
+    )
     tool = ToolContribution(name='github.search_issues')
     provider = ProviderContribution(name='litellm', provider_type='llm')
     store = StoreContribution(backend_name='memory', store_type='artifact')
     sink = EventSinkContribution(backend_name='stdout')
 
     contributions = PluginContributions(
+        workflows=[workflow],
         tools=[tool],
         providers=[provider],
         stores=[store],
         event_sinks=[sink],
     )
 
+    assert contributions.workflows == (workflow,)
     assert contributions.tools == (tool,)
     assert contributions.providers == (provider,)
     assert contributions.stores == (store,)

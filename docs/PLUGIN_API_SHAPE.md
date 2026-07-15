@@ -34,6 +34,7 @@ Coupling goals:
 - `Plugin`
 - `PluginMetadata`
 - `PluginContributions`
+- `WorkflowContribution`
 - `ToolContribution`
 - `ProviderContribution`
 - `StoreContribution`
@@ -41,7 +42,6 @@ Coupling goals:
 
 Deferred from MVP:
 
-- `WorkflowContribution`
 - `WorkerContribution`
 - `UIContribution`
 - `ValidationContext`
@@ -154,6 +154,8 @@ Reason:
 
 ## WorkflowContribution
 
+`WorkflowContribution` is implemented in `langgraph_automation.api.workflow` and is a first-class plugin contribution type.
+
 ### Purpose
 
 WorkflowContribution adds a workflow kind and provides graph structure, nodes, routing, state schema, prompt assembly, and output mapping.
@@ -169,14 +171,13 @@ WorkflowContribution:
     build_workflow(context) -> WorkflowDefinition
 ```
 
-P3-C does not implement `WorkflowDefinition` or `WorkflowRequirements`.
-P3-C does not create `api.workflow`.
-Current internal `GraphDefinition` / `GraphRuntimeRequirements` are not exposed through a public facade here.
-`WorkflowDefinition` / `WorkflowRequirements` remain future public facade candidates.
+`WorkflowDefinition` and `WorkflowRequirements` are implemented in `langgraph_automation.api.workflow`.
+`GraphDefinition` / `GraphRuntimeRequirements` remain internal foundation vocabulary and are not exposed through a public facade here.
 
 ### Validation
 
 WorkflowContribution validates `workflows.<name>.config`.
+The validation hook is retained on the contribution shape, but registry lookup and registration do not invoke it.
 
 Core knows:
 
@@ -194,6 +195,8 @@ WorkflowContribution knows:
 - output_format
 - application-specific behavior parameters
 
+`WorkflowDefinition.build` is retained on the definition shape, but registry lookup and registration do not invoke it.
+
 ## ToolContribution
 
 ### Purpose
@@ -210,7 +213,8 @@ ToolContribution:
     create_tool(context) -> ToolAdapter
 ```
 
-P3-C does not implement `ToolContribution`, `ToolAdapter`, or `ToolDefinition`.
+`ToolContribution` is implemented in `langgraph_automation.api.plugins`.
+`ToolAdapter` and `ToolDefinition` remain deferred.
 
 ### ToolPolicy boundary
 
@@ -305,7 +309,8 @@ WorkerContribution:
     create_worker_adapter(config, factory_context) -> WorkerAdapter
 ```
 
-P3-C does not implement `WorkerContribution` or `WorkerAdapter`.
+`WorkerContribution` remains deferred.
+`WorkerAdapter` remains deferred.
 
 Long-running capability remains a foundation concern. Worker backend selection is a plugin concern. Application-specific long-running behavior remains in workflow plugins.
 

@@ -24,6 +24,7 @@ Config does not name import paths. Config only activates already-registered plug
 Manual registration registers plugin objects and their contributions. Plugin object and contribution shapes are defined in `docs/PLUGIN_API_SHAPE.md`.
 Public facade staging for plugin API types is defined in `docs/PLUGIN_API_FACADE.md`.
 Manual PluginRegistry MVP is implemented internally, but it remains outside the public facade.
+Workflow contributions are part of the manual registry model, and workflow vocabulary is defined in `docs/PLUGIN_API_SHAPE.md` and `docs/PLUGIN_API_FACADE.md`.
 
 Conceptual example only:
 
@@ -52,6 +53,8 @@ registry.register(litellm_provider_plugin)
 - UI extension lookup
 - duplicate registration detection
 - name conflict detection
+
+Workflow kind registration is handled the same way as other contribution scopes: by name-based indexing and duplicate detection.
 
 ### Registry non-responsibilities
 
