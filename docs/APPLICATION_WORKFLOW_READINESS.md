@@ -125,5 +125,6 @@ Application workflow implementation remains deferred until:
 - service integration is routed through `api.engine`
 - L6 application-facing / service-facing tests exist
 
+These conditions are now satisfied.
 `company_agent` remains deferred.
-Application workflow code should not use the transitional service bridge directly.
+The next step is the Minimal Application Workflow Example block.

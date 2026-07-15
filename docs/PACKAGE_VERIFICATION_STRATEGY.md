@@ -38,6 +38,7 @@ This document defines the verification strategy for package-facing boundaries.
 ### L6: Application-Facing Tests
 
 - verify that apps/automation or a sample application uses package facade entrypoints only
+- L6 is implemented through the service bridge now routing through `api.engine`
 
 ## Failure Matrix
 
@@ -65,11 +66,10 @@ Expected behavior:
 - no dangerous data in Run.error_message
 - primary failure is not overwritten by secondary failure
 
-## Transitional Bridge Note
+## Service Integration Note
 
-The current service-layer workflow preparation bridge is acceptable as a transitional integration point.
-It is not the final package-facing boundary.
-The long-term direction is to route service/control-plane code through a package facade.
+The service-layer workflow preparation bridge now routes through `api.engine`.
+The long-term direction remains to keep application/control-plane code on the package-facing facade and away from package internals.
 
 ## Package Facade Verification
 
@@ -88,7 +88,7 @@ Verification levels:
 Headless smoke tests should only prepare workflows.
 They should not require provider network calls or graph execution.
 
-## Block N Update
+## Block O Update
 
-L6 remains pending and depends on service integration via api.engine.
-Boundary Hardening Block N prepares L6 by preventing new application/control-plane leakage into package internals.
+L6 is implemented.
+Service Integration via Package Facade Block O verifies that apps/automation can prepare workflows through `api.engine` without package internal imports.

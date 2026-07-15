@@ -235,6 +235,8 @@ Application workflows are future layers and should not be pulled into `graphs`.
 
 application/control-plane code should use `langgraph_automation.api.engine` as the package-facing facade.
 
+`apps/automation/services/workflow_preparation.py` now routes through `api.engine`; the transitional exception is removed.
+
 Package internals hidden from control-plane:
 
 - `PluginRegistry`
@@ -247,9 +249,3 @@ Package internals hidden from control-plane:
 - `workflows.adapter`
 - `workflows.requirements`
 - `graphs.*`
-
-Temporary exception:
-
-- `apps/automation/services/workflow_preparation.py`
-
-The temporary exception is transitional and should be removed in Service Integration via Package Facade Block O.

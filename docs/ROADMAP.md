@@ -175,7 +175,7 @@ Workflow preparation path:
 
 Service workflow preparation bridge:
 
-- complete, but transitional
+- complete and routed through `api.engine`
 
 Package Roadmap Correction Block J:
 
@@ -197,11 +197,11 @@ Boundary Hardening Block N:
 
 - complete
 
+Service Integration via Package Facade Block O:
+
+- complete
+
 Current:
-
-- Service Integration via Package Facade Block O
-
-Next:
 
 - Minimal Application Workflow Example Block P
 
@@ -211,7 +211,7 @@ Then:
 
 Package Complete:
 
-- not complete yet
+- complete
 
 Application workflow:
 
@@ -221,19 +221,29 @@ company_agent:
 
 - deferred
 
-Before Package Complete:
+Package Complete+ future work:
 
-- application-facing package facade must be implemented
-- verification harness must cover package-facing entrypoints
-- boundary hardening must keep apps/automation on the facade path
-- apps/automation must be able to use package facade without package internals as the final architecture
+- `run_workflow`
+- `api.runtime`
+- graph execution public API
+- worker / queue / outbox
+- true resume
+- external plugin discovery
+- entry point discovery
+- `company_agent`
+- production application workflow
 
-Recommended order after Block M:
+Before Package Complete+:
 
-1. Boundary Hardening Block N
-2. Service Integration via Package Facade Block O
-3. Minimal Application Workflow Example Block P
-4. company_agent Block Q
+- application-facing package facade must stay stable
+- verification harness must continue to cover package-facing entrypoints
+- application/control-plane code must remain on the facade path
+- package internals must stay hidden from application/control-plane code
+
+Recommended order after Block O:
+
+1. Minimal Application Workflow Example Block P
+2. company_agent Block Q
 
 Before First Application Workflow:
 

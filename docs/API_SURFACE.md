@@ -426,4 +426,4 @@ The service-layer workflow preparation bridge is transitional and should eventua
 `langgraph_automation.api.engine` is the package-facing facade for application/control-plane code.
 It hides `PluginRegistry`, `WorkflowPreparer`, `RuntimeAssembler`, `ConfigValidator`, `RuntimeDependencies`, `workflows.catalog`, `workflows.prepare`, `workflows.adapter`, and `workflows.requirements`.
 `run_workflow` and `api.runtime` remain deferred.
-`apps/automation/services/workflow_preparation.py` remains a transitional exception until Block O.
+`apps/automation/services/workflow_preparation.py` now routes through `api.engine`; the transitional exception has been removed.

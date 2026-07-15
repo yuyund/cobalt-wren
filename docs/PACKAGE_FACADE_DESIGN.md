@@ -20,7 +20,7 @@ The facade should hide the moving parts that are still free to evolve:
 - `RuntimeAssembler`
 - `RuntimeDependencies`
 
-The implementation is now in place, and Block M verifies the preparation path through the facade, but the contract remains provisional so the boundary can keep evolving without breaking application code.
+The implementation is now in place, and Block M verifies the preparation path through the facade. Block O routes the service bridge through `api.engine`, while the contract remains provisional so the boundary can keep evolving without breaking application code.
 
 ## Facade Module Name
 
@@ -161,19 +161,14 @@ Public secret resolver injection is deferred until the runtime and secret bounda
 
 ## Migration Direction
 
-The existing service-layer workflow preparation bridge is transitional.
+The existing service-layer workflow preparation bridge now routes through `langgraph_automation.api.engine`.
 
 Current path:
 
 - `apps/automation/services/workflow_preparation.py`
-- uses workflow internals directly
-
-Future path:
-
-- `apps/automation/services/workflow_preparation.py`
 - calls `langgraph_automation.api.engine`
 
-The transitional bridge is acceptable now, but it must not become the permanent boundary.
+The bridge remains thin, but it is no longer the package-internal transitional exception.
 
 ## Verification Target
 
@@ -206,5 +201,5 @@ Deferred until later design blocks:
 
 ## Boundary Hardening Note
 
-`apps/automation/services/workflow_preparation.py` remains the temporary exception.
-It is transitional and should be removed in Service Integration via Package Facade Block O.
+`apps/automation/services/workflow_preparation.py` now routes through `api.engine`.
+The temporary exception has been removed in Service Integration via Package Facade Block O.

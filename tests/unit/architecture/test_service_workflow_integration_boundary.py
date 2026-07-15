@@ -24,26 +24,27 @@ def test_workflow_preparation_service_stays_within_allowed_boundaries() -> None:
     modules = _imports(module)
 
     forbidden_prefixes = (
-        'langgraph_automation.workflows.reference',
-        'langgraph_automation.graphs.runner',
-        'langgraph_automation.graphs.builders',
-        'langgraph_automation.config.validator',
+        'langgraph_automation.workflows.prepare',
+        'langgraph_automation.workflows.catalog',
+        'langgraph_automation.workflows.adapter',
+        'langgraph_automation.workflows.requirements',
+        'langgraph_automation.plugins.registry',
         'langgraph_automation.runtime.assembly',
+        'langgraph_automation.runtime.dependencies',
+        'langgraph_automation.config.validator',
+        'langgraph_automation.graphs',
     )
 
     offenders = [name for name in modules if name.startswith(forbidden_prefixes)]
     assert offenders == []
 
 
-def test_workflow_preparation_service_imports_expected_bridges() -> None:
+def test_workflow_preparation_service_imports_package_facing_boundary_only() -> None:
     modules = _imports(Path('src/langgraph_automation/apps/automation/services/workflow_preparation.py'))
 
     expected_prefixes = (
-        'langgraph_automation.workflows.prepare',
-        'langgraph_automation.workflows.catalog',
-        'langgraph_automation.runtime.dependencies',
-        'langgraph_automation.plugins.registry',
-        'langgraph_automation.api.errors',
+        'langgraph_automation.api.engine',
+        'langgraph_automation.api.plugins',
     )
 
     assert any(name.startswith(expected_prefixes) for name in modules)

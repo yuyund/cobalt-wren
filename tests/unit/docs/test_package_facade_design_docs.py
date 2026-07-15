@@ -27,16 +27,15 @@ def test_package_facade_design_docs_exist_and_cover_core_terms() -> None:
         'WorkflowPreparer',
         'RuntimeAssembler',
         'ConfigValidator',
-        'auto-enabled',
         'Block M',
-        'transitional',
+        'Block O',
         'implemented',
-        'temporary exception',
-        'Service Integration via Package Facade Block O',
+        'block o routes the service bridge through `api.engine`',
     ):
-        assert token in design_text or token in adr_text
+        assert token.lower() in design_text.lower() or token.lower() in adr_text.lower()
 
     assert 'public-facing provisional' in design_text
     assert 'preparation only' in adr_text.lower()
     assert 'verification' in design_text.lower()
     assert 'application-facing package facade' in design_text.lower() or 'package-facing facade' in design_text.lower()
+    assert 'temporary exception has been removed' in design_text.lower()

@@ -1,4 +1,4 @@
-"""Architecture guard for the transitional apps/automation package boundary."""
+"""Architecture guard for the apps/automation package boundary."""
 
 from __future__ import annotations
 
@@ -6,28 +6,28 @@ from pathlib import Path
 
 from tests.support.import_scan import collect_import_targets
 
-TEMPORARY_EXCEPTION = Path("src/langgraph_automation/apps/automation/services/workflow_preparation.py")
+BRIDGE = Path("src/langgraph_automation/apps/automation/services/workflow_preparation.py")
 
 
-def test_workflow_preparation_bridge_is_the_only_temporary_exception() -> None:
-    """Temporary exception: keep this exact bridge until Service Integration via Package Facade Block O."""
-    modules = collect_import_targets(TEMPORARY_EXCEPTION)
+def test_workflow_preparation_bridge_imports_only_the_package_facing_engine_facade() -> None:
+    modules = collect_import_targets(BRIDGE)
 
     forbidden_prefixes = (
-        "langgraph_automation.workflows.reference",
-        "langgraph_automation.graphs.runner",
-        "langgraph_automation.graphs.builders",
-        "langgraph_automation.config.validator",
-        "langgraph_automation.runtime.assembly",
-    )
-    offenders = [module for module in modules if module.startswith(forbidden_prefixes)]
-    assert offenders == [], f"{TEMPORARY_EXCEPTION} imports forbidden modules: {offenders}"
-
-    expected_prefixes = (
         "langgraph_automation.workflows.prepare",
         "langgraph_automation.workflows.catalog",
-        "langgraph_automation.runtime.dependencies",
+        "langgraph_automation.workflows.adapter",
+        "langgraph_automation.workflows.requirements",
         "langgraph_automation.plugins.registry",
-        "langgraph_automation.api.errors",
+        "langgraph_automation.runtime.assembly",
+        "langgraph_automation.runtime.dependencies",
+        "langgraph_automation.config.validator",
+        "langgraph_automation.graphs",
     )
-    assert any(module.startswith(expected_prefixes) for module in modules)
+    offenders = [module for module in modules if module.startswith(forbidden_prefixes)]
+    assert offenders == [], f"{BRIDGE} imports forbidden modules: {offenders}"
+
+    for expected in (
+        "langgraph_automation.api.engine",
+        "langgraph_automation.api.plugins",
+    ):
+        assert expected in modules

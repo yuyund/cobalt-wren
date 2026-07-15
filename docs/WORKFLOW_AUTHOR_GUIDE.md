@@ -75,3 +75,5 @@ Application workflow authors should use public API facades.
 They should not import `apps/automation`, Django, `PluginRegistry`, `RuntimeAssembler`, `ConfigValidator`, `WorkflowPreparer`, or `workflows.catalog` / `workflows.prepare` / `workflows.adapter` / `workflows.requirements`.
 
 `graphs.*` is not a public API for application workflows; it is provisional only where required for `WorkflowDefinition.build`.
+
+Application/control-plane service integration now uses `langgraph_automation.api.engine` for workflow preparation.

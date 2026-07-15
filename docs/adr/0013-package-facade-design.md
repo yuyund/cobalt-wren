@@ -8,8 +8,8 @@ Package / Foundation MVP is complete, but application and control-plane code sti
 
 Today the package contains the internal pieces needed for configuration, plugin registration, runtime assembly, workflow preparation, and built-in workflow wiring, but those pieces are still exposed as internal modules.
 
-The service-layer workflow preparation bridge exists and works, but it is transitional.
-It must not become the final package boundary.
+The service-layer workflow preparation bridge now routes through `api.engine`.
+It remains a thin wrapper, not the final package boundary.
 
 ## Decision
 
@@ -45,7 +45,7 @@ Positive:
 
 - application/control-plane code can depend on a stable package entrypoint rather than package internals
 - package internals can continue to evolve behind the facade
-- the eventual service bridge can route through a single supported boundary
+- the service bridge now routes through the supported boundary
 
 Negative / tradeoffs:
 

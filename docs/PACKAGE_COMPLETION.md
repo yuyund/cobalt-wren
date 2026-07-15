@@ -87,20 +87,29 @@ It should not prematurely expose:
 - checkpoint / resume semantics
 - `run_workflow` as a broad public contract
 
-## Package Complete Is Still Pending
+## Package Complete Status
 
-Package Complete remains not complete because:
+Package Complete is complete.
 
-- boundary hardening is complete at the guard / document level, but the service bridge is still transitional
-- the service bridge is not yet routed through `api.engine`
-- L6 application-facing tests are still deferred
+It is complete because:
 
-## Boundary Hardening Status
+- `langgraph_automation.api.engine` is implemented
+- `langgraph_automation.api.engine` is verified
+- boundary hardening is complete
+- the service bridge routes through `api.engine`
+- the temporary exception has been removed
+- L6 application-facing / service-facing tests exist
 
-Boundary hardening is complete at the guard/document level, but the service bridge remains transitional.
+## Package Complete+
 
-Package Complete remains pending because:
+Package Complete does not require:
 
-- the service bridge is still transitional
-- service integration via api.engine is not complete
-- L6 application-facing tests are still deferred
+- `run_workflow`
+- `api.runtime`
+- graph execution public API
+- worker / queue / outbox
+- true resume
+- external plugin discovery
+- entry point discovery
+- `company_agent`
+- production application workflow

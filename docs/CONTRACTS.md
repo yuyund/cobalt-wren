@@ -294,5 +294,5 @@ These modules re-export selected foundation interfaces. They do not expose workf
 
 - application/control-plane code must not couple directly to package internals
 - `langgraph_automation.api.engine` is the allowed package-facing boundary
-- `apps/automation/services/workflow_preparation.py` remains a temporary exception until Block O
+- `apps/automation/services/workflow_preparation.py` now routes through `api.engine`; the temporary exception has been removed
 - `workflows/applications` should treat `graphs.*` as provisional and not public API, only using it where required for `WorkflowDefinition.build`

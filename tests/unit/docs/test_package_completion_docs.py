@@ -18,21 +18,21 @@ def test_package_completion_docs_exist_and_cover_core_terms() -> None:
 
     assert 'application-facing package facade' in completion_text
     assert 'langgraph_automation.api.engine' in completion_text
-    assert 'service bridge is still transitional' in completion_text.lower()
-    assert 'service integration via api.engine is not complete' in completion_text.lower()
+    assert 'service bridge routes through `api.engine`' in completion_text.lower()
+    assert 'package complete is complete' in completion_text.lower()
+    assert 'package complete+' in completion_text.lower()
     assert 'PluginRegistry' in completion_text
     assert 'WorkflowPreparer' in completion_text
     assert 'verification harness' in completion_text.lower()
-    assert 'package complete remains not complete' in completion_text.lower()
     assert 'company_agent' in completion_text
-    assert 'boundary hardening is complete at the guard / document level, but the service bridge is still transitional' in completion_text.lower()
-    assert 'l6 application-facing tests are still deferred' in completion_text.lower()
+    assert 'l6 application-facing / service-facing tests exist' in completion_text.lower()
+    assert 'run_workflow' in completion_text.lower()
+    assert 'api.runtime' in completion_text.lower()
 
     for token in ('L0', 'L1', 'L2', 'L3', 'L4', 'L5', 'L6'):
         assert token in verification_text
     assert 'api.engine integration is verified in block m' in verification_text.lower()
     assert 'headless prepare is verified in block m' in verification_text.lower()
     assert 'failure matrix' in verification_text.lower()
-    assert 'transitional bridge' in verification_text.lower()
-    assert 'l6 remains pending' in verification_text.lower()
-    assert 'depends on service integration via api.engine' in verification_text.lower()
+    assert 'l6 is implemented' in verification_text.lower()
+    assert 'service-layer workflow preparation bridge now routes through `api.engine`' in verification_text.lower()
