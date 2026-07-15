@@ -418,4 +418,32 @@ Do not mix these layers.
 - name-based resolution boundaries are fixed.
 - workflow-specific config is separated from core schema.
 - validation layering is defined.
-- config loader / normalizer / schema classes remain unimplemented.
+- config validation / registry lookup / runtime assembly remain unimplemented.
+
+
+## Config Core Block B
+
+Config Core Block B implements the raw/normalized boundary for Mapping input only.
+
+Supported top-level fields:
+
+- `version`
+- `environment`
+- `plugins`
+- `providers`
+- `tools`
+- `stores`
+- `event_sinks`
+- `limits`
+- `observability`
+- `safety`
+- `metadata`
+
+Rules:
+
+- unknown core top-level fields are rejected
+- plugin-specific mappings remain opaque to the config core
+- secret references are retained, not resolved
+- config cannot disable safety, redaction, or safe errors
+- config cannot enable `allow_all_tools`
+- config cannot provide arbitrary import / callable paths

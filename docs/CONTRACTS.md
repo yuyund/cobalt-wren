@@ -183,3 +183,16 @@ These modules re-export selected foundation interfaces. They do not expose workf
 
 - node return = state patch dict
 - `ExecutionResult.output_payload` = output candidate dict
+
+
+## Config Core Contract
+
+- loader accepts Mapping input only in MVP
+- loader returns `RawPackageConfig`
+- normalizer returns `NormalizedPackageConfig`
+- Config Core does not import `PluginRegistry`
+- Config Core does not call plugin validation hooks
+- Config Core does not call factory hooks
+- Config Core does not resolve secret values
+- unsafe config is `ConfigError`
+- safety cannot be disabled

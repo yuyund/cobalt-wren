@@ -106,14 +106,14 @@ Current:
 
 Current:
 
-- Package Extension Core Block A
-- api.plugins facade + internal manual PluginRegistry MVP
+- Config Core Block B
+- Config loader / normalizer MVP
 
 Next:
 
-- P1-C Config loader / normalizer MVP
-- then P1-D ConfigValidator MVP
-- then RuntimeAssembly MVP
+- Config Validation Block C
+- ConfigValidator + EffectivePluginSet + registry lookup
+- then Runtime Assembly Block D
 
 ## 6. Recommended Execution Order
 

@@ -565,7 +565,7 @@ ValidatedPackageConfig
 RuntimeAssembly
 ```
 
-P1-A defines the taxonomy only. It does not implement the loader, normalizer, schema, or parser.
+P1-A defines the taxonomy. Config Core Block B implements the mapping loader / normalizer, while schema validation and runtime assembly remain later phases.
 Plugin-specific validation stays with plugin types and is described in `docs/PLUGINS.md`.
 
 ## Relation to existing payloads
@@ -583,6 +583,20 @@ Do not mix these layers:
 - `Run.input_payload` must not be read for model / api_key / base_url / tools.allowed
 - `plugins.enabled` references registered plugin names only; enabled but unregistered plugins are validation errors.
 
+## Config Core Block B
+
+Implemented:
+
+- Mapping input only
+- RawPackageConfig
+- NormalizedPackageConfig
+- defaults
+- minimal security precheck
+- no registry lookup
+- no plugin validation hook
+- no runtime assembly
+- no public `api.config` facade
+
 ## P1-A done when
 
 - config taxonomy categories are written down.
@@ -591,4 +605,4 @@ Do not mix these layers:
 - arbitrary Python import is rejected.
 - safety / redaction / policy bypass are rejected.
 - config source and normalized config are described.
-- loader / schema / parser remain unimplemented.
+- schema validation / runtime assembly remain unimplemented.

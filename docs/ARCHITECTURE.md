@@ -117,6 +117,15 @@ Application workflows are future layers and should not be pulled into `graphs`.
 - provider / store / worker / observability implementations are resolved by name through registries.
 - workflow-specific config is validated by workflow plugin schema, not core schema.
 
+## Config Core Boundary
+
+- `langgraph_automation.config.*` is internal/provisional
+- config core normalizes Mapping input into typed package config
+- config core does not depend on `api.plugins`
+- config core does not depend on `PluginRegistry`
+- `ConfigValidator` and `RuntimeAssembly` are later layers
+- no public `api.config` facade exists yet
+
 ## Plugin Boundary
 
 - `api.plugins` is a public facade for plugin vocabulary.

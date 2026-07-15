@@ -330,3 +330,10 @@ Forbidden config behavior:
 - arbitrary import from config is rejected.
 - safety cannot be disabled by config.
 - `langgraph_automation.api.*` is still not implemented.
+
+
+## Config Surface
+
+- No public `api.config` facade exists yet.
+- `langgraph_automation.config.*` is internal/provisional.
+- Config Core Block B is intentionally not part of the public facade.
