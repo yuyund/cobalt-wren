@@ -549,3 +549,20 @@ P3-C does not create `api.errors` or any error classes.
 - public API facades are not prematurely frozen
 
 Plugin API facade staging is defined in `docs/PLUGIN_API_FACADE.md`.
+
+
+## Factory Hooks
+
+Contribution factory hooks are the runtime assembly boundary:
+
+- `ProviderContribution.create_client`
+- `ToolContribution.create_tool`
+- `StoreContribution.create_store`
+- `EventSinkContribution.create_sink`
+
+RuntimeAssembly calls factory hooks with keyword arguments:
+
+- `config`
+- `context`
+
+Validation hooks remain ConfigValidator responsibility.

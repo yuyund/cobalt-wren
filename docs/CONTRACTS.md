@@ -208,3 +208,17 @@ These modules re-export selected foundation interfaces. They do not expose workf
 - `ConfigValidator` must not call factory hooks
 - validation-hook arbitrary exceptions are wrapped as `PluginValidationError`
 - tool configs outside allowlist are `ConfigError`
+
+
+## Runtime Assembly Contract
+
+- `RuntimeAssembler` accepts `ValidatedPackageConfig`
+- `RuntimeAssembler` uses `EffectivePluginSet`
+- `RuntimeAssembler` does not perform config validation
+- `RuntimeAssembler` does not call validation hooks
+- `RuntimeAssembler` calls factory hooks with keyword arguments only
+- arbitrary factory exceptions are wrapped as `RuntimeAssemblyError`
+- secrets are resolved through `SecretResolver` / `FactoryContext`
+- secret values are not merged into config
+- secret values are not stored in `RuntimeDependencies` metadata
+- `RuntimeAssemblyError` is used for missing factories, unsupported store types, and invalid factory results

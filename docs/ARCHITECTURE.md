@@ -166,3 +166,13 @@ Application workflows are future layers and should not be pulled into `graphs`.
 - `ConfigValidator` turns `NormalizedPackageConfig` into `ValidatedPackageConfig`
 - `EffectivePluginSet` is a validation-time projection of enabled plugins, not the full registry
 - `RuntimeAssembly` remains a later layer and still does not exist yet
+
+
+## Runtime Assembly Boundary
+
+- `langgraph_automation.runtime.*` is internal/provisional
+- runtime assembly consumes `ValidatedPackageConfig` and `EffectivePluginSet`
+- runtime assembly does not depend on `PluginRegistry`
+- runtime assembly does not perform validation
+- runtime assembly does not execute workflows or graph nodes
+- `api.runtime` remains unimplemented

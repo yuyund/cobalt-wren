@@ -111,12 +111,17 @@ Current:
 
 - Config Validation Block C
 - ConfigValidator + EffectivePluginSet + registry lookup
-- 状態: 進行中
+- 状態: 完了
+
+Current:
+
+- Runtime Assembly Block D
+- RuntimeAssembler + RuntimeDependencies + SecretResolver
 
 Next:
 
-- Runtime Assembly Block D
-- then Workflow Extension Block E
+- Workflow Extension Block E
+- then Built-in Wiring Block F
 
 ## 6. Recommended Execution Order
 

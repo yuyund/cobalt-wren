@@ -345,3 +345,10 @@ Forbidden config behavior:
 - `ConfigValidator` is internal/provisional and is not exposed through `api.config`.
 - `EffectivePluginSet` and `ValidatedPackageConfig` are internal config models.
 - public facade work is still limited to `api.llm`, `api.tools`, `api.stores`, `api.events`, `api.errors`, and `api.plugins`.
+
+
+## Runtime Surface
+
+- No public `api.runtime` facade exists yet.
+- `langgraph_automation.runtime.*` is internal/provisional.
+- runtime assembly is not part of the public facade yet.

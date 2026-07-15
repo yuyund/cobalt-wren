@@ -625,3 +625,12 @@ Layer split:
 - Config Core Block B: source loading, normalization, defaults, and minimal security precheck
 - Config Validation Block C: registry lookup, enabled plugin filtering, semantic validation, and plugin-specific validation hooks
 - Runtime Assembly Block D: factory hooks and concrete dependency construction
+
+
+## Config Core to Runtime Assembly
+
+- Config Core Block B produces `RawPackageConfig` and `NormalizedPackageConfig`
+- Config Validation Block C produces `ValidatedPackageConfig`
+- Runtime Assembly Block D consumes `ValidatedPackageConfig` and produces `RuntimeDependencies`
+- factory hooks run only after config validation has completed
+- secret values are resolved through `FactoryContext`, not merged into package config

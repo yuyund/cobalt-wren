@@ -463,3 +463,12 @@ Rules:
 - event sink backends must be provided by enabled plugins
 - validation hooks are plugin-specific and run after registry lookup
 - factory hooks are not called here
+
+
+## Runtime Assembly Boundary
+
+- config schema is loaded and normalized in Config Core
+- config references are validated in Config Validation
+- runtime assembly consumes `ValidatedPackageConfig`
+- runtime assembly does not reinterpret raw config source
+- runtime assembly does not perform registry lookup or plugin validation

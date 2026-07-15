@@ -553,3 +553,11 @@ ToolPlugin provides capability. ToolPolicy grants usage.
 - registered plugins do not automatically become enabled plugins.
 - registry lookup during validation is filtered through the enabled plugin set.
 - `PluginRegistry` does not know config activation policy.
+
+
+## Runtime Assembly Link
+
+- `PluginRegistry` stores definitions only.
+- `ConfigValidator` derives `EffectivePluginSet` from `plugins.enabled`.
+- `RuntimeAssembler` consumes `ValidatedPackageConfig` and `EffectivePluginSet`.
+- `RuntimeAssembler` does not use raw registry lookup.
