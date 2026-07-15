@@ -212,3 +212,12 @@ Application workflows are future layers and should not be pulled into `graphs`.
 - workflow preparation does not call `RuntimeAssembler`
 - workflow preparation does not call `ConfigValidator`
 
+## Service Workflow Integration
+
+- service layer creates or receives `RuntimeDependencies`
+- service layer resolves workflow kinds through `WorkflowPreparer`
+- service layer may use the built-in workflow registry helper
+- `WorkflowPreparer` returns `PreparedWorkflow`
+- service layer can pass `PreparedWorkflow.graph` to the existing runner path
+- service layer does not bypass safe output or safe error contracts
+

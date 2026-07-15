@@ -164,29 +164,21 @@ After Block G:
 - Prefer explicit boundary contracts over implicit conventions.
 - Keep safety boundaries redaction-safe by default.
 
-## 9. Next Candidate Blocks
+## 9. Execution Integration And Beyond
 
-- Execution Integration Block H
-- First Application Workflow Block I
-
-Recommended next order:
-
-1. Execution Integration Block H
-   - reference workflow を新 path で段階的に実行できるようにする
-2. First Application Workflow Block I
-   - `application.company_agent` などを検討する
-
-Application Readiness Block G:
+Execution Integration Block H:
   complete
 
 Current:
-  Execution Integration Block H
-
-Next:
   Service Integration Block I
 
-Then:
+Next:
   First Application Workflow Block J
+
+Before First Application Workflow:
+  - reference workflow must be preparable through service layer
+  - existing safety tests must remain green
+  - no application workflow direct dependency on control plane
 
 Recommended order:
   H: Workflow preparation integration

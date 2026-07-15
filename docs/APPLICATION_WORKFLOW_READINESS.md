@@ -92,3 +92,11 @@ Application workflow readiness still excludes:
 - full execution path migration
 - direct use of `WorkflowPreparer` by application workflow code
 
+## Still Excluded
+
+Application workflow readiness still excludes:
+
+- direct use of apps/automation service helpers by workflow code
+- direct use of `WorkflowPreparer` by workflow code
+- direct use of `PluginRegistry` by workflow code
+

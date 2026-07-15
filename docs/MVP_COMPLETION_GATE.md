@@ -58,3 +58,9 @@ MVP complete does not mean:
 - it prepares a workflow but does not execute it
 - service layer integration remains future work
 
+## Post-MVP Service Integration
+
+- service layer bridge can prepare workflows through `WorkflowPreparer`
+- service layer integration is post-MVP
+- full execution path migration remains future work
+

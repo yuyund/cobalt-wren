@@ -263,3 +263,12 @@ These modules re-export selected foundation interfaces. They do not expose workf
 - `WorkflowPreparer` does not call `ConfigValidator`
 - `PreparedWorkflow` is an internal preparation result, not a public runtime API
 
+## Service Integration Contract
+
+- service layer may call `WorkflowPreparer`
+- service layer may create the built-in workflow registry
+- application workflow code must not call `WorkflowPreparer` directly
+- service layer must preserve safe output and safe error contracts
+- service layer must not persist raw input, prompt, or provider response
+- service layer must not call `ConfigValidator` or `RuntimeAssembler` through `WorkflowPreparer`
+

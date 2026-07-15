@@ -51,3 +51,9 @@ Workflow authors do not call `WorkflowPreparer` directly in normal application c
 `WorkflowPreparer` is framework internal preparation machinery.
 Workflow authors provide `Plugin`, `WorkflowContribution`, and `WorkflowDefinition`.
 
+## Service Layer Boundary
+
+Workflow authors do not call service-layer workflow preparation helpers.
+Workflow authors provide `Plugin`, `WorkflowContribution`, and `WorkflowDefinition`.
+The framework service layer prepares workflows.
+
