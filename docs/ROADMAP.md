@@ -165,72 +165,79 @@ After Block G:
 - Keep safety boundaries redaction-safe by default.
 ## 9. Package Completion And Beyond
 
-Execution Integration Block H:
-  complete
-
-Service Integration Block I:
-  complete, but transitional
-
-Current:
-  Package Roadmap Correction Block J
-
-Next:
-  Package Facade Design Block K
-
-Then:
-  Package Facade Implementation Block L
-
-Then:
-  Package Verification Harness Block M
-
-Current:
-  Boundary Hardening Block N
-
-Then:
-  Service Integration via Package Facade Block O
-
-Then:
-  Minimal Application Workflow Example Block P
-
-Then:
-  company_agent Block Q
-
 Package / Foundation MVP:
-  complete
+
+- complete
+
+Workflow preparation path:
+
+- complete
+
+Service workflow preparation bridge:
+
+- complete, but transitional
+
+Package Roadmap Correction Block J:
+
+- complete
 
 Package Facade Design Block K:
-  complete
+
+- complete
 
 Package Facade Implementation Block L:
-  complete
+
+- complete
 
 Package Verification Harness Block M:
-  complete
+
+- complete
+
+Boundary Hardening Block N:
+
+- complete
+
+Current:
+
+- Service Integration via Package Facade Block O
+
+Next:
+
+- Minimal Application Workflow Example Block P
+
+Then:
+
+- company_agent Block Q
 
 Package Complete:
-  not complete yet
+
+- not complete yet
 
 Application workflow:
-  deferred
+
+- deferred
 
 company_agent:
-  deferred
+
+- deferred
 
 Before Package Complete:
-  - application-facing package facade must be implemented
-  - verification harness must cover package-facing entrypoints
-  - boundary hardening must keep apps/automation on the facade path
-  - apps/automation must be able to use package facade without package internals as the final architecture
+
+- application-facing package facade must be implemented
+- verification harness must cover package-facing entrypoints
+- boundary hardening must keep apps/automation on the facade path
+- apps/automation must be able to use package facade without package internals as the final architecture
 
 Recommended order after Block M:
-  1. Boundary Hardening Block N
-  2. Service Integration via Package Facade Block O
-  3. Minimal Application Workflow Example Block P
-  4. company_agent Block Q
+
+1. Boundary Hardening Block N
+2. Service Integration via Package Facade Block O
+3. Minimal Application Workflow Example Block P
+4. company_agent Block Q
 
 Before First Application Workflow:
-  - package facade must be the preferred entrypoint
-  - service bridge must be routed through package facade
-  - existing safety tests must remain green
-  - no application workflow direct dependency on control plane
 
+- package facade must be the preferred entrypoint
+- service bridge must be routed through package facade
+- existing safety tests must remain green
+- no application workflow direct dependency on control plane

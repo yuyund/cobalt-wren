@@ -230,3 +230,26 @@ Application workflows are future layers and should not be pulled into `graphs`.
 - package facade should hide `PluginRegistry`, `WorkflowPreparer`, `workflows.catalog`, `workflows.adapter`, `workflows.requirements`, `ConfigValidator`, and `RuntimeAssembler`
 - `apps/automation` should not become the final permanent dependency on package internals
 - future service integration should route through the package facade instead of package internals
+
+## Package Facade Boundary Hardening
+
+application/control-plane code should use `langgraph_automation.api.engine` as the package-facing facade.
+
+Package internals hidden from control-plane:
+
+- `PluginRegistry`
+- `ConfigValidator`
+- `RuntimeAssembler`
+- `RuntimeDependencies`
+- `WorkflowPreparer`
+- `workflows.catalog`
+- `workflows.prepare`
+- `workflows.adapter`
+- `workflows.requirements`
+- `graphs.*`
+
+Temporary exception:
+
+- `apps/automation/services/workflow_preparation.py`
+
+The temporary exception is transitional and should be removed in Service Integration via Package Facade Block O.

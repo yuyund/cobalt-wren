@@ -31,9 +31,12 @@ def test_package_facade_design_docs_exist_and_cover_core_terms() -> None:
         'Block M',
         'transitional',
         'implemented',
+        'temporary exception',
+        'Service Integration via Package Facade Block O',
     ):
         assert token in design_text or token in adr_text
 
     assert 'public-facing provisional' in design_text
     assert 'preparation only' in adr_text.lower()
     assert 'verification' in design_text.lower()
+    assert 'application-facing package facade' in design_text.lower() or 'package-facing facade' in design_text.lower()

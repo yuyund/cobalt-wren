@@ -420,3 +420,10 @@ It hides internal package mechanics:
 `run_workflow` and `api.runtime` remain deferred because they would prematurely expose graph execution, checkpoint/resume, worker/queue, and long-running runtime contracts.
 
 The service-layer workflow preparation bridge is transitional and should eventually route through `api.engine` rather than package internals directly.
+
+## Package-Facing Boundary
+
+`langgraph_automation.api.engine` is the package-facing facade for application/control-plane code.
+It hides `PluginRegistry`, `WorkflowPreparer`, `RuntimeAssembler`, `ConfigValidator`, `RuntimeDependencies`, `workflows.catalog`, `workflows.prepare`, `workflows.adapter`, and `workflows.requirements`.
+`run_workflow` and `api.runtime` remain deferred.
+`apps/automation/services/workflow_preparation.py` remains a transitional exception until Block O.

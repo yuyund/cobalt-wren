@@ -289,3 +289,10 @@ These modules re-export selected foundation interfaces. They do not expose workf
 - facade-level verification should cover the `create_engine` -> `prepare_workflow` path without requiring provider network calls or graph execution
 - safe failures must surface `FrameworkError`-derived safe messages only
 - raw traceback, secret values, and provider raw payloads must not leak through `safe_message`
+
+## Boundary Hardening Contract
+
+- application/control-plane code must not couple directly to package internals
+- `langgraph_automation.api.engine` is the allowed package-facing boundary
+- `apps/automation/services/workflow_preparation.py` remains a temporary exception until Block O
+- `workflows/applications` should treat `graphs.*` as provisional and not public API, only using it where required for `WorkflowDefinition.build`

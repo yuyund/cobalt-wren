@@ -91,6 +91,16 @@ It should not prematurely expose:
 
 Package Complete remains not complete because:
 
-- boundary hardening is not complete
+- boundary hardening is complete at the guard / document level, but the service bridge is still transitional
 - the service bridge is not yet routed through `api.engine`
+- L6 application-facing tests are still deferred
+
+## Boundary Hardening Status
+
+Boundary hardening is complete at the guard/document level, but the service bridge remains transitional.
+
+Package Complete remains pending because:
+
+- the service bridge is still transitional
+- service integration via api.engine is not complete
 - L6 application-facing tests are still deferred

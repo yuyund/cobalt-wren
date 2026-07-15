@@ -116,3 +116,14 @@ Application workflow implementation remains deferred until:
 Application workflow implementation remains deferred until the application-facing package facade is designed and implemented.
 `langgraph_automation.api.engine` is the implemented provisional facade target.
 `company_agent` remains deferred until a minimal application workflow validates the package facade.
+
+## Boundary Hardening Gate
+
+Application workflow implementation remains deferred until:
+
+- boundary hardening is complete
+- service integration is routed through `api.engine`
+- L6 application-facing / service-facing tests exist
+
+`company_agent` remains deferred.
+Application workflow code should not use the transitional service bridge directly.

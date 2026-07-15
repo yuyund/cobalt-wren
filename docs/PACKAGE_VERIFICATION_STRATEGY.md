@@ -87,3 +87,8 @@ Verification levels:
 
 Headless smoke tests should only prepare workflows.
 They should not require provider network calls or graph execution.
+
+## Block N Update
+
+L6 remains pending and depends on service integration via api.engine.
+Boundary Hardening Block N prepares L6 by preventing new application/control-plane leakage into package internals.

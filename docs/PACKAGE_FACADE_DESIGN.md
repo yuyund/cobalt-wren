@@ -203,3 +203,8 @@ Deferred until later design blocks:
 - worker / queue
 - external plugin discovery
 - entry point discovery
+
+## Boundary Hardening Note
+
+`apps/automation/services/workflow_preparation.py` remains the temporary exception.
+It is transitional and should be removed in Service Integration via Package Facade Block O.
