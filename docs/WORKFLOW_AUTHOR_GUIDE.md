@@ -1,0 +1,46 @@
+# Workflow Author Guide
+
+This guide explains the minimum workflow author surface.
+
+## How to model a workflow
+
+- create the workflow as a `Plugin`
+- return a `WorkflowContribution`
+- put `metadata`, `requirements`, and `build` on `WorkflowDefinition`
+- use `WorkflowRequirements` to declare needed providers, tools, stores, and sinks
+- keep workflow-specific parameters in the workflow definition or workflow payload, not in framework internals
+
+## What workflow authors should use
+
+Use these public facades:
+
+- `langgraph_automation.api.workflow`
+- `langgraph_automation.api.plugins`
+- `langgraph_automation.api.errors`
+- `langgraph_automation.api.llm`
+- `langgraph_automation.api.tools`
+- `langgraph_automation.api.stores`
+- `langgraph_automation.api.events`
+
+## What workflow authors should not do
+
+- do not call `RuntimeAssembler` directly
+- do not register with `PluginRegistry` inside the workflow package
+- do not import Django models or settings
+- do not import `apps.automation` services
+- do not store raw provider output or secrets in metadata
+- do not treat graph internals as stable public API
+
+## Example
+
+`reference.llm_echo_summary` is the example to follow.
+
+It shows the expected structure:
+
+- `PluginMetadata`
+- `PluginContributions.workflows`
+- `WorkflowContribution`
+- `WorkflowDefinition`
+- `WorkflowRequirements`
+
+The workflow contribution remains declarative. The registry and runtime layers are framework responsibilities.

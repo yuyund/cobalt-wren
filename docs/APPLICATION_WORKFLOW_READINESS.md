@@ -1,0 +1,85 @@
+# Application Workflow Readiness
+
+This document defines the readiness gate for introducing application workflows.
+
+Goal:
+
+- make it safe to load application workflows after the foundation blocks are in place
+- keep application workflows on the `Plugin` / `WorkflowContribution` path
+- keep public facade usage narrow and intentional
+- keep control-plane, Django, registry, and runtime assembly dependencies out of workflow author code
+
+## Public / internal policy
+
+Public facades:
+
+- `langgraph_automation.api.errors`
+- `langgraph_automation.api.plugins`
+- `langgraph_automation.api.workflow`
+- `langgraph_automation.api.llm`
+- `langgraph_automation.api.tools`
+- `langgraph_automation.api.stores`
+- `langgraph_automation.api.events`
+
+Internal / provisional:
+
+- `langgraph_automation.config.*`
+- `langgraph_automation.runtime.*`
+- `langgraph_automation.plugins.registry`
+- `langgraph_automation.workflows.adapter`
+- `langgraph_automation.workflows.requirements`
+- `langgraph_automation.workflows.catalog`
+
+Internal foundation:
+
+- `langgraph_automation.graphs.*`
+
+Control plane:
+
+- `langgraph_automation.apps.automation.*`
+
+Application workflow code should use public facades by default and should not depend on control-plane modules directly.
+
+## Readiness criteria
+
+Ready:
+
+- workflow is represented as a `Plugin`
+- workflow contributions are carried through `PluginContributions.workflows`
+- workflow contribution is expressed with `WorkflowContribution`
+- workflow definition is expressed with `WorkflowDefinition`
+- workflow requirements are declared with `WorkflowRequirements`
+- workflow code does not build runtime dependencies directly
+- workflow code does not call `RuntimeAssembler` directly
+- workflow code does not call `PluginRegistry.register()` directly
+- workflow code does not import Django models or settings
+- workflow code does not import `apps.automation` services
+- workflow code does not persist raw input, raw prompt, or raw provider response
+- workflow code does not place secret values into metadata, logs, or errors
+- workflow code can pass the architecture boundary tests
+- workflow code can be reasoned about through the public workflow facade
+
+Not ready:
+
+- workflow code imports `apps.automation` directly
+- workflow code imports Django models or settings directly
+- workflow code calls `RuntimeAssembler` directly
+- workflow code performs registry registration by itself
+- workflow code keeps raw provider response in state, output, or metadata
+- workflow code stores secret values in metadata
+- workflow code depends on `api.runtime`
+- workflow code depends on public graph internals
+
+## Example workflow
+
+The built-in `reference.llm_echo_summary` workflow is the readiness example.
+
+It demonstrates:
+
+- `PluginMetadata`
+- `PluginContributions.workflows`
+- `WorkflowContribution`
+- `WorkflowDefinition`
+- `WorkflowRequirements`
+
+The example is useful because it shows the expected path without introducing application-specific control-plane logic.

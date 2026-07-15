@@ -188,3 +188,14 @@ Application workflows are future layers and should not be pulled into `graphs`.
 - `workflows.requirements` is the internal `WorkflowRequirements` / `RuntimeDependencies` checker
 - built-in wiring does not require `ConfigValidator` or `RuntimeAssembler` to expand their responsibilities
 - `graphs.*` remains the internal graph foundation and does not import workflow catalog code
+
+## Application Readiness Boundary
+
+- application workflows are expected to be represented as ordinary `Plugin` objects
+- application workflows contribute `WorkflowContribution`
+- application workflows declare `WorkflowRequirements`
+- public workflow vocabulary lives in `api.workflow`
+- runtime assembly and registry usage remain framework responsibilities
+- application workflow code must not depend on control-plane or Django internals directly
+- `reference.llm_echo_summary` is the built-in readiness example
+- it demonstrates the `Plugin -> WorkflowContribution -> WorkflowDefinition -> requirements/build` boundary

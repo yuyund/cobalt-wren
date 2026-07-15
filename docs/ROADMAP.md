@@ -129,9 +129,14 @@ Current:
 - Built-in Wiring Block F
 - 状態: 完了
 
-Next:
+Current:
 
 - Application Readiness Block G
+- 状態: 完了
+
+After Block G:
+
+- Package / Foundation MVP gate complete
 
 ## 6. Recommended Execution Order
 
@@ -140,6 +145,7 @@ Next:
 3. Move to stabilization checkpoint review.
 4. Design the package public/internal API surface.
 5. Only then consider application workflow layering.
+6. Move to execution integration once readiness gates are documented.
 
 ## 7. Non-goals
 
@@ -157,3 +163,15 @@ Next:
 - Prefer registry/catalog composition over direct imports in foundation code.
 - Prefer explicit boundary contracts over implicit conventions.
 - Keep safety boundaries redaction-safe by default.
+
+## 9. Next Candidate Blocks
+
+- Execution Integration Block H
+- First Application Workflow Block I
+
+Recommended next order:
+
+1. Execution Integration Block H
+   - reference workflow を新 path で段階的に実行できるようにする
+2. First Application Workflow Block I
+   - `application.company_agent` などを検討する

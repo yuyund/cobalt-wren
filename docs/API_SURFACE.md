@@ -362,3 +362,34 @@ Forbidden config behavior:
 - No public `api.runtime` facade exists yet.
 - `langgraph_automation.runtime.*` is internal/provisional.
 - runtime assembly is not part of the public facade yet.
+
+## Application Workflow Policy
+
+Application workflow authors should use the public facades:
+
+- `langgraph_automation.api.errors`
+- `langgraph_automation.api.plugins`
+- `langgraph_automation.api.workflow`
+- `langgraph_automation.api.llm`
+- `langgraph_automation.api.tools`
+- `langgraph_automation.api.stores`
+- `langgraph_automation.api.events`
+
+Internal / provisional APIs:
+
+- `langgraph_automation.config.*`
+- `langgraph_automation.runtime.*`
+- `langgraph_automation.plugins.registry`
+- `langgraph_automation.workflows.adapter`
+- `langgraph_automation.workflows.requirements`
+- `langgraph_automation.workflows.catalog`
+
+Internal foundation:
+
+- `langgraph_automation.graphs.*`
+
+Control plane:
+
+- `langgraph_automation.apps.automation.*`
+
+Application workflows are expected to use the public facades first and to keep control-plane dependencies out of workflow packages.

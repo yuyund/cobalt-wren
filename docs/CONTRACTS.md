@@ -238,3 +238,15 @@ These modules re-export selected foundation interfaces. They do not expose workf
 - secret values are not merged into config
 - secret values are not stored in `RuntimeDependencies` metadata
 - `RuntimeAssemblyError` is used for missing factories, unsupported store types, and invalid factory results
+
+## Application Workflow Contract
+
+- application workflow must be modeled as `Plugin` + `WorkflowContribution`
+- application workflow must declare `WorkflowRequirements`
+- application workflow must not construct `RuntimeDependencies` directly
+- application workflow must not call `RuntimeAssembler` directly
+- application workflow must not perform `PluginRegistry` registration by itself
+- application workflow must not import Django models or settings
+- application workflow must not import `apps.automation` services
+- application workflow must not persist raw provider or tool output
+- application workflow must not store secret values in metadata
