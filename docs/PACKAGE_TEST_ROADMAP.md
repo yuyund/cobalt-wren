@@ -2,6 +2,11 @@
 
 This roadmap prioritizes closure of the audit gaps.
 
+Status update:
+
+- the P0 boundary and public-surface drift items were closed in System P0 Assurance Gap Closure Block R
+- the remaining roadmap now focuses on P1 and P2 assurance hardening
+
 ## P0 Closure Order
 
 ### 1. Apps/Automation Boundary Closure
@@ -23,7 +28,8 @@ Forbidden changes:
 
 Target checks:
 
-- forbid `graphs.*`, `workflows.catalog`, `plugins.registry`, `runtime.assembly`, `runtime.dependencies`, and `config.validator` imports from `apps/automation`
+- forbid new `graphs.*`, `workflows.catalog`, `plugins.registry`, `runtime.assembly`, `runtime.dependencies`, and `config.validator` imports from `apps/automation`
+- allow only exact execution-adapter paths for the current control-plane execution boundary
 
 ### 2. Public Surface Drift Closure
 
@@ -42,7 +48,7 @@ Forbidden changes:
 
 Target checks:
 
-- resolve the `UnknownWorkflowKindError` mismatch
+- resolve the unknown-workflow-kind mismatch by treating `PluginResolutionError` as the canonical unknown workflow error
 
 ### 3. Explicit Plugin Assurance
 
@@ -101,6 +107,27 @@ Forbidden changes:
 Target checks:
 
 - service bridge continues to avoid `workflows.prepare`, `workflows.catalog`, `plugins.registry`, and runtime/config internals
+
+### 6. Control-Plane Execution Adapter Boundary
+
+Purpose:
+
+- document and guard the remaining direct graph/runtime imports that are part of the current execution adapter
+
+Allowed changes:
+
+- exact allowlist updates for `apps/automation/services/runtime.py`, `execution.py`, and `runs.py`
+- docs updates that explain the direct execution adapter boundary
+
+Forbidden changes:
+
+- spreading graph/runtime imports into new `apps/automation` modules
+- introducing new direct package-internal dependencies without an explicit execution-adapter rationale
+
+Target checks:
+
+- exact allowlist remains limited to the current execution adapter modules
+- `workflow_config.py` stays graph-free
 
 ## P2 Closure Order
 

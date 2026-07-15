@@ -211,13 +211,17 @@ System Assurance Scope Expansion Audit Block Q:
 Current:
 
 - System P0 Assurance Gap Closure Block R
+- 状態: 完了
 
 Next:
 
-- control-plane boundary closure
-- public surface drift closure
+- System P1 Assurance Hardening Block S
+
+Next focus areas:
+
 - persistence durability assurance
 - admin/UI redaction assurance
+- execution adapter boundary hardening
 
 Later:
 

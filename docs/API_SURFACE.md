@@ -52,7 +52,6 @@ Implemented public workflow vocabulary:
 
 - `WorkflowDefinition`
 - `WorkflowRequirements`
-- `UnknownWorkflowKindError`
 
 Decisions:
 
@@ -62,6 +61,7 @@ Decisions:
 - Plugin authors should move toward a future registration API rather than editing catalog internals directly.
 
 `GraphDefinition` remains internal foundation vocabulary and is not exported from `api.workflow`.
+Unknown workflow kinds are surfaced through `PluginResolutionError`.
 
 ## Runtime API surface
 
@@ -191,7 +191,6 @@ The full error taxonomy remains documented in `docs/ERROR_TAXONOMY.md`, and the 
 Future public candidates may include:
 
 - `WorkflowConfigurationError`
-- `UnknownWorkflowKindError`
 - `RuntimeDependencyError`
 - `ToolPolicyDeniedError`
 - `ProviderError`
@@ -205,6 +204,7 @@ Current guidance:
 - No additional error classes are exported beyond the minimal facade.
 - The minimal public error facade is intentionally smaller than the full taxonomy.
 - `FrameworkError`, `ConfigError`, `PluginRegistrationError`, `PluginResolutionError`, `PluginValidationError`, `RuntimeAssemblyError`, and `SafetyBoundaryError` were the minimal candidates and are now implemented.
+Unknown workflow kinds remain represented by `PluginResolutionError` in the implemented public surface.
 
 ## Plugin API surface
 

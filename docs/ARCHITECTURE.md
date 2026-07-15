@@ -221,6 +221,15 @@ Application workflows are future layers and should not be pulled into `graphs`.
 - service layer can pass `PreparedWorkflow.graph` to the existing runner path
 - service layer does not bypass safe output or safe error contracts
 
+## Control-Plane Execution Adapter
+
+- `apps/automation/services/runtime.py`, `execution.py`, and `runs.py` are the current control-plane execution adapters.
+- These modules may depend on `graphs.*` and `workflows.catalog` for the current execution path.
+- That dependency is deliberate while `api.runtime` and a broader execution facade remain deferred.
+- `apps/automation/services/workflow_config.py` is kept graph-free after the P0 audit fix and should remain a pure control-plane config helper.
+- The allowed exact import sites for graph/runtime internals should be enforced with architecture guards instead of blanket banning all `apps/automation` imports.
+- Future migration should route execution semantics through a dedicated execution facade rather than expanding the package facade indiscriminately.
+
 ## Package Facade Direction
 
 - the service-layer workflow preparation bridge is transitional
@@ -236,6 +245,8 @@ Application workflows are future layers and should not be pulled into `graphs`.
 application/control-plane code should use `langgraph_automation.api.engine` as the package-facing facade.
 
 `apps/automation/services/workflow_preparation.py` now routes through `api.engine`; the transitional exception is removed.
+
+`apps/automation/services/runtime.py`, `execution.py`, and `runs.py` remain explicit execution adapters for the current direct graph path and are not part of the package-facing preparation facade.
 
 Package internals hidden from control-plane:
 

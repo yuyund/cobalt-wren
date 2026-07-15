@@ -35,5 +35,5 @@ Docs are supporting material only.
 
 - `run_workflow` is still deferred and not exported.
 - `api.runtime` does not exist yet.
-- `UnknownWorkflowKindError` is still mentioned in docs, but `api.workflow` does not export it.
-- `apps/automation/services/runtime.py` and `workflow_config.py` still import graph foundation modules directly.
+- Unknown workflow kinds are represented by `PluginResolutionError` in the implemented public surface.
+- `apps/automation/services/runtime.py`, `execution.py`, and `runs.py` remain the exact control-plane execution adapters; `workflow_config.py` is graph-free after the audit fix.

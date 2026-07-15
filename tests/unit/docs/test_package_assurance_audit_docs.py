@@ -12,6 +12,7 @@ def test_package_assurance_audit_docs_exist_and_cover_traceability_terms() -> No
     traceability = root / "PACKAGE_TEST_TRACEABILITY.md"
     gaps = root / "PACKAGE_ASSURANCE_GAPS.md"
     roadmap = root / "PACKAGE_TEST_ROADMAP.md"
+    api_surface = root / "API_SURFACE.md"
 
     for path in (inventory, invariants, traceability, gaps, roadmap):
         assert path.exists()
@@ -21,6 +22,7 @@ def test_package_assurance_audit_docs_exist_and_cover_traceability_terms() -> No
     traceability_text = traceability.read_text()
     gaps_text = gaps.read_text()
     roadmap_text = roadmap.read_text()
+    api_surface_text = api_surface.read_text()
 
     for token in ("CODE_CONFIRMED", "TEST_CONFIRMED", "ARCH_GUARD_CONFIRMED", "DOC_ONLY", "ASSUMED", "GAP"):
         assert token in inventory_text
@@ -34,5 +36,8 @@ def test_package_assurance_audit_docs_exist_and_cover_traceability_terms() -> No
     assert "p1" in gaps_text.lower()
     assert "p2" in gaps_text.lower()
     assert "apps/automation" in gaps_text.lower()
-    assert "unknownworkflowkinderror" in gaps_text.lower()
+    assert "pluginresolutionerror" in gaps_text.lower()
+    assert "exact execution-adapter allowlist" in gaps_text.lower()
     assert "closure order" in roadmap_text.lower()
+    assert "unknownworkflowkinderror" not in api_surface_text.lower()
+    assert "pluginresolutionerror" in api_surface_text.lower()

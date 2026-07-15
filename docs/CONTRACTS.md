@@ -272,6 +272,15 @@ These modules re-export selected foundation interfaces. They do not expose workf
 - service layer must not persist raw input, prompt, or provider response
 - service layer must not call `ConfigValidator` or `RuntimeAssembler` through `WorkflowPreparer`
 
+## Control-Plane Execution Adapter Contract
+
+- `apps/automation/services/runtime.py`, `execution.py`, and `runs.py` are the current control-plane execution adapters.
+- These adapters may import `graphs.runtime`, `graphs.runner`, `graphs.registry`, `graphs.config`, and `workflows.catalog` for the current direct execution path.
+- The allowed direct imports should be exact and should not spread to new `apps/automation` modules.
+- `apps/automation/services/workflow_config.py` should remain graph-free after the P0 audit fix.
+- This direct execution adapter boundary is temporary and should eventually route through a dedicated execution facade such as `api.runtime`.
+- The execution facade remains deferred; this contract only acknowledges the current adapter responsibility.
+
 ## Package Facade Contract
 
 - package complete requires an application-facing package facade
@@ -295,4 +304,6 @@ These modules re-export selected foundation interfaces. They do not expose workf
 - application/control-plane code must not couple directly to package internals
 - `langgraph_automation.api.engine` is the allowed package-facing boundary
 - `apps/automation/services/workflow_preparation.py` now routes through `api.engine`; the temporary exception has been removed
+- `apps/automation` must not grow new direct imports into `graphs.*`, `runtime.*`, `workflows.prepare`, `workflows.catalog`, `workflows.adapter`, `workflows.requirements`, `plugins.registry`, or `config.validator` outside the explicit execution adapters above
+- exact allowlists for the execution adapters are enforced by architecture guards
 - `workflows/applications` should treat `graphs.*` as provisional and not public API, only using it where required for `WorkflowDefinition.build`

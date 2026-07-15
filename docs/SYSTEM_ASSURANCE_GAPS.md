@@ -11,10 +11,7 @@ The supplemental report is hypothesis only.
 
 | Gap | Evidence | Why it matters | Risk |
 | --- | --- | --- | --- |
-| Control-plane services still import graph/runtime internals directly | `src/langgraph_automation/apps/automation/services/runtime.py`, `execution.py`, `runs.py`, `workflow_config.py` import `graphs.*` and `workflows.catalog` | The desired end state is an application/control-plane boundary centered on `langgraph_automation.api.engine`. The control plane still contains direct foundation imports outside the workflow-preparation bridge. | P0 |
-| Package-wide `apps/automation` import guard is still missing | Existing guard coverage is file-specific and currently centered on `services/workflow_preparation.py` and a few other paths, not the whole `src/langgraph_automation/apps/automation/**/*.py` tree | A new control-plane module could reintroduce package-internal coupling without being caught by the current guard pattern. | P0 |
-| Public surface docs still drift from code on workflow error vocabulary | `docs/API_SURFACE.md` still says `UnknownWorkflowKindError` is implemented, but `src/langgraph_automation/api/workflow.py::__all__` does not export it | Public surface drift is a contract problem, not just a documentation typo. | P0 |
-| Service layer runtime/execution remains on the direct graph path | `apps/automation/services/execution.py`, `runs.py`, `runtime.py` still dispatch through `graphs.runner` and `graphs.runtime` | The system still has a direct execution path outside the package facade. | P0 |
+| No open P0 gap remains after Block R | `src/langgraph_automation/apps/automation/services/runtime.py`, `execution.py`, and `runs.py` remain the exact control-plane execution adapters; `workflow_config.py` no longer imports graph internals; `tests/unit/architecture/test_apps_automation_package_boundary.py` enforces the exact allowlist; `docs/API_SURFACE.md` now treats unknown workflow kinds as `PluginResolutionError` | The previous P0 items were either removed, rerouted, or reclassified as an explicit execution-adapter boundary with exact guard coverage. | Low |
 
 ## P1 Gaps
 
@@ -38,6 +35,7 @@ The supplemental report is hypothesis only.
 
 - The package facade and system boundary are fully finalized everywhere the docs imply.
 - `workflows/applications` is ready for real application workflow code today.
+- `apps/automation/services/runtime.py`, `execution.py`, and `runs.py` are the current control-plane execution adapter boundary.
 
 ## ASSUMED Behavior
 
@@ -47,11 +45,12 @@ The supplemental report is hypothesis only.
 
 ## CONTRACT_DRIFT
 
-- `docs/API_SURFACE.md` claims `UnknownWorkflowKindError` is implemented, but `api.workflow` does not export it.
+- No unknown-workflow-kind drift remains; unknown workflow kinds are represented by `PluginResolutionError` in the public surface.
+- If a future `apps/automation` module imports package internals outside the exact execution-adapter allowlist, that would reintroduce boundary drift.
 
 ## Untested Or Under-tested Invariants
 
-- package-wide `apps/automation` import restrictions
+- package-wide `apps/automation` import restrictions beyond the exact execution-adapter allowlist
 - admin exposure redaction
 - durable artifact/checkpoint body persistence
 - graph opacity as a caller contract
@@ -68,15 +67,14 @@ The package audit baseline still informs this system audit:
 
 ### P0
 
-1. Control-plane boundary closure
-2. Public surface drift closure
+1. None remaining; P0 issues were closed in Block R.
 
 ### P1
 
-3. Persistence durability assurance
-4. Admin/UI redaction assurance
-5. Control-plane execution-path closure
+1. Persistence durability assurance
+2. Admin/UI redaction assurance
+3. Control-plane execution-path closure
 
 ### P2
 
-6. Template polish and audit-doc refresh
+1. Template polish and audit-doc refresh

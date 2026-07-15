@@ -4,20 +4,23 @@ from __future__ import annotations
 
 from collections.abc import Collection, Mapping
 from dataclasses import dataclass, field
-from typing import Any
+from typing import Any, Protocol
 
 from langgraph_automation.core.summary import summarize_mapping
-from langgraph_automation.graphs.constants import DEFAULT_GRAPH_KIND
-from langgraph_automation.graphs.types import GraphRuntimeRequirements
 
-MINIMAL_GRAPH_KIND = DEFAULT_GRAPH_KIND
+MINIMAL_GRAPH_KIND = 'llm_echo_summary'
+
+
+class _GraphRuntimeRequirements(Protocol):
+    requires_llm: bool
+    required_tools: tuple[str, ...]
 
 
 @dataclass(frozen=True)
 class GraphWorkflowConfig:
     """Normalized workflow-level graph configuration."""
 
-    kind: str = DEFAULT_GRAPH_KIND
+    kind: str = MINIMAL_GRAPH_KIND
 
 
 @dataclass(frozen=True)
@@ -117,7 +120,7 @@ def _parse_graph_config(definition_payload: Mapping[str, Any] | None, *, default
 def parse_workflow_runtime_config(
     definition_payload: Mapping[str, Any] | None,
     *,
-    default_graph_kind: str = DEFAULT_GRAPH_KIND,
+    default_graph_kind: str = MINIMAL_GRAPH_KIND,
 ) -> WorkflowRuntimeConfig:
     """Parse a workflow definition payload into normalized runtime config."""
 
@@ -166,9 +169,9 @@ def _graph_kind_issue_message(
 def validate_workflow_runtime_config(
     definition_payload: Mapping[str, Any] | None,
     *,
-    default_graph_kind: str = DEFAULT_GRAPH_KIND,
+    default_graph_kind: str = MINIMAL_GRAPH_KIND,
     supported_graph_kinds: Collection[str] | None = None,
-    graph_requirements: Mapping[str, GraphRuntimeRequirements] | None = None,
+    graph_requirements: Mapping[str, _GraphRuntimeRequirements] | None = None,
 ) -> WorkflowConfigValidation:
     """Validate workflow runtime configuration and return normalized issues."""
 

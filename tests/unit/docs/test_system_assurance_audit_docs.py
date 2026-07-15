@@ -25,6 +25,8 @@ def test_system_assurance_audit_docs_exist_and_cover_core_terms() -> None:
         "code is the source of truth",
         "tests are the source of truth",
         "supplemental report is hypothesis only",
+        "PluginResolutionError",
+        "execution-adapter boundary",
         "Layer / Dependency Matrix",
         "Dataflow Matrix",
         "Lifecycle Matrix",

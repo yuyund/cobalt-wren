@@ -49,16 +49,5 @@ def test_workflow_config_does_not_depend_on_graph_runtime_or_concrete_graphs() -
     path = Path('src/langgraph_automation/apps/automation/services/workflow_config.py')
     modules = _imported_modules(path)
 
-    offenders = [
-        module
-        for module in modules
-        if module.startswith(
-            (
-                'langgraph_automation.graphs.runtime',
-                'langgraph_automation.graphs.config',
-                'langgraph_automation.graphs.builders',
-                'langgraph_automation.graphs.nodes',
-            )
-        )
-    ]
+    offenders = [module for module in modules if module.startswith('langgraph_automation.graphs')]
     assert offenders == []
