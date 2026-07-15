@@ -20,6 +20,8 @@ The facade should hide the moving parts that are still free to evolve:
 - `RuntimeAssembler`
 - `RuntimeDependencies`
 
+The implementation is now in place, but the contract remains provisional so the boundary can keep evolving without breaking application code.
+
 ## Facade Module Name
 
 The facade module name is:
@@ -29,6 +31,7 @@ The facade module name is:
 Status:
 
 - public-facing provisional
+- implemented as the initial package facade in Block L
 
 ## Why `api.engine`
 

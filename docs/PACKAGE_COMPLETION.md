@@ -6,6 +6,14 @@ This document defines what package completion means after the foundation MVP.
 
 Package Complete means the package-facing surface is ready for application and control-plane code to use without depending on package internals directly.
 
+## Package Facade Implementation Status
+
+- `langgraph_automation.api.engine` is implemented as the initial package facade
+- the facade remains public-facing provisional
+- preparation-only scope is still intentional
+- `run_workflow` remains deferred
+- `api.runtime` remains deferred
+
 Required:
 
 - application-facing package facade exists

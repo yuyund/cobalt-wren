@@ -67,4 +67,4 @@ Workflow authors should not use:
 - `RuntimeAssembler` directly
 - `ConfigValidator` directly
 
-Workflow authors should target public facades first, and later the package facade once it is introduced.
+Workflow authors should target public facades first, and later the package facade `langgraph_automation.api.engine` for package-level orchestration. They should not call the package facade directly from normal workflow code.

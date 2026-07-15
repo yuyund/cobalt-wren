@@ -32,12 +32,13 @@ Current implemented public facade:
 - `langgraph_automation.api.errors`
 - `langgraph_automation.api.plugins`
 - `langgraph_automation.api.workflow`
+- `langgraph_automation.api.engine`
 
-Future public surfaces:
+Deferred public surfaces:
 
 - `langgraph_automation.api.runtime`
 
-Package P0-B implements the minimal facade described below.
+Package P0-B plus the package facade blocks implement the minimal facade described below.
 
 ## Workflow API surface
 
@@ -244,6 +245,7 @@ Guidance:
 - `langgraph_automation.api.stores`
 - `langgraph_automation.api.events`
 - `langgraph_automation.api.workflow`
+- `langgraph_automation.api.engine`
 
 These modules re-export selected stable interfaces only. They do not expose runtime concrete implementation, plugin loader, config loader, or public error taxonomy.
 
@@ -280,7 +282,7 @@ Notes:
 
 - Plugin taxonomy is defined in `docs/PLUGINS.md`.
 - Plugins should depend on `langgraph_automation.api.*` public facade modules, not internal implementation modules.
-- `api.workflow`, `api.runtime`, and `api.errors` remain future surfaces and are not implemented yet.
+- `api.workflow` and `api.errors` are implemented public facades, `api.engine` is the public-facing provisional package facade, and `api.runtime` remains deferred.
 - Manual registration and registry boundaries are defined in `docs/PLUGIN_REGISTRATION.md`.
 - Plugin API shapes are documented in `docs/PLUGIN_API_SHAPE.md`.
 - Plugin API facade staging is defined in `docs/PLUGIN_API_FACADE.md`.
@@ -289,6 +291,7 @@ Notes:
 
 - `api.workflow` is implemented and defines `WorkflowMetadata`, `WorkflowRequirements`, `WorkflowDefinition`, and `WorkflowContribution`.
 - `api.plugins` aggregates workflow contributions through `PluginContributions.workflows`.
+- `api.engine` is implemented as the public-facing provisional package facade.
 - Built-in workflow wiring uses `workflows.catalog` and `workflows.adapter` internally, not public graph internals.
 - `GraphDefinition`, `GraphRuntime`, and `GraphRuntimeConfig` remain outside the public facade.
 
@@ -297,8 +300,9 @@ Notes:
 - Implemented public facade remains `api.llm`, `api.tools`, `api.stores`, and `api.events`.
 - `api.plugins` remains implemented.
 - `api.workflow` remains implemented.
-- `api.runtime` remains future.
-- `api.errors` remains future.
+- `api.engine` is implemented and remains provisional.
+- `api.runtime` remains deferred.
+- `api.errors` is implemented.
 - `GraphRuntime` and `GraphDefinition` remain outside the public facade.
 
 ## Config-facing concepts
@@ -339,7 +343,7 @@ Forbidden config behavior:
 - `workflows/catalog.py` is treated as internal / semi-internal composition.
 - arbitrary import from config is rejected.
 - safety cannot be disabled by config.
-- `langgraph_automation.api.*` is still not implemented.
+- `langgraph_automation.api.engine` is implemented as the package facade, while `langgraph_automation.api.runtime` remains deferred.
 
 
 ## Config Surface
@@ -370,6 +374,7 @@ Application workflow authors should use the public facades:
 - `langgraph_automation.api.errors`
 - `langgraph_automation.api.plugins`
 - `langgraph_automation.api.workflow`
+- `langgraph_automation.api.engine`
 - `langgraph_automation.api.llm`
 - `langgraph_automation.api.tools`
 - `langgraph_automation.api.stores`
@@ -395,26 +400,22 @@ Control plane:
 
 Application workflows are expected to use the public facades first and to keep control-plane dependencies out of workflow packages.
 
-## Package Facade Direction
+## Package Facade Surface
 
-A public-facing provisional package facade is expected to hide internal package mechanics:
+`langgraph_automation.api.engine` is the implemented public-facing provisional package facade.
+
+It hides internal package mechanics:
 
 - `PluginRegistry`
 - `WorkflowPreparer`
 - `workflows.catalog`
+- `workflows.prepare`
 - `workflows.adapter`
 - `workflows.requirements`
 - `ConfigValidator`
 - `RuntimeAssembler`
+- `RuntimeDependencies`
 
-Candidate facade module names:
+`run_workflow` and `api.runtime` remain deferred because they would prematurely expose graph execution, checkpoint/resume, worker/queue, and long-running runtime contracts.
 
-- `langgraph_automation.api.engine`
-- `langgraph_automation.api.package`
-- `langgraph_automation.api.runtime`
-
-Caution:
-
-- `api.runtime` suggests a broader runtime contract and should be used only after careful design.
-- The first facade should focus on package context creation, workflow preparation, and reference workflow verification.
-- It should not prematurely expose `run_workflow`, graph runner internals, long-running execution, or checkpoint/resume semantics.
+The service-layer workflow preparation bridge is transitional and should eventually route through `api.engine` rather than package internals directly.

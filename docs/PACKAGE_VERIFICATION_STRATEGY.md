@@ -21,6 +21,7 @@ This document defines the verification strategy for package-facing boundaries.
 ### L3: Integration Tests
 
 - verify that config -> runtime -> workflow preparation can flow through the package-facing entrypoint
+- for this phase, the package-facing entrypoint is `langgraph_automation.api.engine`
 
 ### L4: Headless Smoke Tests
 

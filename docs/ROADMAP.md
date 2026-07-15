@@ -198,6 +198,12 @@ Then:
 Package / Foundation MVP:
   complete
 
+Package Facade Design Block K:
+  complete
+
+Current:
+  Package Facade Implementation Block L
+
 Package Complete:
   not complete yet
 
@@ -208,9 +214,9 @@ company_agent:
   deferred
 
 Before Package Complete:
-  - application-facing package facade must be designed
   - application-facing package facade must be implemented
   - verification harness must cover package-facing entrypoints
+  - boundary hardening must keep apps/automation on the facade path
   - apps/automation must be able to use package facade without package internals as the final architecture
 
 Before First Application Workflow:
@@ -220,7 +226,6 @@ Before First Application Workflow:
   - no application workflow direct dependency on control plane
 
 Recommended order:
-  J: roadmap / contract / verification strategy correction
   K: package facade design
   L: package facade implementation
   M: package verification harness

@@ -275,9 +275,13 @@ These modules re-export selected foundation interfaces. They do not expose workf
 ## Package Facade Contract
 
 - package complete requires an application-facing package facade
-- the provisional facade module name is `langgraph_automation.api.engine`
-- the facade must hide `PluginRegistry`, `WorkflowPreparer`, `workflows.catalog`, `workflows.adapter`, `workflows.requirements`, `ConfigValidator`, and `RuntimeAssembler`
+- the implemented provisional facade module name is `langgraph_automation.api.engine`
+- the facade must hide `PluginRegistry`, `WorkflowPreparer`, `workflows.catalog`, `workflows.prepare`, `workflows.adapter`, `workflows.requirements`, `ConfigValidator`, `RuntimeAssembler`, and `RuntimeDependencies`
+- `create_engine` accepts raw package config plus explicit plugins
+- `AutomationEngine.prepare_workflow` returns a public-facing provisional `EnginePreparedWorkflow`
+- `EnginePreparedWorkflow.graph` is opaque and must not become a stable public contract
 - application/control-plane code should use the facade rather than package internals
 - the current service bridge is transitional and must not be treated as the final architecture
 - the facade should provide a small supported entrypoint for package context creation and workflow preparation
-- the facade should not prematurely expose full workflow execution, graph runner internals, or checkpoint/resume semantics
+- the facade should not prematurely expose `run_workflow`, full workflow execution, graph runner internals, or checkpoint/resume semantics
+- `api.runtime` remains deferred until the runtime contract is designed explicitly

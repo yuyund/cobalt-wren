@@ -114,5 +114,5 @@ Application workflow implementation remains deferred until:
 ## Package Facade Dependency
 
 Application workflow implementation remains deferred until the application-facing package facade is designed and implemented.
-`api.engine` is the provisional facade design target.
+`langgraph_automation.api.engine` is the implemented provisional facade target.
 `company_agent` remains deferred until a minimal application workflow validates the package facade.

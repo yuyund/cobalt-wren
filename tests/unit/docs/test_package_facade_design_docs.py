@@ -28,6 +28,7 @@ def test_package_facade_design_docs_exist_and_cover_core_terms() -> None:
         'RuntimeAssembler',
         'ConfigValidator',
         'transitional',
+        'implemented',
     ):
         assert token in design_text or token in adr_text
 
