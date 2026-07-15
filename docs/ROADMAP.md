@@ -124,9 +124,14 @@ Current:
 - api.workflow + WorkflowContribution support
 - 状態: 完了
 
-Next:
+Current:
 
 - Built-in Wiring Block F
+- 状態: 完了
+
+Next:
+
+- Application Readiness Block G
 
 ## 6. Recommended Execution Order
 

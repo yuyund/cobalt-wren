@@ -273,6 +273,7 @@ Notes:
 
 - `graphs/registry.py` is the current foundation registry mechanism, but external consumers should not depend on it as a permanent public contract.
 - `workflows/catalog.py` is package composition internal / semi-internal.
+- Built-in reference workflows are composed through `workflows.catalog`, `workflows.adapter`, and `workflows.reference.*`.
 - A future registration API should become the supported path for extending workflows.
 
 ## Plugin taxonomy
@@ -288,6 +289,7 @@ Notes:
 
 - `api.workflow` is implemented and defines `WorkflowMetadata`, `WorkflowRequirements`, `WorkflowDefinition`, and `WorkflowContribution`.
 - `api.plugins` aggregates workflow contributions through `PluginContributions.workflows`.
+- Built-in workflow wiring uses `workflows.catalog` and `workflows.adapter` internally, not public graph internals.
 - `GraphDefinition`, `GraphRuntime`, and `GraphRuntimeConfig` remain outside the public facade.
 
 ## Plugin facade staging

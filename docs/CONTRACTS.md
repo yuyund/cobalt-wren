@@ -101,6 +101,9 @@ These contracts describe the current internal foundation surface. If parts of th
 - `GraphDefinition` and `GraphRuntime` remain internal foundation vocabulary
 - `PluginRegistry` stores workflow contributions only
 - `PluginRegistry` does not build or execute workflows
+- built-in/reference workflows use the same `Plugin` / `WorkflowContribution` path as external workflows
+- `workflows.adapter` is the only place that calls `WorkflowDefinition.build`
+- `workflows.requirements` is the internal `WorkflowRequirements` / `RuntimeDependencies` checker
 - `ConfigValidator` does not validate workflow configs yet
 - `RuntimeAssembler` does not execute workflows
 - `api.runtime` is not part of `api.workflow`

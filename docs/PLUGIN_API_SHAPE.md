@@ -173,6 +173,7 @@ WorkflowContribution:
 
 `WorkflowDefinition` and `WorkflowRequirements` are implemented in `langgraph_automation.api.workflow`.
 `GraphDefinition` / `GraphRuntimeRequirements` remain internal foundation vocabulary and are not exposed through a public facade here.
+Built-in reference workflows are still ordinary workflow contributions; the workflow adapter is the only place that calls `WorkflowDefinition.build`.
 
 ### Validation
 

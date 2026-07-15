@@ -142,6 +142,7 @@ Application workflows are future layers and should not be pulled into `graphs`.
 - ConfigValidator calls contribution validation hooks.
 - RuntimeAssembly calls contribution factory hooks.
 - GraphRuntime and GraphDefinition remain outside the public facade.
+- Built-in reference workflows are composed through `workflows.catalog` and `workflows.adapter`, while `workflows.reference.*` stays internal.
 
 ## Error Boundary
 
@@ -178,3 +179,12 @@ Application workflows are future layers and should not be pulled into `graphs`.
 - runtime assembly does not perform validation
 - runtime assembly does not execute workflows or graph nodes
 - `api.runtime` remains unimplemented
+
+## Built-in Wiring Boundary
+
+- built-in/reference workflows are represented as ordinary `Plugin` objects
+- built-in workflow contributions are routed through `api.workflow` and `PluginRegistry`
+- `workflows.adapter` is the only place that calls `WorkflowDefinition.build`
+- `workflows.requirements` is the internal `WorkflowRequirements` / `RuntimeDependencies` checker
+- built-in wiring does not require `ConfigValidator` or `RuntimeAssembler` to expand their responsibilities
+- `graphs.*` remains the internal graph foundation and does not import workflow catalog code

@@ -63,7 +63,7 @@ def test_registry_rejects_duplicate_workflow_kind() -> None:
 
     assert excinfo.value.code == "PLUGIN_CONTRIBUTION_CONFLICT"
     assert excinfo.value.component == "plugin_registry"
-    assert excinfo.value.metadata["contribution_scope"] == "workflows"
+    assert excinfo.value.metadata["contribution_scope"] == "workflow"
     assert excinfo.value.metadata["contribution_name"] == "company_agent"
 
 

@@ -43,15 +43,7 @@ class PluginRegistry:
 
         for workflow in plugin.contributions.workflows:
             if workflow.kind in seen_workflows or workflow.kind in self._workflows:
-                raise self._duplicate_contribution_error(
-                    contribution_scope='workflows',
-                    contribution_name=workflow.kind,
-                    metadata={
-                        'plugin_name': plugin_name,
-                        'contribution_scope': 'workflows',
-                        'contribution_name': workflow.kind,
-                    },
-                )
+                raise self._duplicate_workflow_error(plugin_name, workflow)
             seen_workflows.add(workflow.kind)
 
         for tool in plugin.contributions.tools:
@@ -158,6 +150,19 @@ class PluginRegistry:
             code='PLUGIN_DUPLICATE_NAME',
             component=_PLUGIN_REGISTRY_COMPONENT,
             metadata={'plugin_name': plugin_name},
+        )
+
+    @staticmethod
+    def _duplicate_workflow_error(plugin_name: str, workflow: WorkflowContribution) -> PluginRegistrationError:
+        return PluginRegistrationError(
+            f"Plugin registration failed: duplicate workflow contribution '{workflow.kind}'.",
+            code='PLUGIN_CONTRIBUTION_CONFLICT',
+            component=_PLUGIN_REGISTRY_COMPONENT,
+            metadata={
+                'plugin_name': plugin_name,
+                'contribution_scope': 'workflow',
+                'contribution_name': workflow.kind,
+            },
         )
 
     @staticmethod

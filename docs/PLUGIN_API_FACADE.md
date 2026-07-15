@@ -127,7 +127,9 @@ Reasons for keeping workflow vocabulary in a dedicated facade:
 
 - workflow is the user-facing term that plugin authors should import
 - `api.plugins` can aggregate workflow contributions without owning workflow-specific vocabulary
+- built-in workflows are ordinary `Plugin` objects that register `WorkflowContribution` through `PluginRegistry`
 - internal graph vocabulary remains free to evolve separately
+- built-in wiring stays in `workflows.catalog` and `workflows.adapter`
 
 ## Why api.runtime is deferred
 
@@ -210,3 +212,9 @@ Implemented public facade:
 Future facade:
 
 - `api.runtime`
+
+Built-in workflow wiring:
+
+- built-in/reference workflows are represented as ordinary `Plugin` objects
+- `WorkflowContribution` is staged through `api.workflow` and registered with `PluginRegistry`
+- `WorkflowDefinition.build` is called only by the internal workflow adapter
