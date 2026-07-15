@@ -1,0 +1,76 @@
+# Package Invariants
+
+This document records the invariants that are currently supported by code and tests.
+
+## Boundary Invariants
+
+| Invariant | Implementation evidence | Test evidence | Evidence level | Gap / risk |
+| --- | --- | --- | --- | --- |
+| `api.engine` is the package-facing boundary for application/control-plane code | `src/langgraph_automation/api/engine.py::create_engine`, `AutomationEngine.prepare_workflow`, `EnginePreparedWorkflow` | `tests/unit/api/test_public_engine_imports.py::test_public_engine_api_exports`, `tests/unit/architecture/test_engine_facade_boundary.py::test_api_engine_imports_only_allowed_package_facades_and_internal_layers`, `tests/integration/api/test_engine_facade_smoke.py::test_api_engine_headless_prepare_does_not_execute_provider_or_tool` | `TEST_CONFIRMED` + `ARCH_GUARD_CONFIRMED` | Low risk |
+| `api.engine` does not expose `run_workflow` or `api.runtime` | `src/langgraph_automation/api/engine.py`, `src/langgraph_automation/api/__init__.py` | `tests/unit/api/test_public_engine_imports.py::test_public_engine_api_exports`, `tests/unit/architecture/test_engine_facade_boundary.py::test_api_runtime_facade_is_not_created_yet` | `TEST_CONFIRMED` + `ARCH_GUARD_CONFIRMED` | Low risk |
+| `apps/automation/services/workflow_preparation.py` routes through `api.engine` | `src/langgraph_automation/apps/automation/services/workflow_preparation.py::prepare_run_workflow`, `resolve_graph_for_run` | `tests/unit/apps/automation/services/test_workflow_preparation_service.py::test_prepare_run_workflow_uses_api_engine`, `tests/unit/apps/automation/services/test_service_integration_via_engine.py::test_service_layer_prepares_reference_workflow_through_engine`, `tests/unit/architecture/test_apps_automation_package_boundary.py::test_workflow_preparation_bridge_imports_only_the_package_facing_engine_facade` | `TEST_CONFIRMED` + `ARCH_GUARD_CONFIRMED` | Medium risk because other `apps/automation` modules still import internals |
+| `apps/automation` is not yet fully free of package-internal imports | `src/langgraph_automation/apps/automation/services/runtime.py`, `workflow_config.py`, `execution.py`, `runs.py` still import graph/workflow internals | No package-wide guard covers every `apps/automation` module yet | `GAP` | P0 risk |
+| `workflows/applications` must avoid control-plane imports | `tests/unit/architecture/test_application_workflow_public_api_boundary.py` | Guard exists but the package is currently empty | `ARCH_GUARD_CONFIRMED` | Low risk until files are added |
+
+## Safety Invariants
+
+| Invariant | Implementation evidence | Test evidence | Evidence level | Gap / risk |
+| --- | --- | --- | --- | --- |
+| Headless workflow preparation does not execute provider network calls | `src/langgraph_automation/api/engine.py::create_engine`, `AutomationEngine.prepare_workflow` | `tests/integration/api/test_engine_facade_smoke.py::test_api_engine_headless_prepare_does_not_execute_provider_or_tool` | `TEST_CONFIRMED` | Low risk |
+| Headless workflow preparation does not execute tool calls | `src/langgraph_automation/api/engine.py::create_engine`, `AutomationEngine.prepare_workflow` | `tests/integration/api/test_engine_facade_smoke.py::test_api_engine_headless_prepare_does_not_execute_provider_or_tool` | `TEST_CONFIRMED` | Low risk |
+| Safe errors do not leak traceback or secret values | `src/langgraph_automation/api/errors.py`, `src/langgraph_automation/api/engine.py`, `src/langgraph_automation/workflows/adapter.py`, `src/langgraph_automation/runtime/secrets.py` | `tests/unit/api/test_engine_errors.py`, `tests/integration/api/test_engine_facade_failure_matrix.py`, `tests/unit/core/test_result_safety.py`, `tests/unit/graphs/test_runner.py`, `tests/unit/automation/test_run_failure_observability_masking.py` | `TEST_CONFIRMED` | Low risk |
+| Primary failure is preserved over secondary observability failure | `src/langgraph_automation/graphs/runner.py`, `src/langgraph_automation/apps/automation/services/runs.py` | `tests/unit/graphs/test_runner.py::test_run_graph_once_preserves_primary_failure_when_span_failed_fails`, `tests/unit/automation/test_run_failure_observability_masking.py::test_start_run_preserves_primary_failure_when_run_failed_observability_fails` | `TEST_CONFIRMED` | Low risk |
+| Raw input / raw tool output / raw provider output stay out of safe persistence | `src/langgraph_automation/core/result_safety.py`, `src/langgraph_automation/graphs/runner.py`, `src/langgraph_automation/apps/automation/services/runs.py` | `tests/unit/core/test_result_safety.py`, `tests/unit/graphs/test_graph_runner_state_safety.py`, `tests/unit/automation/test_run_safety.py` | `TEST_CONFIRMED` | Low risk |
+
+## Config Invariants
+
+| Invariant | Implementation evidence | Test evidence | Evidence level | Gap / risk |
+| --- | --- | --- | --- | --- |
+| Raw package config must be a mapping and version 1 | `src/langgraph_automation/config/loader.py::load_package_config_from_mapping` | `tests/unit/config/test_config_loader.py` | `TEST_CONFIRMED` | Low risk |
+| Unsafe config shapes are rejected before normalization | `src/langgraph_automation/config/security.py::precheck_package_config_mapping` | `tests/unit/config/test_config_security.py` | `TEST_CONFIRMED` | Low risk |
+| Normalization applies defaults and typed models | `src/langgraph_automation/config/normalizer.py::normalize_package_config` | `tests/unit/config/test_config_normalizer.py` | `TEST_CONFIRMED` | Low risk |
+| `ConfigValidator` resolves only enabled plugins | `src/langgraph_automation/config/validator.py::ConfigValidator.validate` | `tests/unit/config/test_config_validator_*.py` | `TEST_CONFIRMED` | Low risk |
+| Validation hooks may run, factory hooks must not run during validation | `src/langgraph_automation/config/validator.py::_invoke_validation_hook` | `tests/unit/config/test_config_validator_*.py` | `TEST_CONFIRMED` | Low risk |
+
+## Plugin Invariants
+
+| Invariant | Implementation evidence | Test evidence | Evidence level | Gap / risk |
+| --- | --- | --- | --- | --- |
+| `PluginContributions` aggregates workflow, tool, provider, store, and event sink contributions | `src/langgraph_automation/api/plugins.py::PluginContributions` | `tests/unit/api/test_plugin_contributions.py`, `tests/unit/api/test_public_plugins_imports.py` | `TEST_CONFIRMED` | Low risk |
+| `PluginRegistry` stores definitions and rejects duplicate names / contributions | `src/langgraph_automation/plugins/registry.py::PluginRegistry.register` | `tests/unit/plugins/test_registry.py`, `tests/unit/plugins/test_registry_workflows.py` | `TEST_CONFIRMED` | Low risk |
+| `PluginRegistry` does not call validation or factory hooks during registration | `src/langgraph_automation/plugins/registry.py::PluginRegistry.register` | `tests/unit/plugins/test_registry.py`, `tests/unit/plugins/test_registry_workflows.py` | `TEST_CONFIRMED` | Low risk |
+| Unknown plugin / tool / provider / store / workflow lookups surface safe resolution errors | `src/langgraph_automation/plugins/registry.py::PluginRegistry.get_*` | `tests/unit/plugins/test_registry.py`, `tests/unit/plugins/test_registry_workflows.py` | `TEST_CONFIRMED` | Low risk |
+
+## Runtime Assembly Invariants
+
+| Invariant | Implementation evidence | Test evidence | Evidence level | Gap / risk |
+| --- | --- | --- | --- | --- |
+| Runtime assembly consumes `ValidatedPackageConfig` and `SecretResolver` | `src/langgraph_automation/runtime/assembly.py::RuntimeAssembler`, `src/langgraph_automation/runtime/secrets.py::EnvSecretResolver` | `tests/unit/runtime/test_runtime_assembler_*.py`, `tests/unit/runtime/test_secret_resolver.py` | `TEST_CONFIRMED` | Low risk |
+| Missing provider/tool/store/event sink factories are safe failures | `src/langgraph_automation/runtime/assembly.py` | `tests/unit/runtime/test_runtime_assembler_*.py` | `TEST_CONFIRMED` | Low risk |
+| Arbitrary factory exceptions are wrapped as `RuntimeAssemblyError` | `src/langgraph_automation/runtime/assembly.py` | `tests/unit/runtime/test_runtime_assembler_*.py` | `TEST_CONFIRMED` | Low risk |
+| Missing secrets are safe failures with bounded metadata | `src/langgraph_automation/runtime/secrets.py::EnvSecretResolver.resolve` | `tests/unit/api/test_engine_errors.py`, `tests/integration/api/test_engine_facade_failure_matrix.py`, `tests/unit/runtime/test_secret_resolver.py` | `TEST_CONFIRMED` | Low risk |
+
+## Workflow Preparation Invariants
+
+| Invariant | Implementation evidence | Test evidence | Evidence level | Gap / risk |
+| --- | --- | --- | --- | --- |
+| `WorkflowPreparer` resolves registered workflow kinds | `src/langgraph_automation/workflows/prepare.py::WorkflowPreparer.prepare` | `tests/unit/workflows/test_workflow_preparer.py`, `tests/unit/workflows/test_builtin_workflow_preparation.py` | `TEST_CONFIRMED` | Low risk |
+| Workflow requirements are checked before build | `src/langgraph_automation/workflows/prepare.py::WorkflowPreparer.prepare`, `src/langgraph_automation/workflows/requirements.py::check_workflow_requirements` | `tests/unit/workflows/test_workflow_requirements.py`, `tests/unit/workflows/test_workflow_preparer.py`, `tests/integration/api/test_engine_facade_failure_matrix.py` | `TEST_CONFIRMED` | Low risk |
+| `WorkflowDefinition.build` is called only through the adapter | `src/langgraph_automation/workflows/adapter.py::build_workflow_graph` | `tests/unit/workflows/test_workflow_adapter.py`, `tests/unit/workflows/test_workflow_preparer.py` | `TEST_CONFIRMED` | Low risk |
+| Preparation does not execute graphs | `src/langgraph_automation/workflows/prepare.py`, `src/langgraph_automation/api/engine.py` | `tests/integration/api/test_engine_facade_smoke.py`, `tests/unit/workflows/test_workflow_preparer.py`, `tests/unit/apps/automation/services/test_workflow_graph_resolution.py` | `TEST_CONFIRMED` | Low risk |
+
+## Facade Invariants
+
+| Invariant | Implementation evidence | Test evidence | Evidence level | Gap / risk |
+| --- | --- | --- | --- | --- |
+| `EnginePreparedWorkflow` is the public-facing handle returned by `api.engine` | `src/langgraph_automation/api/engine.py::EnginePreparedWorkflow`, `AutomationEngine.prepare_workflow` | `tests/unit/api/test_engine_prepare_workflow.py`, `tests/integration/api/test_engine_facade_smoke.py` | `TEST_CONFIRMED` | Low risk |
+| `api.engine` hides registry, validator, assembler, dependencies, and preparer internals | `src/langgraph_automation/api/engine.py::AutomationEngine`, `create_engine` | `tests/unit/api/test_engine_create.py`, `tests/unit/api/test_public_engine_imports.py`, `tests/unit/architecture/test_engine_facade_boundary.py` | `TEST_CONFIRMED` + `ARCH_GUARD_CONFIRMED` | Low risk |
+| `api.engine` does not export `run_workflow` | `src/langgraph_automation/api/engine.py`, `src/langgraph_automation/api/__init__.py` | `tests/unit/api/test_public_engine_imports.py`, `tests/unit/architecture/test_engine_facade_boundary.py` | `TEST_CONFIRMED` + `ARCH_GUARD_CONFIRMED` | Low risk |
+
+## Service Integration Invariants
+
+| Invariant | Implementation evidence | Test evidence | Evidence level | Gap / risk |
+| --- | --- | --- | --- | --- |
+| `prepare_run_workflow` canonicalizes `llm_echo_summary` to `reference.llm_echo_summary` | `src/langgraph_automation/apps/automation/services/workflow_preparation.py::canonicalize_workflow_kind`, `prepare_run_workflow` | `tests/unit/apps/automation/services/test_workflow_preparation_service.py`, `tests/unit/apps/automation/services/test_service_integration_via_engine.py` | `TEST_CONFIRMED` | Low risk |
+| `resolve_graph_for_run` returns `EnginePreparedWorkflow.graph` | `src/langgraph_automation/apps/automation/services/workflow_preparation.py::resolve_graph_for_run` | `tests/unit/apps/automation/services/test_workflow_graph_resolution.py` | `TEST_CONFIRMED` | Low risk |
+| Service preparation does not require callers to use `WorkflowPreparer` or `PluginRegistry` directly | `src/langgraph_automation/apps/automation/services/workflow_preparation.py` | `tests/unit/apps/automation/services/test_service_integration_via_engine.py`, `tests/unit/architecture/test_apps_automation_package_boundary.py` | `TEST_CONFIRMED` + `ARCH_GUARD_CONFIRMED` | Low risk |

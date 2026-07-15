@@ -163,6 +163,7 @@ After Block G:
 - Prefer registry/catalog composition over direct imports in foundation code.
 - Prefer explicit boundary contracts over implicit conventions.
 - Keep safety boundaries redaction-safe by default.
+
 ## 9. Package Completion And Beyond
 
 Package / Foundation MVP:
@@ -251,3 +252,29 @@ Before First Application Workflow:
 - service bridge must be routed through package facade
 - existing safety tests must remain green
 - no application workflow direct dependency on control plane
+
+## 10. Package Assurance Audit
+
+Current:
+
+- Package Assurance Code-First Audit Block P
+- 状態: 完了
+
+Audit output:
+
+- `docs/PACKAGE_ASSURANCE_INVENTORY.md`
+- `docs/PACKAGE_INVARIANTS.md`
+- `docs/PACKAGE_TEST_TRACEABILITY.md`
+- `docs/PACKAGE_ASSURANCE_GAPS.md`
+- `docs/PACKAGE_TEST_ROADMAP.md`
+
+Next:
+
+- First P0 Assurance Gap Closure Block
+
+Audit focus:
+
+- code-first evidence
+- traceability
+- risk-ranked gap closure
+- docs/code/test reconciliation
