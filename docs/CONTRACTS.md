@@ -278,6 +278,7 @@ These modules re-export selected foundation interfaces. They do not expose workf
 - the implemented provisional facade module name is `langgraph_automation.api.engine`
 - the facade must hide `PluginRegistry`, `WorkflowPreparer`, `workflows.catalog`, `workflows.prepare`, `workflows.adapter`, `workflows.requirements`, `ConfigValidator`, `RuntimeAssembler`, and `RuntimeDependencies`
 - `create_engine` accepts raw package config plus explicit plugins
+- explicit plugins passed to `create_engine` are registered and auto-enabled for validation and runtime assembly
 - `AutomationEngine.prepare_workflow` returns a public-facing provisional `EnginePreparedWorkflow`
 - `EnginePreparedWorkflow.graph` is opaque and must not become a stable public contract
 - application/control-plane code should use the facade rather than package internals
@@ -285,3 +286,6 @@ These modules re-export selected foundation interfaces. They do not expose workf
 - the facade should provide a small supported entrypoint for package context creation and workflow preparation
 - the facade should not prematurely expose `run_workflow`, full workflow execution, graph runner internals, or checkpoint/resume semantics
 - `api.runtime` remains deferred until the runtime contract is designed explicitly
+- facade-level verification should cover the `create_engine` -> `prepare_workflow` path without requiring provider network calls or graph execution
+- safe failures must surface `FrameworkError`-derived safe messages only
+- raw traceback, secret values, and provider raw payloads must not leak through `safe_message`

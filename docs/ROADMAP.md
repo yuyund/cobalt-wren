@@ -183,7 +183,7 @@ Then:
 Then:
   Package Verification Harness Block M
 
-Then:
+Current:
   Boundary Hardening Block N
 
 Then:
@@ -201,8 +201,11 @@ Package / Foundation MVP:
 Package Facade Design Block K:
   complete
 
-Current:
-  Package Facade Implementation Block L
+Package Facade Implementation Block L:
+  complete
+
+Package Verification Harness Block M:
+  complete
 
 Package Complete:
   not complete yet
@@ -219,17 +222,15 @@ Before Package Complete:
   - boundary hardening must keep apps/automation on the facade path
   - apps/automation must be able to use package facade without package internals as the final architecture
 
+Recommended order after Block M:
+  1. Boundary Hardening Block N
+  2. Service Integration via Package Facade Block O
+  3. Minimal Application Workflow Example Block P
+  4. company_agent Block Q
+
 Before First Application Workflow:
   - package facade must be the preferred entrypoint
   - service bridge must be routed through package facade
   - existing safety tests must remain green
   - no application workflow direct dependency on control plane
 
-Recommended order:
-  K: package facade design
-  L: package facade implementation
-  M: package verification harness
-  N: boundary hardening
-  O: service integration via package facade
-  P: minimal application workflow example
-  Q: company_agent

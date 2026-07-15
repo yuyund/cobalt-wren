@@ -27,6 +27,8 @@ def test_package_facade_design_docs_exist_and_cover_core_terms() -> None:
         'WorkflowPreparer',
         'RuntimeAssembler',
         'ConfigValidator',
+        'auto-enabled',
+        'Block M',
         'transitional',
         'implemented',
     ):
@@ -34,3 +36,4 @@ def test_package_facade_design_docs_exist_and_cover_core_terms() -> None:
 
     assert 'public-facing provisional' in design_text
     assert 'preparation only' in adr_text.lower()
+    assert 'verification' in design_text.lower()

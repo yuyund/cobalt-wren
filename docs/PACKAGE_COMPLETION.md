@@ -14,6 +14,13 @@ Package Complete means the package-facing surface is ready for application and c
 - `run_workflow` remains deferred
 - `api.runtime` remains deferred
 
+## Verification Harness Status
+
+- `api.engine` integration, smoke, and failure-matrix coverage is implemented
+- explicit plugins passed to `create_engine` are registered and auto-enabled for validation and runtime assembly
+- the facade-level verification harness covers the package-facing preparation path
+- `reference.llm_echo_summary` headless preparation is verified through `api.engine`
+
 Required:
 
 - application-facing package facade exists
@@ -79,3 +86,11 @@ It should not prematurely expose:
 - long-running execution
 - checkpoint / resume semantics
 - `run_workflow` as a broad public contract
+
+## Package Complete Is Still Pending
+
+Package Complete remains not complete because:
+
+- boundary hardening is not complete
+- the service bridge is not yet routed through `api.engine`
+- L6 application-facing tests are still deferred

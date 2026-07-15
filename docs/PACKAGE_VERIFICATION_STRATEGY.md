@@ -22,14 +22,18 @@ This document defines the verification strategy for package-facing boundaries.
 
 - verify that config -> runtime -> workflow preparation can flow through the package-facing entrypoint
 - for this phase, the package-facing entrypoint is `langgraph_automation.api.engine`
+- api.engine integration is verified in Block M
 
 ### L4: Headless Smoke Tests
 
-- verify that the reference workflow can be prepared or executed through the package-facing path
+- verify that the reference workflow can be prepared through the package-facing path
+- reference.llm_echo_summary headless prepare is verified in Block M
 
 ### L5: Failure Matrix Tests
 
-- verify that unknown workflow, missing provider, build failure, and unsafe output paths fail safely
+- verify that unknown workflow, missing provider, build failure, and factory failure paths fail safely
+- facade-level failure coverage is verified in Block M
+- execution-path raw output persistence remains covered by lower-level runtime tests
 
 ### L6: Application-Facing Tests
 
@@ -79,7 +83,7 @@ Verification levels:
 
 - L3: config -> runtime -> workflow preparation through `api.engine`
 - L4: reference workflow headless prepare through `api.engine`
-- L5: safe failures for unknown workflow, missing provider, and build failure
+- L5: facade-level safe failures verified through `api.engine`
 
 Headless smoke tests should only prepare workflows.
 They should not require provider network calls or graph execution.

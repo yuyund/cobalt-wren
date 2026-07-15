@@ -403,6 +403,7 @@ Application workflows are expected to use the public facades first and to keep c
 ## Package Facade Surface
 
 `langgraph_automation.api.engine` is the implemented public-facing provisional package facade.
+Block M verifies the `create_engine` -> `prepare_workflow` path through this facade.
 
 It hides internal package mechanics:
 

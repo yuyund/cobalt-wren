@@ -20,7 +20,7 @@ The facade should hide the moving parts that are still free to evolve:
 - `RuntimeAssembler`
 - `RuntimeDependencies`
 
-The implementation is now in place, but the contract remains provisional so the boundary can keep evolving without breaking application code.
+The implementation is now in place, and Block M verifies the preparation path through the facade, but the contract remains provisional so the boundary can keep evolving without breaking application code.
 
 ## Facade Module Name
 
@@ -115,6 +115,8 @@ This keeps application/control-plane code simple and lets the facade hide:
 
 Explicit plugins are accepted as a sequence so manual registration remains available without requiring plugin discovery.
 
+Explicit plugins passed to `create_engine` are registered and auto-enabled for validation and runtime assembly.
+
 ## Output Design
 
 `EnginePreparedWorkflow` is the public-facing provisional result.
@@ -185,7 +187,7 @@ Verification levels:
 
 - L3: config -> runtime -> workflow preparation through `api.engine`
 - L4: reference workflow headless prepare through `api.engine`
-- L5: safe failures for unknown workflow, missing provider, and build failure
+- L5: facade-level safe failures verified through `api.engine`
 
 Headless smoke tests should only prepare workflows.
 They should not require provider network calls or graph execution.

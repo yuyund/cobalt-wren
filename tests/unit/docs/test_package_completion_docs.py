@@ -20,9 +20,13 @@ def test_package_completion_docs_exist_and_cover_core_terms() -> None:
     assert 'langgraph_automation.api.engine' in completion_text
     assert 'PluginRegistry' in completion_text
     assert 'WorkflowPreparer' in completion_text
+    assert 'verification harness' in completion_text.lower()
+    assert 'package complete remains not complete' in completion_text.lower()
     assert 'company_agent' in completion_text
 
     for token in ('L0', 'L1', 'L2', 'L3', 'L4', 'L5', 'L6'):
         assert token in verification_text
+    assert 'api.engine integration is verified in block m' in verification_text.lower()
+    assert 'headless prepare is verified in block m' in verification_text.lower()
     assert 'failure matrix' in verification_text.lower()
     assert 'transitional bridge' in verification_text.lower()
