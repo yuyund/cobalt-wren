@@ -57,3 +57,14 @@ Workflow authors do not call service-layer workflow preparation helpers.
 Workflow authors provide `Plugin`, `WorkflowContribution`, and `WorkflowDefinition`.
 The framework service layer prepares workflows.
 
+## Package Facade Target
+
+Workflow authors should not use:
+
+- `apps/automation` service helpers
+- `WorkflowPreparer` directly
+- `PluginRegistry` directly
+- `RuntimeAssembler` directly
+- `ConfigValidator` directly
+
+Workflow authors should target public facades, and later the package facade once it is introduced.

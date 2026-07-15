@@ -64,3 +64,23 @@ MVP complete does not mean:
 - service layer integration is post-MVP
 - full execution path migration remains future work
 
+## Package Complete
+
+Package Complete means:
+
+- application-facing package facade exists
+- package facade hides `PluginRegistry`, `WorkflowPreparer`, `workflows.catalog`, `workflows.adapter`, `workflows.requirements`, `ConfigValidator`, and `RuntimeAssembler`
+- application/control-plane code can use the package through a stable facade
+- verification harness is in place
+- apps/automation does not depend on package internals as the final architecture
+- workflows/applications do not depend on control-plane or package internals
+
+Package Complete does not mean:
+
+- `company_agent` is implemented
+- production application workflows are implemented
+- worker / queue / outbox exists
+- true resume exists
+- external plugin discovery exists
+- entry point discovery exists
+- long-running execution semantics are complete

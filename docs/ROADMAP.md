@@ -163,25 +163,68 @@ After Block G:
 - Prefer registry/catalog composition over direct imports in foundation code.
 - Prefer explicit boundary contracts over implicit conventions.
 - Keep safety boundaries redaction-safe by default.
-
-## 9. Execution Integration And Beyond
+## 9. Package Completion And Beyond
 
 Execution Integration Block H:
   complete
 
+Service Integration Block I:
+  complete, but transitional
+
 Current:
-  Service Integration Block I
+  Package Roadmap Correction Block J
 
 Next:
-  First Application Workflow Block J
+  Package Facade Design Block K
+
+Then:
+  Package Facade Implementation Block L
+
+Then:
+  Package Verification Harness Block M
+
+Then:
+  Boundary Hardening Block N
+
+Then:
+  Service Integration via Package Facade Block O
+
+Then:
+  Minimal Application Workflow Example Block P
+
+Then:
+  company_agent Block Q
+
+Package / Foundation MVP:
+  complete
+
+Package Complete:
+  not complete yet
+
+Application workflow:
+  deferred
+
+company_agent:
+  deferred
+
+Before Package Complete:
+  - application-facing package facade must be designed
+  - application-facing package facade must be implemented
+  - verification harness must cover package-facing entrypoints
+  - apps/automation must be able to use package facade without package internals as the final architecture
 
 Before First Application Workflow:
-  - reference workflow must be preparable through service layer
+  - package facade must be the preferred entrypoint
+  - service bridge must be routed through package facade
   - existing safety tests must remain green
   - no application workflow direct dependency on control plane
 
 Recommended order:
-  H: Workflow preparation integration
-  I: Service layer integration
-  J: First application workflow
-
+  J: roadmap / contract / verification strategy correction
+  K: package facade design
+  L: package facade implementation
+  M: package verification harness
+  N: boundary hardening
+  O: service integration via package facade
+  P: minimal application workflow example
+  Q: company_agent

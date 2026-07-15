@@ -272,3 +272,11 @@ These modules re-export selected foundation interfaces. They do not expose workf
 - service layer must not persist raw input, prompt, or provider response
 - service layer must not call `ConfigValidator` or `RuntimeAssembler` through `WorkflowPreparer`
 
+## Package Facade Contract
+
+- package complete requires an application-facing package facade
+- the facade must hide `PluginRegistry`, `WorkflowPreparer`, `workflows.catalog`, `workflows.adapter`, `workflows.requirements`, `ConfigValidator`, and `RuntimeAssembler`
+- application/control-plane code should use the facade rather than package internals
+- the current service bridge is transitional and must not be treated as the final architecture
+- the facade should provide a small supported entrypoint for package context creation and workflow preparation
+- the facade should not prematurely expose full workflow execution, graph runner internals, or checkpoint/resume semantics

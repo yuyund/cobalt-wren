@@ -100,3 +100,13 @@ Application workflow readiness still excludes:
 - direct use of `WorkflowPreparer` by workflow code
 - direct use of `PluginRegistry` by workflow code
 
+## Package Completion Dependency
+
+Application workflow implementation remains deferred until:
+
+- application-facing package facade is designed
+- application-facing package facade is implemented
+- package verification harness is in place
+- service integration uses the package facade
+
+`company_agent` is explicitly deferred until after a minimal application workflow example validates the package facade.

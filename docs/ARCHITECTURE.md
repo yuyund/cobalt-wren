@@ -221,3 +221,11 @@ Application workflows are future layers and should not be pulled into `graphs`.
 - service layer can pass `PreparedWorkflow.graph` to the existing runner path
 - service layer does not bypass safe output or safe error contracts
 
+## Package Facade Direction
+
+- the service-layer workflow preparation bridge is transitional
+- it is not the final package API
+- it is not the application-facing API
+- it must eventually route through a package facade
+- package facade should hide `PluginRegistry`, `WorkflowPreparer`, `workflows.catalog`, `workflows.adapter`, `workflows.requirements`, `ConfigValidator`, and `RuntimeAssembler`
+- `apps/automation` should not become the final permanent dependency on package internals

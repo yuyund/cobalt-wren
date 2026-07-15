@@ -394,3 +394,27 @@ Control plane:
 - `langgraph_automation.apps.automation.*`
 
 Application workflows are expected to use the public facades first and to keep control-plane dependencies out of workflow packages.
+
+## Package Facade Direction
+
+A future application-facing package facade is expected to hide internal package mechanics:
+
+- `PluginRegistry`
+- `WorkflowPreparer`
+- `workflows.catalog`
+- `workflows.adapter`
+- `workflows.requirements`
+- `ConfigValidator`
+- `RuntimeAssembler`
+
+Candidate facade module names:
+
+- `langgraph_automation.api.engine`
+- `langgraph_automation.api.package`
+- `langgraph_automation.api.runtime`
+
+Caution:
+
+- `api.runtime` suggests a broader runtime contract and should be used only after careful design.
+- The first facade should focus on package context creation, workflow preparation, and reference workflow verification.
+- It should not prematurely expose `run_workflow`, graph runner internals, long-running execution, or checkpoint/resume semantics.
