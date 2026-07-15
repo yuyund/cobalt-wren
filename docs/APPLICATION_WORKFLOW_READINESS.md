@@ -110,3 +110,9 @@ Application workflow implementation remains deferred until:
 - service integration uses the package facade
 
 `company_agent` is explicitly deferred until after a minimal application workflow example validates the package facade.
+
+## Package Facade Dependency
+
+Application workflow implementation remains deferred until the application-facing package facade is designed and implemented.
+`api.engine` is the provisional facade design target.
+`company_agent` remains deferred until a minimal application workflow validates the package facade.

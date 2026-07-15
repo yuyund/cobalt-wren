@@ -42,17 +42,19 @@ A later package-complete-plus phase may add:
 - plugin version compatibility
 - deprecation policy
 
-## Package Facade Candidates
+## Package Facade Module
 
-Possible facade module names:
+The preferred facade module name is `langgraph_automation.api.engine`.
 
-- `langgraph_automation.api.engine`
-- `langgraph_automation.api.package`
-- `langgraph_automation.api.runtime`
+Why not `api.runtime` yet:
 
-Caution:
+- it suggests a broader runtime contract than the package needs at this stage
+- it can easily imply graph execution, checkpointing, resume, and worker semantics
+- it remains deferred
 
-- `api.runtime` suggests a broader runtime contract and should be introduced only after careful design.
+Why not `api.package`:
+
+- it is less explicit about the orchestration role of the facade
 
 ## Initial Facade Scope
 

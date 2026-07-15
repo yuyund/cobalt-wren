@@ -65,3 +65,20 @@ Expected behavior:
 The current service-layer workflow preparation bridge is acceptable as a transitional integration point.
 It is not the final package-facing boundary.
 The long-term direction is to route service/control-plane code through a package facade.
+
+## Package Facade Verification
+
+The first package-facade verification target should be:
+
+- `create_engine(config_mapping)`
+- `engine.prepare_workflow("reference.llm_echo_summary")`
+- `EnginePreparedWorkflow`
+
+Verification levels:
+
+- L3: config -> runtime -> workflow preparation through `api.engine`
+- L4: reference workflow headless prepare through `api.engine`
+- L5: safe failures for unknown workflow, missing provider, and build failure
+
+Headless smoke tests should only prepare workflows.
+They should not require provider network calls or graph execution.

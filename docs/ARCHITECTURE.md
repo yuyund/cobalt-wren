@@ -226,6 +226,7 @@ Application workflows are future layers and should not be pulled into `graphs`.
 - the service-layer workflow preparation bridge is transitional
 - it is not the final package API
 - it is not the application-facing API
-- it must eventually route through a package facade
+- the provisional package facade is `langgraph_automation.api.engine`
 - package facade should hide `PluginRegistry`, `WorkflowPreparer`, `workflows.catalog`, `workflows.adapter`, `workflows.requirements`, `ConfigValidator`, and `RuntimeAssembler`
 - `apps/automation` should not become the final permanent dependency on package internals
+- future service integration should route through the package facade instead of package internals

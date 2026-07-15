@@ -397,7 +397,7 @@ Application workflows are expected to use the public facades first and to keep c
 
 ## Package Facade Direction
 
-A future application-facing package facade is expected to hide internal package mechanics:
+A public-facing provisional package facade is expected to hide internal package mechanics:
 
 - `PluginRegistry`
 - `WorkflowPreparer`

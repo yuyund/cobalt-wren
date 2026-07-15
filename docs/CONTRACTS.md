@@ -275,6 +275,7 @@ These modules re-export selected foundation interfaces. They do not expose workf
 ## Package Facade Contract
 
 - package complete requires an application-facing package facade
+- the provisional facade module name is `langgraph_automation.api.engine`
 - the facade must hide `PluginRegistry`, `WorkflowPreparer`, `workflows.catalog`, `workflows.adapter`, `workflows.requirements`, `ConfigValidator`, and `RuntimeAssembler`
 - application/control-plane code should use the facade rather than package internals
 - the current service bridge is transitional and must not be treated as the final architecture
