@@ -202,13 +202,27 @@ Service Integration via Package Facade Block O:
 
 - complete
 
+## 10. System Assurance Roadmap
+
+System Assurance Scope Expansion Audit Block Q:
+
+- complete
+
 Current:
 
-- Minimal Application Workflow Example Block P
+- System P0 Assurance Gap Closure Block R
 
-Then:
+Next:
 
-- company_agent Block Q
+- control-plane boundary closure
+- public surface drift closure
+- persistence durability assurance
+- admin/UI redaction assurance
+
+Later:
+
+- Minimal Application Workflow Example
+- company_agent
 
 Package Complete:
 
