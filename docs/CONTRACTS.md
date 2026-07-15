@@ -196,3 +196,15 @@ These modules re-export selected foundation interfaces. They do not expose workf
 - Config Core does not resolve secret values
 - unsafe config is `ConfigError`
 - safety cannot be disabled
+
+
+## Config Validation Contract
+
+- `ConfigValidator` is the first layer allowed to import `PluginRegistry`
+- `ConfigValidator` derives an `EffectivePluginSet` from `plugins.enabled`
+- registered plugins do not imply enabled plugins
+- contribution references are resolved against `EffectivePluginSet`, not raw registry state
+- `ConfigValidator` may call plugin-specific validation hooks
+- `ConfigValidator` must not call factory hooks
+- validation-hook arbitrary exceptions are wrapped as `PluginValidationError`
+- tool configs outside allowlist are `ConfigError`

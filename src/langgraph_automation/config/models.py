@@ -7,6 +7,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 __all__ = [
+    "EffectivePluginSet",
     "EventSinkBackendConfig",
     "LimitsConfig",
     "NormalizedPackageConfig",
@@ -17,6 +18,7 @@ __all__ = [
     "SecretRef",
     "StoreBackendConfig",
     "ToolsConfig",
+    "ValidatedPackageConfig",
 ]
 
 
@@ -162,3 +164,27 @@ class NormalizedPackageConfig:
         object.__setattr__(self, "event_sinks", _copy_mapping(self.event_sinks))
         object.__setattr__(self, "observability", _copy_mapping(self.observability))
         object.__setattr__(self, "metadata", _copy_mapping(self.metadata))
+
+
+@dataclass(frozen=True, slots=True)
+class EffectivePluginSet:
+    plugins: tuple[object, ...]
+    plugin_names: tuple[str, ...]
+    tools: Mapping[str, object]
+    providers: Mapping[str, object]
+    stores: Mapping[tuple[str, str], object]
+    event_sinks: Mapping[str, object]
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "plugins", tuple(self.plugins))
+        object.__setattr__(self, "plugin_names", _tupleize_strings(self.plugin_names))
+        object.__setattr__(self, "tools", _copy_mapping(self.tools))
+        object.__setattr__(self, "providers", _copy_mapping(self.providers))
+        object.__setattr__(self, "stores", _copy_mapping(self.stores))
+        object.__setattr__(self, "event_sinks", _copy_mapping(self.event_sinks))
+
+
+@dataclass(frozen=True, slots=True)
+class ValidatedPackageConfig:
+    normalized: NormalizedPackageConfig
+    effective_plugins: EffectivePluginSet

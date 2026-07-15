@@ -447,3 +447,19 @@ Rules:
 - config cannot disable safety, redaction, or safe errors
 - config cannot enable `allow_all_tools`
 - config cannot provide arbitrary import / callable paths
+
+
+## Config Validation Block C
+
+`ConfigValidator` validates normalized config against the plugin registry through an `EffectivePluginSet` derived from `plugins.enabled`.
+
+Rules:
+
+- enabled plugins must be registered
+- provider references must be provided by enabled plugins
+- tools.allowlist must be provided by enabled plugins
+- tools.configs must be a subset of tools.allowlist
+- store backends must be provided by enabled plugins
+- event sink backends must be provided by enabled plugins
+- validation hooks are plugin-specific and run after registry lookup
+- factory hooks are not called here

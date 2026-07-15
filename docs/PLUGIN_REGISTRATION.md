@@ -544,3 +544,12 @@ ToolPlugin provides capability. ToolPolicy grants usage.
 - registered vs enabled plugins are separated.
 - validation boundary is fixed.
 - registry / validator / runtime assembly relationship is fixed.
+
+
+## Config Validation Block C
+
+- `PluginRegistry` stores all registered plugins and contributions.
+- `ConfigValidator` derives `EffectivePluginSet` from `plugins.enabled`.
+- registered plugins do not automatically become enabled plugins.
+- registry lookup during validation is filtered through the enabled plugin set.
+- `PluginRegistry` does not know config activation policy.

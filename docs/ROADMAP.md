@@ -104,16 +104,19 @@ Current:
 - api.errors minimal facade implementation
 - 状態: 完了
 
-Current:
-
 - Config Core Block B
-- Config loader / normalizer MVP
+- 状態: 完了
 
-Next:
+Current:
 
 - Config Validation Block C
 - ConfigValidator + EffectivePluginSet + registry lookup
-- then Runtime Assembly Block D
+- 状態: 進行中
+
+Next:
+
+- Runtime Assembly Block D
+- then Workflow Extension Block E
 
 ## 6. Recommended Execution Order
 

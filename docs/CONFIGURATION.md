@@ -565,7 +565,7 @@ ValidatedPackageConfig
 RuntimeAssembly
 ```
 
-P1-A defines the taxonomy. Config Core Block B implements the mapping loader / normalizer, while schema validation and runtime assembly remain later phases.
+P1-A defines the taxonomy. Config Core Block B implements the mapping loader / normalizer. Config Validation Block C adds registry-backed semantic validation, and Runtime Assembly Block D remains later.
 Plugin-specific validation stays with plugin types and is described in `docs/PLUGINS.md`.
 
 ## Relation to existing payloads
@@ -606,3 +606,22 @@ Implemented:
 - safety / redaction / policy bypass are rejected.
 - config source and normalized config are described.
 - schema validation / runtime assembly remain unimplemented.
+
+
+## Config Validation Block C
+
+Implemented:
+
+- ConfigValidator
+- EffectivePluginSet
+- ValidatedPackageConfig
+- `plugins.enabled` registered check
+- enabled contribution filtering
+- provider / tool / store / event sink reference validation
+- plugin-specific validation hooks
+
+Layer split:
+
+- Config Core Block B: source loading, normalization, defaults, and minimal security precheck
+- Config Validation Block C: registry lookup, enabled plugin filtering, semantic validation, and plugin-specific validation hooks
+- Runtime Assembly Block D: factory hooks and concrete dependency construction

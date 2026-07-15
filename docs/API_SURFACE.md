@@ -337,3 +337,11 @@ Forbidden config behavior:
 - No public `api.config` facade exists yet.
 - `langgraph_automation.config.*` is internal/provisional.
 - Config Core Block B is intentionally not part of the public facade.
+
+
+## Config Validation Surface
+
+- `langgraph_automation.config.*` remains internal/provisional.
+- `ConfigValidator` is internal/provisional and is not exposed through `api.config`.
+- `EffectivePluginSet` and `ValidatedPackageConfig` are internal config models.
+- public facade work is still limited to `api.llm`, `api.tools`, `api.stores`, `api.events`, `api.errors`, and `api.plugins`.

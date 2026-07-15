@@ -157,3 +157,12 @@ Application workflows are future layers and should not be pulled into `graphs`.
 - Internal graph vocabulary may remain in foundation code, but public-facing vocabulary should move toward workflow terms.
 - ConfigValidator, PluginRegistry, RuntimeAssembly, GraphRuntime, and EventSink have separate error boundaries.
 - primary failure preservation is a framework-wide invariant.
+
+
+## Config Validation Boundary
+
+- `langgraph_automation.config.validator` is the first config layer allowed to depend on `langgraph_automation.plugins.registry`
+- `langgraph_automation.config.models`, `loader`, `normalizer`, and `security` remain free of registry and plugin facade dependencies
+- `ConfigValidator` turns `NormalizedPackageConfig` into `ValidatedPackageConfig`
+- `EffectivePluginSet` is a validation-time projection of enabled plugins, not the full registry
+- `RuntimeAssembly` remains a later layer and still does not exist yet
