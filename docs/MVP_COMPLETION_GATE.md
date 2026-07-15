@@ -51,3 +51,10 @@ MVP complete does not mean:
 - `company_agent`
 - `api.runtime` public facade
 - full workflow execution integration
+
+## Post-MVP Integration
+
+- workflow preparation path is the first post-MVP execution integration step
+- it prepares a workflow but does not execute it
+- service layer integration remains future work
+

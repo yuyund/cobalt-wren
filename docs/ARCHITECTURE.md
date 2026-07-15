@@ -199,3 +199,16 @@ Application workflows are future layers and should not be pulled into `graphs`.
 - application workflow code must not depend on control-plane or Django internals directly
 - `reference.llm_echo_summary` is the built-in readiness example
 - it demonstrates the `Plugin -> WorkflowContribution -> WorkflowDefinition -> requirements/build` boundary
+
+## Workflow Preparation
+
+- workflow preparation resolves a workflow kind through `PluginRegistry`
+- workflow preparation obtains `WorkflowContribution` and `WorkflowDefinition`
+- workflow preparation checks `WorkflowRequirements` against `RuntimeDependencies`
+- workflow preparation builds the internal graph through `workflows.adapter`
+- workflow preparation returns `PreparedWorkflow`
+- workflow preparation does not execute graphs
+- workflow preparation does not modify the Run lifecycle
+- workflow preparation does not call `RuntimeAssembler`
+- workflow preparation does not call `ConfigValidator`
+

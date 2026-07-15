@@ -44,3 +44,10 @@ It shows the expected structure:
 - `WorkflowRequirements`
 
 The workflow contribution remains declarative. The registry and runtime layers are framework responsibilities.
+
+## Preparation Boundary
+
+Workflow authors do not call `WorkflowPreparer` directly in normal application code.
+`WorkflowPreparer` is framework internal preparation machinery.
+Workflow authors provide `Plugin`, `WorkflowContribution`, and `WorkflowDefinition`.
+

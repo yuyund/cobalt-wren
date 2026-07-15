@@ -175,3 +175,21 @@ Recommended next order:
    - reference workflow を新 path で段階的に実行できるようにする
 2. First Application Workflow Block I
    - `application.company_agent` などを検討する
+
+Application Readiness Block G:
+  complete
+
+Current:
+  Execution Integration Block H
+
+Next:
+  Service Integration Block I
+
+Then:
+  First Application Workflow Block J
+
+Recommended order:
+  H: Workflow preparation integration
+  I: Service layer integration
+  J: First application workflow
+

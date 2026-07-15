@@ -250,3 +250,16 @@ These modules re-export selected foundation interfaces. They do not expose workf
 - application workflow must not import `apps.automation` services
 - application workflow must not persist raw provider or tool output
 - application workflow must not store secret values in metadata
+
+## Workflow Preparation Contract
+
+- `WorkflowPreparer` accepts `PluginRegistry` and `RuntimeDependencies`
+- `WorkflowPreparer` resolves `WorkflowContribution` by workflow kind
+- `WorkflowPreparer` checks requirements before build
+- `WorkflowPreparer` calls `WorkflowDefinition.build` only through `workflows.adapter`
+- `WorkflowPreparer` does not call `WorkflowContribution.validate_config`
+- `WorkflowPreparer` does not execute graphs
+- `WorkflowPreparer` does not call `RuntimeAssembler`
+- `WorkflowPreparer` does not call `ConfigValidator`
+- `PreparedWorkflow` is an internal preparation result, not a public runtime API
+

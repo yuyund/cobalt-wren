@@ -382,6 +382,7 @@ Internal / provisional APIs:
 - `langgraph_automation.plugins.registry`
 - `langgraph_automation.workflows.adapter`
 - `langgraph_automation.workflows.requirements`
+- `langgraph_automation.workflows.prepare`
 - `langgraph_automation.workflows.catalog`
 
 Internal foundation:

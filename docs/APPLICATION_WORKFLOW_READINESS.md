@@ -83,3 +83,12 @@ It demonstrates:
 - `WorkflowRequirements`
 
 The example is useful because it shows the expected path without introducing application-specific control-plane logic.
+
+## Scope Still Excluded
+
+Application workflow readiness still excludes:
+
+- service layer integration
+- full execution path migration
+- direct use of `WorkflowPreparer` by application workflow code
+
