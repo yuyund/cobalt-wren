@@ -229,6 +229,14 @@ Persistence contract test harness:
 - durable backend: deferred
 - next block: Durable Artifact / Checkpoint Backend Block V
 
+Artifact protocol sufficiency / durable backend design:
+
+- Block V: complete
+- protocol decision: BLOCKED_BY_PROTOCOL
+- selected backend candidate: FilesystemArtifactStore
+- durability target: PROCESS_DURABLE
+- next block: Artifact Store Protocol Evolution Block V2
+
 Later:
 
 - Minimal Application Workflow Example

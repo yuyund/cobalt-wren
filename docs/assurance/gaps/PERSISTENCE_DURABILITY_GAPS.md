@@ -10,6 +10,7 @@ This document ranks the remaining persistence gaps after the current code-first 
 
 | Gap | Evidence | Why it matters | Risk |
 | --- | --- | --- | --- |
+| ArtifactStore protocol is still metadata-only | `src/langgraph_automation/api/stores.py`, `src/langgraph_automation/integrations/artifact/base.py`, `src/langgraph_automation/integrations/artifact/memory_store.py` | The first durable artifact backend is blocked until the protocol can carry body semantics. | High |
 | No durable artifact backend | `src/langgraph_automation/integrations/artifact/memory_store.py`, `src/langgraph_automation/apps/automation/services/runtime.py` | Artifact bodies are not restart-safe or deployment-shared. | High |
 | No durable checkpoint backend | `src/langgraph_automation/integrations/checkpoint/memory_store.py`, `src/langgraph_automation/apps/automation/services/runtime.py` | Checkpoint bodies are not restart-safe or deployment-shared. | High |
 | No body/metadata orchestration path | `src/langgraph_automation/apps/automation/services/execution.py`, `src/langgraph_automation/apps/automation/services/runs.py`, `src/langgraph_automation/graphs/runner.py` | The execution path does not write or verify artifact/checkpoint bodies today. | High |
@@ -24,6 +25,7 @@ This document ranks the remaining persistence gaps after the current code-first 
 | Missing checksum / serializer / version fields in store results | `src/langgraph_automation/integrations/artifact/base.py`, `src/langgraph_automation/integrations/checkpoint/base.py` | Integrity cannot be verified mechanically today. | Medium |
 | Missing backend capability model | current protocol shapes are minimal | Future durable backends need a shared capability vocabulary for contract tests. | Medium |
 | Durable backend orchestration remains unimplemented | `src/langgraph_automation/apps/automation/services/execution.py`, `src/langgraph_automation/apps/automation/services/runs.py`, `src/langgraph_automation/graphs/runner.py` | The execution path still does not write or verify artifact/checkpoint bodies. | Medium |
+| FilesystemArtifactStore target design is deferred until protocol evolution | `docs/architecture/audit/ARTIFACT_STORE_PROTOCOL_SUFFICIENCY_AUDIT.md`, `docs/architecture/design/DURABLE_ARTIFACT_BACKEND_DESIGN.md` | The first durable artifact backend is a target design only until the protocol is evolved. | Medium |
 
 ## Current EPHEMERAL Limitations
 
@@ -35,11 +37,12 @@ This document ranks the remaining persistence gaps after the current code-first 
 
 ## Recommended Closure Order
 
-1. Durable artifact backend
-2. Durable checkpoint backend
-3. Orchestration integration with body-first / metadata-second writes
-4. Restart durability tests
-5. Reconciliation and cleanup policy
+1. ArtifactStore protocol evolution
+2. Durable artifact backend
+3. Durable checkpoint backend
+4. Orchestration integration with body-first / metadata-second writes
+5. Restart durability tests
+6. Reconciliation and cleanup policy
 
 ## Deferred Work
 
@@ -51,6 +54,7 @@ This document ranks the remaining persistence gaps after the current code-first 
 - api.runtime is deferred
 - persistence contract test harness is complete
 - next block: durable artifact backend
+- next block after that: Artifact Store Protocol Evolution Block V2
 
 ## Block Status
 
