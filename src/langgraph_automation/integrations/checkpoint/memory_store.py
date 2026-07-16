@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from copy import deepcopy
 from typing import Any
 
 from .base import CheckpointStore, CheckpointWriteResult
@@ -23,7 +24,7 @@ class MemoryCheckpointStore(CheckpointStore):
         backend: str = 'memory',
         node_name: str = '',
     ) -> CheckpointWriteResult:
-        self._store[run_id] = dict(state)
+        self._store[run_id] = deepcopy(state)
         self._counter += 1
         return CheckpointWriteResult(
             checkpoint_id=f'checkpoint-{self._counter}',
@@ -36,7 +37,7 @@ class MemoryCheckpointStore(CheckpointStore):
 
     def load(self, run_id: int) -> dict[str, Any] | None:
         state = self._store.get(run_id)
-        return None if state is None else dict(state)
+        return None if state is None else deepcopy(state)
 
     def delete(self, run_id: int) -> None:
         self._store.pop(run_id, None)

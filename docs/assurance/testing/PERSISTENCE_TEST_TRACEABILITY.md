@@ -7,10 +7,13 @@ This traceability matrix links the durability contract to the current code and t
 | Invariant | Failure mode | Implementation point | Current test | Required test layer | Coverage | Gap | Risk |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | Store protocols remain minimal | API surface drift | `src/langgraph_automation/api/stores.py` | `tests/unit/api/test_public_api_imports.py` | L1 protocol test | `TEST_CONFIRMED` | none | low |
-| Memory stores are EPHEMERAL | restart durability loss | `src/langgraph_automation/integrations/artifact/memory_store.py`, `src/langgraph_automation/integrations/checkpoint/memory_store.py` | `tests/unit/artifact/test_memory_store.py`, `tests/unit/integrations/test_checkpoint_summary.py` | L2 reusable backend contract suite | `TEST_CONFIRMED` | durable restart coverage absent | high |
+| Reusable baseline persistence contract suite exists | baseline contract drift | `tests/contract/persistence/test_artifact_store_baseline_contract.py`, `tests/contract/persistence/test_checkpoint_store_baseline_contract.py` | new contract harness | L2 reusable backend contract suite | `TEST_CONFIRMED` | durable restart / integrity / concurrency profiles remain deferred | high |
+| Memory stores are EPHEMERAL | restart durability loss | `src/langgraph_automation/integrations/artifact/memory_store.py`, `src/langgraph_automation/integrations/checkpoint/memory_store.py` | `tests/unit/artifact/test_memory_store.py`, `tests/unit/integrations/test_checkpoint_summary.py`, `tests/unit/runtime/test_persistence_runtime_wiring.py` | L2 reusable backend contract suite | `TEST_CONFIRMED` | durable restart coverage absent | high |
 | Artifact writes are metadata-safe | S1 / S5 / S6 | `src/langgraph_automation/integrations/artifact/memory_store.py`, `src/langgraph_automation/integrations/observability/django_event_sink.py` | `tests/unit/artifact/test_keys.py`, `tests/integration/django/test_event_sink.py` | L7 safety regression | `TEST_CONFIRMED` | durable body semantics absent | medium |
 | Checkpoint summaries are bounded and redacted | S1 / S6 | `src/langgraph_automation/integrations/checkpoint/summary.py`, `src/langgraph_automation/integrations/checkpoint/memory_store.py` | `tests/unit/integrations/test_checkpoint_summary.py` | L7 safety regression | `TEST_CONFIRMED` | body-read verification absent | medium |
 | Runtime assembly wires in-memory stores | backend selection | `src/langgraph_automation/apps/automation/services/runtime.py` | `tests/unit/automation/test_runtime_factory.py` | L3 persistence orchestration integration | `TEST_CONFIRMED` | no durable backend selection tests | high |
+| Backend registry stays synchronized with concrete implementations | registration drift | `tests/support/persistence/backends.py` | `tests/contract/persistence/test_persistence_backend_registration.py` | L1 / L2 registry guard | `TEST_CONFIRMED` | future backend onboarding still needs the same registry pattern | medium |
+| Deterministic fault injection is available for store wrappers | fault timing / suppression | `tests/support/persistence/faults.py` | `tests/contract/persistence/test_persistence_fault_harness.py` | L4 fault-injection tests | `TEST_CONFIRMED` | orchestration faults remain deferred until body/metadata writes exist | medium |
 | Graph runtime carries stores but runner does not call them | orchestration gap | `src/langgraph_automation/graphs/runtime.py`, `src/langgraph_automation/graphs/runner.py` | `tests/unit/graphs/test_runner.py`, `tests/unit/graphs/test_graph_runner_state_safety.py` | L3 / L4 | `TEST_CONFIRMED` for state safety only | no body-store call coverage | high |
 | Safe run output/error persistence is preserved | S3 / S6 | `src/langgraph_automation/apps/automation/services/runs.py` | `tests/unit/automation/test_run_safety.py` | L7 safety regression | `TEST_CONFIRMED` | body store persistence absent | medium |
 | Primary observability failure is preserved | secondary failure masking | `src/langgraph_automation/integrations/observability/failure_policy.py`, `src/langgraph_automation/graphs/runner.py` | `tests/unit/graphs/test_runner.py`, `tests/unit/automation/test_run_failure_observability_masking.py` | L4 fault-injection | `TEST_CONFIRMED` | none | low |
@@ -60,10 +63,12 @@ Capability-based assertions:
 - current tests do not prove idempotent conflict semantics
 - current tests do not prove checksum / serializer integrity semantics
 - current tests do not prove body-store orchestration through the execution path
+- current tests now prove the reusable baseline contract harness, backend registry guard, and deterministic fault harness
 
 ## Deferred Work
 
 - durable artifact/checkpoint backend is deferred
+- body/metadata orchestration is deferred
 - run_workflow is deferred
 - api.runtime is deferred
 - true resume is deferred

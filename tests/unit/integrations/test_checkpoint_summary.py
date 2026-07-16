@@ -47,3 +47,12 @@ def test_memory_checkpoint_store_uses_summarized_state() -> None:
     assert len(result.state_summary) < 500
     loaded = json.loads(result.state_summary)
     assert loaded['preview']['***REDACTED***'] == REDACTED_VALUE
+
+
+def test_memory_checkpoint_store_currently_replaces_latest_state() -> None:
+    store = MemoryCheckpointStore()
+
+    store.save(7, {'phase': 'first'}, thread_id='thread-1', node_name='planner')
+    store.save(7, {'phase': 'second'}, thread_id='thread-1', node_name='planner')
+
+    assert store.load(7) == {'phase': 'second'}

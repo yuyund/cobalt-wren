@@ -22,3 +22,14 @@ def test_memory_artifact_store_put_get_and_list_for_run() -> None:
     assert written.storage_key == 'run-123/output.md'
     assert store.get('run-123/output.md') == written
     assert store.list_for_run(123) == [written]
+
+
+def test_memory_artifact_store_currently_overwrites_same_storage_key() -> None:
+    store = MemoryArtifactStore()
+    first = ArtifactWriteResult(storage_key='run-123/output.md', name='first', kind='text', metadata={'run_id': 123, 'version': 1})
+    second = ArtifactWriteResult(storage_key='run-123/output.md', name='second', kind='text', metadata={'run_id': 123, 'version': 2})
+
+    store.put(first)
+    store.put(second)
+
+    assert store.get('run-123/output.md') == second

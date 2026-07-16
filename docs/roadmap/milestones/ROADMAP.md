@@ -223,6 +223,12 @@ Next focus areas:
 - persistence durability assurance and contract test harness
 - control-plane execution facade follow-up
 
+Persistence contract test harness:
+
+- Block U: complete
+- durable backend: deferred
+- next block: Durable Artifact / Checkpoint Backend Block V
+
 Later:
 
 - Minimal Application Workflow Example
@@ -252,6 +258,12 @@ Persistence durability audit:
 - Block T: complete
 - durable backend: deferred
 - next block: Persistence Contract Test Harness Block U
+
+Persistence contract test harness:
+
+- Block U: complete
+- durable backend: still deferred
+- next block: Durable Artifact / Checkpoint Backend Block V
 
 Package Complete+ future work:
 

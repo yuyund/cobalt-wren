@@ -29,5 +29,5 @@ def validate_storage_key(storage_key: str) -> str:
     """Return the storage key when safe, otherwise raise ValueError."""
 
     if not is_safe_storage_key(storage_key):
-        raise ValueError(f"unsafe artifact storage key: {storage_key!r}")
+        raise ValueError("unsafe artifact storage key")
     return storage_key

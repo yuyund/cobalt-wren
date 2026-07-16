@@ -23,7 +23,7 @@ This document ranks the remaining persistence gaps after the current code-first 
 | --- | --- | --- | --- |
 | Missing checksum / serializer / version fields in store results | `src/langgraph_automation/integrations/artifact/base.py`, `src/langgraph_automation/integrations/checkpoint/base.py` | Integrity cannot be verified mechanically today. | Medium |
 | Missing backend capability model | current protocol shapes are minimal | Future durable backends need a shared capability vocabulary for contract tests. | Medium |
-| Missing docs/test harness for durability suite | new traceability docs only | The next block still needs the reusable contract suite and fault-injection harness. | Medium |
+| Durable backend orchestration remains unimplemented | `src/langgraph_automation/apps/automation/services/execution.py`, `src/langgraph_automation/apps/automation/services/runs.py`, `src/langgraph_automation/graphs/runner.py` | The execution path still does not write or verify artifact/checkpoint bodies. | Medium |
 
 ## Current EPHEMERAL Limitations
 
@@ -35,12 +35,11 @@ This document ranks the remaining persistence gaps after the current code-first 
 
 ## Recommended Closure Order
 
-1. Persistence contract test harness
-2. Durable artifact backend
-3. Durable checkpoint backend
-4. Orchestration integration with body-first / metadata-second writes
-5. Restart durability tests
-6. Reconciliation and cleanup policy
+1. Durable artifact backend
+2. Durable checkpoint backend
+3. Orchestration integration with body-first / metadata-second writes
+4. Restart durability tests
+5. Reconciliation and cleanup policy
 
 ## Deferred Work
 
@@ -50,6 +49,8 @@ This document ranks the remaining persistence gaps after the current code-first 
 - true resume is deferred
 - run_workflow is deferred
 - api.runtime is deferred
+- persistence contract test harness is complete
+- next block: durable artifact backend
 
 ## Block Status
 

@@ -89,6 +89,14 @@ Evidence:
 - `tests/unit/artifact/test_memory_store.py`
 - `tests/unit/integrations/test_checkpoint_summary.py`
 
+## Validation Harness
+
+The reusable baseline contract suite lives in `tests/contract/persistence/` and exercises the public/provisional store methods as black-box behavior.
+
+Characterization tests for current in-memory overwrite behavior stay in unit tests and do not define the shared baseline contract.
+
+Advanced durable semantics remain deferred until durable backends exist.
+
 ## Object State Model
 
 ### ABSENT

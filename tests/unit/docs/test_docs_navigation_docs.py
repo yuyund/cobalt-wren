@@ -43,6 +43,7 @@ def test_docs_navigation_entries_exist_and_point_to_subsections() -> None:
     assurance_contracts_index = root / 'assurance' / 'contracts' / 'index.md'
     assurance_gaps_index = root / 'assurance' / 'gaps' / 'index.md'
     assurance_testing_index = root / 'assurance' / 'testing' / 'index.md'
+    assurance_persistence_harness = root / 'assurance' / 'testing' / 'PERSISTENCE_CONTRACT_TEST_HARNESS.md'
 
     for path in (
         docs_index,
@@ -81,6 +82,7 @@ def test_docs_navigation_entries_exist_and_point_to_subsections() -> None:
         assurance_contracts_index,
         assurance_gaps_index,
         assurance_testing_index,
+        assurance_persistence_harness,
     ):
         assert path.exists()
 
@@ -99,6 +101,7 @@ def test_docs_navigation_entries_exist_and_point_to_subsections() -> None:
     workflows_index_text = workflows_index.read_text()
     roadmap_index_text = roadmap_index.read_text()
     assurance_index_text = assurance_index.read_text()
+    assurance_testing_text = assurance_testing_index.read_text()
 
     for token in ('./AGENTS.md', './agent/index.md', './architecture/index.md'):
         assert token in index_text
@@ -136,3 +139,4 @@ def test_docs_navigation_entries_exist_and_point_to_subsections() -> None:
     assert 'contracts/index.md' in assurance_index_text
     assert 'gaps/index.md' in assurance_index_text
     assert 'testing/index.md' in assurance_index_text
+    assert 'PERSISTENCE_CONTRACT_TEST_HARNESS.md' in assurance_testing_text
