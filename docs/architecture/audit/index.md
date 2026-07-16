@@ -4,7 +4,7 @@ Read this folder when you want the code-first assurance matrix and the current b
 
 ## Entry Points
 - `SYSTEM_BOUNDARY_AND_DATAFLOW_AUDIT.md`: the full system boundary and dataflow audit.
+- `PERSISTENCE_FAILURE_MODE_AUDIT.md`: the current persistence failure-mode audit.
 
 ## Read Next
 - Start with the audit after you understand the layer map and the main flows.
-

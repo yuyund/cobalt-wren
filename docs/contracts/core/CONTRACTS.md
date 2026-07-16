@@ -184,6 +184,7 @@ These contracts describe the current internal foundation surface. If parts of th
 
 - artifact store は metadata と body を分離する
 - body は将来の永続化設計まで bounded に扱う
+- current memory store は EPHEMERAL で、same identity / different content の conflict を保証しない
 - raw secrets / raw provider payload を保存しない
 - DB metadata には body copy を入れない
 
@@ -192,6 +193,7 @@ These contracts describe the current internal foundation surface. If parts of th
 - checkpoint state は safe summary / metadata のみ
 - raw input / raw response / raw output を保存しない
 - true resume は別途 contract が固まるまで未実装
+- current memory store は EPHEMERAL で、restart durability と versioned lineage を保証しない
 - DB metadata には checkpoint body copy を入れない
 
 ## P0-B Public Facade Contract

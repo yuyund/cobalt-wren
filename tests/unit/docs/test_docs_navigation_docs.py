@@ -22,6 +22,7 @@ def test_docs_navigation_entries_exist_and_point_to_subsections() -> None:
     architecture_layers_index = root / 'architecture' / 'layers' / 'index.md'
     architecture_dataflow = root / 'architecture' / 'dataflow' / 'DATAFLOW.md'
     architecture_audit_index = root / 'architecture' / 'audit' / 'index.md'
+    architecture_persistence_audit = root / 'architecture' / 'audit' / 'PERSISTENCE_FAILURE_MODE_AUDIT.md'
     api_index = root / 'api' / 'index.md'
     api_surface_index = root / 'api' / 'surface' / 'index.md'
     api_errors_index = root / 'api' / 'errors' / 'index.md'
@@ -41,6 +42,7 @@ def test_docs_navigation_entries_exist_and_point_to_subsections() -> None:
     assurance_scope_index = root / 'assurance' / 'scope' / 'index.md'
     assurance_contracts_index = root / 'assurance' / 'contracts' / 'index.md'
     assurance_gaps_index = root / 'assurance' / 'gaps' / 'index.md'
+    assurance_testing_index = root / 'assurance' / 'testing' / 'index.md'
 
     for path in (
         docs_index,
@@ -58,6 +60,7 @@ def test_docs_navigation_entries_exist_and_point_to_subsections() -> None:
         architecture_layers_index,
         architecture_dataflow,
         architecture_audit_index,
+        architecture_persistence_audit,
         api_index,
         api_surface_index,
         api_errors_index,
@@ -77,6 +80,7 @@ def test_docs_navigation_entries_exist_and_point_to_subsections() -> None:
         assurance_scope_index,
         assurance_contracts_index,
         assurance_gaps_index,
+        assurance_testing_index,
     ):
         assert path.exists()
 
@@ -117,6 +121,7 @@ def test_docs_navigation_entries_exist_and_point_to_subsections() -> None:
     assert 'layers/index.md' in architecture_index_text
     assert 'dataflow/DATAFLOW.md' in architecture_index_text
     assert 'audit/index.md' in architecture_index_text
+    assert 'PERSISTENCE_FAILURE_MODE_AUDIT.md' in architecture_index_text
     assert 'surface/index.md' in api_index_text
     assert 'errors/index.md' in api_index_text
     assert 'model/index.md' in configuration_index_text
@@ -130,3 +135,4 @@ def test_docs_navigation_entries_exist_and_point_to_subsections() -> None:
     assert 'scope/index.md' in assurance_index_text
     assert 'contracts/index.md' in assurance_index_text
     assert 'gaps/index.md' in assurance_index_text
+    assert 'testing/index.md' in assurance_index_text

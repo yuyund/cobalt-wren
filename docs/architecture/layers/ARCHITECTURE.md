@@ -105,6 +105,7 @@ Reference workflows exist to verify wiring and safety.
 Application workflows are future layers and should not be pulled into `graphs`.
 
 The dynamic UI and admin surfaces are presentation layers only; they must read safe summaries and never expose raw payload or traceback fields directly.
+Persistence durability is still EPHEMERAL today; artifact/checkpoint bodies remain outside the current execution path until the later durable backend block.
 
 
 ## Configuration Boundary

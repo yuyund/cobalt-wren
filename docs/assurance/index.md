@@ -5,6 +5,7 @@ This folder collects the system safety contracts and the remaining assurance gap
 ## Entry Points
 - `scope/index.md`: what the system assurance effort covers.
 - `contracts/index.md`: the safety exposure contract for display and persistence surfaces.
+- `testing/index.md`: persistence durability traceability guidance.
 - `gaps/index.md`: what remains open.
 
 ## Read Next

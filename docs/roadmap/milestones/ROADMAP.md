@@ -220,7 +220,7 @@ Next:
 
 Next focus areas:
 
-- persistence durability assurance
+- persistence durability assurance and contract test harness
 - control-plane execution facade follow-up
 
 Later:
@@ -246,6 +246,12 @@ P1 safety exposure hardening:
 - observability metadata safety: complete
 - safe error exposure: complete
 - persistence durability: deferred
+
+Persistence durability audit:
+
+- Block T: complete
+- durable backend: deferred
+- next block: Persistence Contract Test Harness Block U
 
 Package Complete+ future work:
 
