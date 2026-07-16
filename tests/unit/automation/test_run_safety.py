@@ -96,7 +96,11 @@ def test_start_run_exception_path_saves_safe_error_message(monkeypatch: pytest.M
     run = Run.objects.create(workflow=workflow, name='run-exception')
 
     def fake_dispatch(*_args, **_kwargs):
-        raise RuntimeError('Authorization: Bearer secret-token /tmp/secret.txt')
+        raise RuntimeError(
+            'Traceback (most recent call last):\n'
+            '  File "/tmp/secret.txt", line 1, in <module>\n'
+            'Authorization: Bearer secret-token /tmp/secret.txt'
+        )
 
     monkeypatch.setattr(run_services, 'dispatch_run_execution', fake_dispatch)
 
@@ -105,7 +109,14 @@ def test_start_run_exception_path_saves_safe_error_message(monkeypatch: pytest.M
 
     run.refresh_from_db()
     assert run.status == RunStatus.FAILED
-    assert run.error_message == safe_run_error_message(RuntimeError('Authorization: Bearer secret-token /tmp/secret.txt'))
+    assert run.error_message == safe_run_error_message(
+        RuntimeError(
+            'Traceback (most recent call last):\n'
+            '  File "/tmp/secret.txt", line 1, in <module>\n'
+            'Authorization: Bearer secret-token /tmp/secret.txt'
+        )
+    )
+    assert 'Traceback' not in run.error_message
     assert REDACTED_VALUE in run.error_message
     assert 'secret-token' not in run.error_message
     assert '/tmp/secret.txt' not in run.error_message

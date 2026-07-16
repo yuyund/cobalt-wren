@@ -2,13 +2,14 @@
 
 from __future__ import annotations
 
-from collections.abc import Iterable
+from collections.abc import Iterable, Mapping, Sequence
 
 from django.db.models import Model
 
 from langgraph_automation.apps.automation.ui.actions import build_action_specs
 from langgraph_automation.apps.automation.ui.formatters import format_value
 from langgraph_automation.apps.automation.ui.redaction import redact_value
+from langgraph_automation.core.summary import summarize_display_value
 from langgraph_automation.apps.automation.ui.registry import get_model_ui_config
 from langgraph_automation.apps.automation.ui.specs import DetailPageSpec, FieldSpec, FragmentSpec, FormSpec, ListPageSpec, RelatedSectionSpec, TableSpec
 
@@ -72,14 +73,21 @@ def _build_fields(obj: object | None, field_names: list[str], *, readonly: bool)
     fields: list[FieldSpec] = []
     for name in field_names:
         raw_value = getattr(obj, name, None)
-        redacted_value, redacted = redact_value(name, raw_value)
-        field_type = _field_type_from_value(redacted_value)
+        if name.endswith('_summary'):
+            safe_value = raw_value
+            redacted = False
+        elif isinstance(raw_value, Mapping) or (isinstance(raw_value, Sequence) and not isinstance(raw_value, (str, bytes, bytearray))):
+            safe_value = summarize_display_value(raw_value)
+            redacted = True
+        else:
+            safe_value, redacted = redact_value(name, raw_value)
+        field_type = _field_type_from_value(safe_value)
         fields.append(
             FieldSpec(
                 name=name,
                 label=name.replace('_', ' ').title(),
                 raw_value=raw_value,
-                display_value=format_value(redacted_value),
+                display_value=format_value(safe_value),
                 field_type=field_type,
                 component=_component_from_field_type(field_type),
                 readonly=readonly,

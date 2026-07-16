@@ -7,8 +7,8 @@ from pathlib import Path
 
 def test_package_completion_docs_exist_and_cover_core_terms() -> None:
     root = Path('docs')
-    completion = root / 'PACKAGE_COMPLETION.md'
-    verification = root / 'PACKAGE_VERIFICATION_STRATEGY.md'
+    completion = root / 'package' / 'completion' / 'PACKAGE_COMPLETION.md'
+    verification = root / 'package' / 'verification' / 'PACKAGE_VERIFICATION_STRATEGY.md'
 
     assert completion.exists()
     assert verification.exists()

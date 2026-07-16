@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from django.db import models
 
+from langgraph_automation.core.summary import summarize_display_value
 from langgraph_automation.integrations.artifact.keys import validate_storage_key
 
 
@@ -39,3 +40,7 @@ class Artifact(models.Model):
     def clean(self) -> None:
         super().clean()
         self.storage_key = validate_storage_key(self.storage_key)
+
+    @property
+    def metadata_summary(self) -> object:
+        return summarize_display_value(self.metadata)

@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from django.db import models
 
+from langgraph_automation.core.summary import summarize_display_value
+
 
 class RunEventLevel(models.TextChoices):
     '''Log-like severity for append-only timeline entries.'''
@@ -41,3 +43,7 @@ class RunEvent(models.Model):
 
     def __str__(self) -> str:
         return f'Event({self.pk}, {self.event_type})'
+
+    @property
+    def payload_summary(self) -> object:
+        return summarize_display_value(self.payload)

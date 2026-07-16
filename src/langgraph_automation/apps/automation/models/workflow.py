@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from django.db import models
 
+from langgraph_automation.core.summary import summarize_display_value
+
 
 class Workflow(models.Model):
     '''Definition and configuration for a LangGraph workflow.'''
@@ -19,3 +21,7 @@ class Workflow(models.Model):
 
     def __str__(self) -> str:
         return self.name
+
+    @property
+    def definition_payload_summary(self) -> object:
+        return summarize_display_value(self.definition_payload)

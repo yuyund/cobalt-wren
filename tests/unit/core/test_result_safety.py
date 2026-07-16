@@ -61,3 +61,18 @@ def test_safe_run_error_message_handles_string_input() -> None:
     assert REDACTED_VALUE in message
     assert 'abc123' not in message
     assert 'hunter2' not in message
+
+
+def test_safe_run_error_message_discards_traceback_like_multiline_input() -> None:
+    message = safe_run_error_message(
+        'Traceback (most recent call last):\n'
+        '  File "/tmp/secret.txt", line 1, in <module>\n'
+        'RuntimeError: Authorization: Bearer secret-token /tmp/secret.txt'
+    )
+
+    assert message.startswith('Error: ')
+    assert 'Traceback' not in message
+    assert 'File "/tmp/secret.txt"' not in message
+    assert 'secret-token' not in message
+    assert '/tmp/secret.txt' not in message
+    assert REDACTED_VALUE in message

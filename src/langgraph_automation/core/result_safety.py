@@ -44,6 +44,13 @@ def _bounded_preview(value: Any) -> str:
     return truncate_text(redact_text(str(value)), max_chars=_MAX_OUTPUT_PREVIEW_CHARS)
 
 
+def _normalize_error_text(text: str) -> str:
+    lines = [line.strip() for line in text.splitlines() if line.strip()]
+    if not lines:
+        return REDACTED_VALUE
+    return lines[-1]
+
+
 def _summarize_any(value: Any, *, depth: int) -> Any:
     if depth < 0:
         return REDACTED_VALUE
@@ -124,7 +131,7 @@ def safe_run_error_message(error: BaseException | str) -> str:
     else:
         error_type = 'Error'
         raw_message = error or 'operation failed'
-    bounded = truncate_text(redact_text(raw_message), max_chars=_MAX_ERROR_MESSAGE_CHARS).strip()
+    bounded = truncate_text(redact_text(_normalize_error_text(raw_message)), max_chars=_MAX_ERROR_MESSAGE_CHARS).strip()
     if not bounded:
         bounded = REDACTED_VALUE
     return f'{error_type}: {bounded}'

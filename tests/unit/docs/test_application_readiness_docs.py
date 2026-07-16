@@ -7,9 +7,9 @@ from pathlib import Path
 
 def test_application_readiness_docs_exist_and_cover_core_terms() -> None:
     root = Path('docs')
-    readiness = root / 'APPLICATION_WORKFLOW_READINESS.md'
-    guide = root / 'WORKFLOW_AUTHOR_GUIDE.md'
-    gate = root / 'MVP_COMPLETION_GATE.md'
+    readiness = root / 'workflows' / 'readiness' / 'APPLICATION_WORKFLOW_READINESS.md'
+    guide = root / 'workflows' / 'authoring' / 'WORKFLOW_AUTHOR_GUIDE.md'
+    gate = root / 'roadmap' / 'gates' / 'MVP_COMPLETION_GATE.md'
 
     assert readiness.exists()
     assert guide.exists()

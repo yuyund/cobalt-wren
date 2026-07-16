@@ -2,12 +2,12 @@
 {% block title %}{{ page.title }}{% endblock %}
 {% block content %}
 <h1>{{ page.title }}</h1>
-<form method=post>
+<form method="post">
   {% csrf_token %}
   {% for field in page.fields %}
   <div>
     <label>{{ field.label }}</label>
-    <input value={{ field.display_value }} {% if field.readonly %}readonly{% endif %} />
+    <input value="{{ field.display_value }}" {% if field.readonly %}readonly{% endif %} />
   </div>
   {% endfor %}
 </form>

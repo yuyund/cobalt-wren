@@ -7,12 +7,12 @@ from pathlib import Path
 
 def test_package_assurance_audit_docs_exist_and_cover_traceability_terms() -> None:
     root = Path("docs")
-    inventory = root / "PACKAGE_ASSURANCE_INVENTORY.md"
-    invariants = root / "PACKAGE_INVARIANTS.md"
-    traceability = root / "PACKAGE_TEST_TRACEABILITY.md"
-    gaps = root / "PACKAGE_ASSURANCE_GAPS.md"
-    roadmap = root / "PACKAGE_TEST_ROADMAP.md"
-    api_surface = root / "API_SURFACE.md"
+    inventory = root / "package" / "gaps" / "PACKAGE_ASSURANCE_INVENTORY.md"
+    invariants = root / "package" / "completion" / "PACKAGE_INVARIANTS.md"
+    traceability = root / "package" / "verification" / "PACKAGE_TEST_TRACEABILITY.md"
+    gaps = root / "package" / "gaps" / "PACKAGE_ASSURANCE_GAPS.md"
+    roadmap = root / "package" / "verification" / "PACKAGE_TEST_ROADMAP.md"
+    api_surface = root / "api" / "surface" / "API_SURFACE.md"
 
     for path in (inventory, invariants, traceability, gaps, roadmap):
         assert path.exists()

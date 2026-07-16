@@ -85,6 +85,38 @@ def test_event_sink_bounds_and_redacts_long_payloads_and_summaries() -> None:
 
 
 @pytest.mark.django_db
+def test_event_sink_redacts_secret_like_values_from_payloads_and_metadata() -> None:
+    workflow = Workflow.objects.create(name='wf-sink-secret')
+    run = Run.objects.create(workflow=workflow, name='run-sink-secret', status=RunStatus.PENDING)
+    sink = DjangoEventSink()
+
+    secret = 'Authorization: Bearer secret-token /tmp/secret.txt'
+
+    semantic_event = sink.semantic_event(
+        run.pk,
+        'planner.decision_made',
+        message='planner selected route',
+        payload={'route': 'plan', 'token': secret},
+    )
+    graph_ref = sink.span_started(run.pk, ExecutionSpanType.GRAPH, 'demo-graph-secret', node_name='graph', metadata={'api_key': secret})
+    sink.span_completed(graph_ref, output_summary=secret, metrics={'nested': {'password': secret}}, metadata={'raw_path': '/tmp/secret.txt'})
+    artifact = sink.artifact_created(run.pk, 'artifact-2', 'report', 'text', metadata={'trace_id': secret})
+    checkpoint = sink.checkpoint_saved(run.pk, 'thread-2', 'checkpoint-2', 'sqlite', state_summary=secret)
+
+    run.refresh_from_db()
+    graph_span = run.spans.get(name='demo-graph-secret')
+    artifact.refresh_from_db()
+    checkpoint.refresh_from_db()
+
+    assert semantic_event.payload == {'route': 'plan', 'token': '***REDACTED***'}
+    assert secret not in str(graph_span.metadata)
+    assert secret not in str(graph_span.metrics)
+    assert secret not in str(artifact.metadata)
+    assert secret not in checkpoint.state_summary
+    assert '/tmp/secret.txt' not in checkpoint.state_summary
+
+
+@pytest.mark.django_db
 def test_event_sink_rejects_unsafe_artifact_storage_keys() -> None:
     workflow = Workflow.objects.create(name='wf-sink-unsafe')
     run = Run.objects.create(workflow=workflow, name='run-sink-unsafe', status=RunStatus.PENDING)

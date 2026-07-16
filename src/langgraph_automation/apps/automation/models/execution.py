@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from django.db import models
 
+from langgraph_automation.core.summary import summarize_display_value
+
 
 class ExecutionSpanType(models.TextChoices):
     '''Span categories used by observability and the UI.'''
@@ -74,3 +76,11 @@ class ExecutionSpan(models.Model):
             ExecutionSpanStatus.CANCELLED,
             ExecutionSpanStatus.SKIPPED,
         }
+
+    @property
+    def metadata_summary(self) -> object:
+        return summarize_display_value(self.metadata)
+
+    @property
+    def metrics_summary(self) -> object:
+        return summarize_display_value(self.metrics)

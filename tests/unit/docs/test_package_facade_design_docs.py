@@ -7,7 +7,7 @@ from pathlib import Path
 
 def test_package_facade_design_docs_exist_and_cover_core_terms() -> None:
     root = Path('docs')
-    design = root / 'PACKAGE_FACADE_DESIGN.md'
+    design = root / 'package' / 'completion' / 'PACKAGE_FACADE_DESIGN.md'
     adr = root / 'adr' / '0013-package-facade-design.md'
 
     assert design.exists()

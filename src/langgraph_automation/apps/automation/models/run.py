@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from django.db import models
 
+from langgraph_automation.core.summary import summarize_display_value
+
 
 class RunStatus(models.TextChoices):
     '''Lifecycle states for a workflow run.'''
@@ -49,3 +51,11 @@ class Run(models.Model):
     @property
     def is_terminal_state(self) -> bool:
         return self.status in {RunStatus.SUCCEEDED, RunStatus.FAILED, RunStatus.CANCELLED}
+
+    @property
+    def input_payload_summary(self) -> object:
+        return summarize_display_value(self.input_payload)
+
+    @property
+    def output_payload_summary(self) -> object:
+        return summarize_display_value(self.output_payload)

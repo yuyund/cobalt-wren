@@ -54,4 +54,5 @@ def test_hidden_fields_are_not_auto_added() -> None:
     field_names = {field.name for field in spec.fields}
 
     assert 'workflow' in field_names
-    assert 'input_payload' in field_names
+    assert 'input_payload' not in field_names
+    assert 'input_payload_summary' in field_names

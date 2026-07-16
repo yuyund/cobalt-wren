@@ -4,19 +4,17 @@ This repository contains a Django-based control plane around LangGraph execution
 
 Detailed design documents live under `docs/`:
 
-- `docs/CODEX_WORKFLOW.md`
-- `docs/ROADMAP.md`
-- `docs/ARCHITECTURE.md`
-- `docs/CONTRACTS.md`
-- `docs/API_SURFACE.md`
-- `docs/CONFIGURATION.md`
-- `docs/CONFIG_SCHEMA.md`
-- `docs/PLUGINS.md`
-- `docs/PLUGIN_REGISTRATION.md`
-- `docs/PLUGIN_API_SHAPE.md`
-- `docs/PLUGIN_API_FACADE.md`
-- `docs/ERROR_TAXONOMY.md`
-- `docs/API_ERRORS_FACADE.md`
+- `docs/index.md`
+- `docs/agent/`
+- `docs/architecture/`
+- `docs/api/`
+- `docs/configuration/`
+- `docs/contracts/`
+- `docs/package/`
+- `docs/plugins/`
+- `docs/workflows/`
+- `docs/roadmap/`
+- `docs/assurance/`
 - `docs/adr/`
 
 ## Architecture Overview

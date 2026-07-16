@@ -114,6 +114,37 @@ def summarize_mapping(value: Mapping[str, Any], max_depth: int = DEFAULT_MAX_DEP
     return summary
 
 
+def summarize_display_value(value: Any, *, max_items: int = DEFAULT_MAX_ITEMS) -> Any:
+    """Return a display-safe summary without previewing raw payload contents."""
+
+    if value is None or isinstance(value, (bool, int, float)):
+        return value
+    if isinstance(value, str):
+        return {'value_type': 'str', 'length': len(value)}
+    if isinstance(value, Mapping):
+        items = list(value.items())
+        summary: dict[str, Any] = {'value_type': 'dict', 'size': len(items), 'keys': [], 'types': {}, 'sizes': {}}
+        if len(items) > max_items:
+            summary['truncated'] = True
+        for key, nested_value in items[:max_items]:
+            key_name = str(key)
+            key_label = REDACTED_VALUE if is_sensitive_key(key_name) else key_name
+            summary['keys'].append(key_label)
+            summary['types'][key_label] = _type_name(nested_value)
+            size = _size_of(nested_value)
+            if size is not None:
+                summary['sizes'][key_label] = size
+        return summary
+    if isinstance(value, Sequence) and not isinstance(value, (str, bytes, bytearray)):
+        items = list(value)
+        summary = {'value_type': 'list', 'size': len(items), 'item_types': []}
+        if len(items) > max_items:
+            summary['truncated'] = True
+        summary['item_types'] = [_type_name(item) for item in items[:max_items]]
+        return summary
+    return {'value_type': _type_name(value)}
+
+
 def summarize_messages(messages: list[dict[str, Any]]) -> dict[str, Any]:
     """Summarize chat-style messages without returning full prompt text."""
 
