@@ -1,19 +1,23 @@
 # Durable Artifact Test Plan
 
-This document defines the acceptance plan for the first durable artifact backend once protocol evolution enables it.
+This document defines the acceptance plan for the first durable artifact backend.
+
+The protocol sufficiency blocker is resolved.
+The backend implementation is still deferred.
 
 ## Baseline Contract Activation
 
 - reuse `tests/contract/persistence/`
-- add the backend to the test-only registry
 - keep the baseline suite black-box
 - keep characterization tests separate
+- keep the body-aware artifact contract executable against `MemoryArtifactStore`
 
 ## Advanced Contract Activation
 
 - immutable write
 - idempotent write
 - deterministic conflict
+- conflict detection
 - integrity verification
 - restart durability
 - concurrency safety
@@ -22,14 +26,23 @@ This document defines the acceptance plan for the first durable artifact backend
 ## Required Test Cases
 
 - restart test: create with one store instance, recreate with the same root, then read back
+- body round-trip: write bytes, read descriptor + body back
 - corruption test: manifest/body mismatch must fail safely
 - missing body test: manifest exists but body is absent
 - same-key/same-content test: idempotent success
 - same-key/different-content test: deterministic conflict
-- two-instance concurrency test: two store instances on the same root
-- process concurrency test: concurrent writers on the same host
+- same-key/different-run test: deterministic conflict
+- same-key/different-content-type test: deterministic conflict
+- same-key/different-metadata test: deterministic conflict
+- defensive copy test: caller mutation does not affect stored state
+- deterministic list ordering test: `list_for_run()` does not depend on insertion order
+- size correctness
+- digest correctness
+- repr safety
 - safe error test: no root/path/body/secret leakage
 - path/symlink test: no root escape, no symlink traversal
+- two-instance concurrency test: two store instances on the same root
+- process concurrency test: concurrent writers on the same host
 - backend registration test: concrete backend must be registered in the test registry
 - runtime wiring test: runtime should be able to select the backend explicitly
 - config validation test: root must be injected as trusted config
@@ -47,12 +60,12 @@ This document defines the acceptance plan for the first durable artifact backend
 - advanced durable contract suite passes
 - restart and concurrency tests pass
 - safe diagnostics pass
-- protocol sufficiency blocker is resolved before implementation work starts
+- protocol sufficiency is approved for implementation
 - default backend remains memory until the filesystem backend is explicitly opted in
 
 ## Deferred Work
 
-- implementation is deferred until the protocol evolves
+- implementation is deferred until the backend block starts
 - checkpoint durability is deferred
 - body/metadata orchestration is deferred
 - true resume is deferred

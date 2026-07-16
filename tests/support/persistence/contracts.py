@@ -2,30 +2,36 @@
 
 from __future__ import annotations
 
-from langgraph_automation.integrations.artifact.base import ArtifactStore, ArtifactWriteResult
+import pytest
+
+from langgraph_automation.api.errors import ArtifactConflictError, ArtifactIntegrityError, ArtifactValidationError
+from langgraph_automation.core.redaction import REDACTED_VALUE
+from langgraph_automation.integrations.artifact.base import ArtifactReadResult, ArtifactStore, ArtifactWriteRequest
 from langgraph_automation.integrations.checkpoint.base import CheckpointStore
 
 
 def assert_artifact_round_trip(store: ArtifactStore) -> None:
-    artifact = ArtifactWriteResult(
+    request = ArtifactWriteRequest(
+        run_id=123,
         storage_key='run-123/report.md',
+        body=b'hello world',
         name='report',
         kind='text',
         content_type='text/markdown',
-        size=12,
         metadata={'run_id': 123, 'phase': 'run', 'nested': {'value': 'keep-me'}},
     )
 
-    written = store.put(artifact)
+    written = store.put(request)
     fetched = store.get('run-123/report.md')
 
     assert fetched is not None
-    assert fetched.storage_key == written.storage_key
-    assert fetched.name == written.name
-    assert fetched.kind == written.kind
-    assert fetched.content_type == written.content_type
-    assert fetched.size == written.size
-    assert fetched.metadata == written.metadata
+    assert isinstance(fetched, ArtifactReadResult)
+    assert fetched.artifact == written
+    assert fetched.body == request.body
+    assert written.size == len(request.body)
+    assert written.digest.startswith('sha256:')
+    assert fetched.artifact.digest == written.digest
+    assert fetched.artifact.metadata == request.metadata
 
 
 def assert_artifact_missing_behavior(store: ArtifactStore) -> None:
@@ -34,35 +40,36 @@ def assert_artifact_missing_behavior(store: ArtifactStore) -> None:
 
 
 def assert_artifact_run_isolation(store: ArtifactStore) -> None:
-    run_a = ArtifactWriteResult(storage_key='run-1/a.md', name='a', kind='text', metadata={'run_id': 1})
-    run_b = ArtifactWriteResult(storage_key='run-2/b.md', name='b', kind='text', metadata={'run_id': 2})
-    store.put(run_a)
-    store.put(run_b)
+    run_a = ArtifactWriteRequest(run_id=1, storage_key='run-1/a.md', body=b'a', name='a', kind='text', metadata={'run_id': 1})
+    run_b = ArtifactWriteRequest(run_id=2, storage_key='run-2/b.md', body=b'b', name='b', kind='text', metadata={'run_id': 2})
+    written_a = store.put(run_a)
+    written_b = store.put(run_b)
 
     assert [item.storage_key for item in store.list_for_run(1)] == ['run-1/a.md']
     assert [item.storage_key for item in store.list_for_run(2)] == ['run-2/b.md']
+    assert written_a.storage_key != written_b.storage_key
 
 
 def assert_artifact_defensive_copy(store: ArtifactStore) -> None:
     metadata = {'run_id': 9, 'nested': {'token': 'abc123'}, 'items': [1, 2, 3]}
-    artifact = ArtifactWriteResult(storage_key='run-9/copy.md', name='copy', kind='text', metadata=metadata)
+    request = ArtifactWriteRequest(run_id=9, storage_key='run-9/copy.md', body=b'copy', name='copy', kind='text', metadata=metadata)
 
-    store.put(artifact)
+    store.put(request)
     metadata['nested']['token'] = 'changed'
     metadata['items'].append(4)
 
     fetched = store.get('run-9/copy.md')
     assert fetched is not None
-    assert fetched.metadata['nested']['token'] == 'abc123'
-    assert fetched.metadata['items'] == [1, 2, 3]
+    assert fetched.artifact.metadata['nested']['token'] == REDACTED_VALUE
+    assert fetched.artifact.metadata['items'] == [1, 2, 3]
 
-    fetched.metadata['nested']['token'] = 'mutated'
-    fetched.metadata['items'].append(5)
+    fetched.artifact.metadata['nested']['token'] = 'mutated'
+    fetched.artifact.metadata['items'].append(5)
 
     round_trip = store.get('run-9/copy.md')
     assert round_trip is not None
-    assert round_trip.metadata['nested']['token'] == 'abc123'
-    assert round_trip.metadata['items'] == [1, 2, 3]
+    assert round_trip.artifact.metadata['nested']['token'] == REDACTED_VALUE
+    assert round_trip.artifact.metadata['items'] == [1, 2, 3]
 
 
 def assert_artifact_safe_reference_rejected(store: ArtifactStore) -> None:
@@ -73,36 +80,144 @@ def assert_artifact_safe_reference_rejected(store: ArtifactStore) -> None:
         'token:example/output.md',
     )
     for storage_key in unsafe_keys:
-        artifact = ArtifactWriteResult(storage_key=storage_key, name='report', kind='text')
-        try:
-            store.put(artifact)
-        except ValueError as exc:
-            assert storage_key not in str(exc)
-            assert 'secret' not in str(exc).lower()
-            assert 'token' not in str(exc).lower()
-            assert 'authorization' not in str(exc).lower()
-            assert '/tmp' not in str(exc)
-        else:
-            raise AssertionError(f'unsafe storage key was accepted: {storage_key!r}')
+        with pytest.raises(ArtifactValidationError) as exc_info:
+            store.put(
+                ArtifactWriteRequest(
+                    run_id=1,
+                    storage_key=storage_key,
+                    body=b'report',
+                    name='report',
+                    kind='text',
+                )
+            )
+        text = str(exc_info.value)
+        assert storage_key not in text
+        assert 'secret' not in text.lower()
+        assert 'token' not in text.lower()
+        assert 'authorization' not in text.lower()
+        assert '/tmp' not in text
 
 
 def assert_artifact_diagnostic_non_exposure(store: ArtifactStore) -> None:
-    artifact = ArtifactWriteResult(
-        storage_key='/tmp/secret.txt',
+    request = ArtifactWriteRequest(
+        run_id=1,
+        storage_key='run-1/diagnostic.md',
+        body=b'SUPER_SECRET_BODY_SENTINEL',
         name='report',
         kind='text',
-        metadata={'secret': 'token', 'path': '/tmp/secret.txt'},
+        metadata={'secret': 'SUPER_SECRET_METADATA_SENTINEL', 'path': '/tmp/secret.txt'},
     )
-    try:
-        store.put(artifact)
-    except ValueError as exc:
-        text = str(exc)
+    written = store.put(request)
+    fetched = store.get('run-1/diagnostic.md')
+    assert fetched is not None
+
+    for text in (repr(request), repr(written), repr(fetched)):
+        assert 'SUPER_SECRET_BODY_SENTINEL' not in text
+        assert 'SUPER_SECRET_METADATA_SENTINEL' not in text
         assert '/tmp/secret.txt' not in text
         assert 'token' not in text.lower()
         assert 'secret' not in text.lower()
         assert 'authorization' not in text.lower()
-    else:
-        raise AssertionError('unsafe storage key was accepted')
+
+
+def assert_artifact_idempotency_and_conflict(store: ArtifactStore) -> None:
+    base = ArtifactWriteRequest(
+        run_id=7,
+        storage_key='run-7/report.md',
+        body=b'hello',
+        name='report',
+        kind='text',
+        content_type='text/markdown',
+        metadata={'phase': 'run', 'nested': {'value': 'keep-me'}},
+    )
+    written = store.put(base)
+
+    same_request = ArtifactWriteRequest(
+        run_id=7,
+        storage_key='run-7/report.md',
+        body=b'hello',
+        name='report',
+        kind='text',
+        content_type='text/markdown',
+        metadata={'nested': {'value': 'keep-me'}, 'phase': 'run'},
+    )
+    same_written = store.put(same_request)
+    assert same_written == written
+    assert store.get('run-7/report.md').artifact == written
+
+    conflict_inputs = (
+        ArtifactWriteRequest(run_id=7, storage_key='run-7/report.md', body=b'hello-2', name='report', kind='text', content_type='text/markdown', metadata={'phase': 'run'}),
+        ArtifactWriteRequest(run_id=8, storage_key='run-7/report.md', body=b'hello', name='report', kind='text', content_type='text/markdown', metadata={'phase': 'run'}),
+        ArtifactWriteRequest(run_id=7, storage_key='run-7/report.md', body=b'hello', name='report', kind='text', content_type='application/json', metadata={'phase': 'run'}),
+        ArtifactWriteRequest(run_id=7, storage_key='run-7/report.md', body=b'hello', name='report', kind='text', content_type='text/markdown', metadata={'phase': 'changed'}),
+    )
+    for request in conflict_inputs:
+        with pytest.raises(ArtifactConflictError):
+            store.put(request)
+        assert store.get('run-7/report.md').artifact == written
+
+
+def assert_artifact_integrity_errors_are_representable() -> None:
+    error = ArtifactIntegrityError('Artifact store detected an integrity failure.', code='ARTIFACT_STORE_INTEGRITY_FAILURE')
+    assert error.safe_message == 'Artifact store detected an integrity failure.'
+    assert error.code == 'ARTIFACT_STORE_INTEGRITY_FAILURE'
+
+
+def assert_artifact_storage_value_copy(store: ArtifactStore) -> None:
+    request = ArtifactWriteRequest(
+        run_id=11,
+        storage_key='run-11/list.md',
+        body=b'list body',
+        name='list',
+        kind='text',
+        metadata={'nested': {'token': 'abc123'}},
+    )
+    store.put(request)
+    listed = store.list_for_run(11)
+    assert listed
+    listed[0].metadata['nested']['token'] = 'mutated'
+    fetched = store.get('run-11/list.md')
+    assert fetched is not None
+    assert fetched.artifact.metadata['nested']['token'] == REDACTED_VALUE
+
+
+def assert_artifact_digest_and_size(store: ArtifactStore) -> None:
+    request = ArtifactWriteRequest(run_id=12, storage_key='run-12/digest.md', body=b'hello digest', name='digest', kind='text')
+    written = store.put(request)
+    assert written.size == len(b'hello digest')
+    assert written.digest.startswith('sha256:')
+    read = store.get('run-12/digest.md')
+    assert read is not None
+    assert read.artifact.size == written.size
+    assert read.artifact.digest == written.digest
+
+
+def assert_artifact_list_order_is_deterministic(store: ArtifactStore) -> None:
+    store.put(ArtifactWriteRequest(run_id=13, storage_key='run-13/b.md', body=b'b', name='b', kind='text'))
+    store.put(ArtifactWriteRequest(run_id=13, storage_key='run-13/a.md', body=b'a', name='a', kind='text'))
+    assert [artifact.storage_key for artifact in store.list_for_run(13)] == ['run-13/a.md', 'run-13/b.md']
+
+
+def assert_artifact_safe_storage_key_validation(store: ArtifactStore) -> None:
+    with pytest.raises(ArtifactValidationError):
+        store.put(ArtifactWriteRequest(run_id=1, storage_key='/tmp/output.md', body=b'report', name='report', kind='text'))
+
+
+def assert_artifact_read_result_repr_safety(store: ArtifactStore) -> None:
+    request = ArtifactWriteRequest(
+        run_id=14,
+        storage_key='run-14/repr.md',
+        body=b'SUPER_SECRET_BODY_SENTINEL',
+        name='repr',
+        kind='text',
+        metadata={'token': 'SUPER_SECRET_METADATA_SENTINEL'},
+    )
+    store.put(request)
+    result = store.get('run-14/repr.md')
+    assert result is not None
+    text = repr(result)
+    assert 'SUPER_SECRET_BODY_SENTINEL' not in text
+    assert 'SUPER_SECRET_METADATA_SENTINEL' not in text
 
 
 def assert_checkpoint_round_trip(store: CheckpointStore) -> None:

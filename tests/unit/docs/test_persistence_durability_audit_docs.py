@@ -63,6 +63,8 @@ def test_persistence_durability_audit_docs_exist_and_cover_core_terms() -> None:
         'restart durability',
         'concurrency',
         'safety exposure regression',
+        'body-aware',
+        'approved_for_implementation',
     ):
         assert token in traceability_text
 
@@ -73,5 +75,6 @@ def test_persistence_durability_audit_docs_exist_and_cover_core_terms() -> None:
         'production behavior was not changed',
         'next block',
         'durable artifact/checkpoint backend is deferred',
+        'artifactstore protocol evolution is complete',
     ):
         assert token in gaps_text

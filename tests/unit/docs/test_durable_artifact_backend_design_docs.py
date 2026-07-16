@@ -19,16 +19,19 @@ def test_durable_artifact_backend_design_docs_exist_and_cover_core_terms() -> No
     test_plan_text = test_plan.read_text().lower()
 
     for token in (
-        'blocked_by_protocol',
+        'approved_for_implementation',
+        'artifactwriterequest',
+        'storedartifact',
+        'artifactreadresult',
+        'body-aware',
         'process_durable',
         'filesystemartifactstore',
-        'metadata-only',
         'body input',
         'body output',
         'idempotency',
         'integrity',
         'protocol evolution options',
-        'recommended path: `b`',
+        'recommended path: `a`',
         'default backend remains memory',
     ):
         assert token in protocol_text
@@ -45,18 +48,24 @@ def test_durable_artifact_backend_design_docs_exist_and_cover_core_terms() -> No
         'restart and concurrency',
         'safe errors',
         'protocol dependency',
-        'default backend remains memoryartifactstore',
+        'default backend remains memory-backed',
+        'protocol is now protocol-sufficient',
     ):
         assert token in design_text
 
     for token in (
         'baseline contract activation',
         'advanced contract activation',
+        'body round-trip',
         'restart test',
         'corruption test',
         'missing body test',
         'same-key/same-content test',
         'same-key/different-content test',
+        'same-key/different-run test',
+        'same-key/different-content-type test',
+        'same-key/different-metadata test',
+        'deterministic list ordering test',
         'two-instance concurrency test',
         'process concurrency test',
         'safe error test',
@@ -65,6 +74,7 @@ def test_durable_artifact_backend_design_docs_exist_and_cover_core_terms() -> No
         'runtime wiring test',
         'xfail policy',
         'default backend remains memory',
+        'protocol sufficiency is approved for implementation',
         'checkpoint durability is deferred',
         'body/metadata orchestration is deferred',
         'true resume is deferred',

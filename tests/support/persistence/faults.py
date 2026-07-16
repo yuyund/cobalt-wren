@@ -8,7 +8,7 @@ from enum import StrEnum
 from typing import Any, Callable
 
 from langgraph_automation.core.redaction import redact_text
-from langgraph_automation.integrations.artifact.base import ArtifactStore, ArtifactWriteResult
+from langgraph_automation.integrations.artifact.base import ArtifactReadResult, ArtifactStore, ArtifactWriteRequest, StoredArtifact
 from langgraph_automation.integrations.checkpoint.base import CheckpointStore, CheckpointWriteResult
 
 
@@ -69,21 +69,21 @@ class FaultingArtifactStore(_FaultingBase, ArtifactStore):
         super().__init__(plan=plan)
         self._inner = inner
 
-    def put(self, artifact: ArtifactWriteResult) -> ArtifactWriteResult:
+    def put(self, request: ArtifactWriteRequest) -> StoredArtifact:
         operation = 'put'
         call_count = self._call_counts[operation] + 1
         self._call_counts[operation] = call_count
-        safe_identifier = self._safe_identifier(artifact.storage_key)
+        safe_identifier = self._safe_identifier(request.storage_key)
         if self._should_fault(operation, call_count, FaultTiming.BEFORE):
             self._record(operation=operation, call_count=call_count, safe_identifier=safe_identifier, timing=FaultTiming.BEFORE, delegate_ran=False)
             raise self._plan.exception_factory()  # type: ignore[union-attr]
-        result = self._inner.put(artifact)
+        result = self._inner.put(request)
         self._record(operation=operation, call_count=call_count, safe_identifier=safe_identifier, timing=FaultTiming.AFTER, delegate_ran=True)
         if self._should_fault(operation, call_count, FaultTiming.AFTER):
             raise self._plan.exception_factory()  # type: ignore[union-attr]
         return result
 
-    def get(self, artifact_id: str) -> ArtifactWriteResult | None:
+    def get(self, artifact_id: str) -> ArtifactReadResult | None:
         operation = 'get'
         call_count = self._call_counts[operation] + 1
         self._call_counts[operation] = call_count
@@ -97,7 +97,7 @@ class FaultingArtifactStore(_FaultingBase, ArtifactStore):
             raise self._plan.exception_factory()  # type: ignore[union-attr]
         return result
 
-    def list_for_run(self, run_id: int) -> list[ArtifactWriteResult]:
+    def list_for_run(self, run_id: int | str) -> list[StoredArtifact]:
         operation = 'list_for_run'
         call_count = self._call_counts[operation] + 1
         self._call_counts[operation] = call_count

@@ -3,7 +3,8 @@
 This document defines the target design for the first durable artifact backend.
 
 The implementation is not added in this block.
-The design is conditioned on protocol evolution because the current `ArtifactStore` protocol is `BLOCKED_BY_PROTOCOL` for actual body durability.
+The design is now protocol-sufficient because `ArtifactStore` is body-aware and conflict-aware.
+The protocol is now protocol-sufficient for backend implementation work.
 
 ## Selected Backend Candidate
 
@@ -225,8 +226,8 @@ Current orchestration remains deferred:
 
 ## Protocol Dependency
 
-This backend design is a target only.
+This backend design is now protocol-sufficient.
 
-It requires a body-bearing protocol seam before implementation can begin.
+The backend itself remains unimplemented in this block.
 
-Default backend remains MemoryArtifactStore until the filesystem backend is introduced explicitly.
+Default backend remains memory-backed `MemoryArtifactStore` until the filesystem backend is introduced explicitly.

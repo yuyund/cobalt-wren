@@ -18,7 +18,7 @@ This document defines the reusable black-box contract test harness for ArtifactS
 
 ## Baseline Contract
 
-- ArtifactStore: round-trip, missing behavior, run isolation, defensive copy, safe reference rejection, diagnostic non-exposure.
+- ArtifactStore: body round-trip, missing behavior, run isolation, defensive copy, deterministic list ordering, idempotent write, conflict detection, safe reference rejection, diagnostic non-exposure.
 - CheckpointStore: round-trip, missing behavior, run isolation, defensive copy, delete contract, latest-state compatibility, diagnostic non-exposure.
 - Baseline tests live under `tests/contract/persistence/`.
 
@@ -48,12 +48,18 @@ This document defines the reusable black-box contract test harness for ArtifactS
 
 ## Artifact Baseline Cases
 
-- round-trip
+- body round-trip
 - missing behavior
 - run isolation
 - defensive copy
+- deterministic list ordering
+- idempotent write
+- conflict detection
 - safe reference rejection
 - diagnostic non-exposure
+- size correctness
+- digest correctness
+- repr safety
 
 ## Checkpoint Baseline Cases
 

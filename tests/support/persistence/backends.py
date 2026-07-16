@@ -45,6 +45,9 @@ def artifact_backend_specs() -> tuple[ArtifactBackendSpec, ...]:
                     ContractCapability.DEFENSIVE_COPY,
                     ContractCapability.SAFE_REFERENCE,
                     ContractCapability.RUN_ISOLATION,
+                    ContractCapability.IMMUTABLE_WRITE,
+                    ContractCapability.IDEMPOTENT_WRITE,
+                    ContractCapability.CONFLICT_DETECTION,
                 }
             ),
         ),

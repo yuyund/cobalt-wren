@@ -34,16 +34,25 @@ def test_tool_api_all() -> None:
 
 
 def test_store_api_exports() -> None:
-    from langgraph_automation.api.stores import ArtifactStore, CheckpointStore
+    from langgraph_automation.api.stores import ArtifactReadResult, ArtifactStore, ArtifactWriteRequest, CheckpointStore, StoredArtifact
 
     assert ArtifactStore is not None
+    assert ArtifactWriteRequest is not None
+    assert StoredArtifact is not None
+    assert ArtifactReadResult is not None
     assert CheckpointStore is not None
 
 
 def test_store_api_all() -> None:
     import langgraph_automation.api.stores as stores_api
 
-    assert set(stores_api.__all__) == {'ArtifactStore', 'CheckpointStore'}
+    assert set(stores_api.__all__) == {
+        'ArtifactStore',
+        'ArtifactWriteRequest',
+        'StoredArtifact',
+        'ArtifactReadResult',
+        'CheckpointStore',
+    }
 
 
 def test_event_api_exports() -> None:

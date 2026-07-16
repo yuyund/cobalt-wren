@@ -4,7 +4,8 @@ from __future__ import annotations
 
 import pytest
 
-from langgraph_automation.integrations.artifact.base import ArtifactWriteResult
+from langgraph_automation.api.errors import ArtifactValidationError
+from langgraph_automation.integrations.artifact.base import ArtifactWriteRequest
 from langgraph_automation.integrations.artifact.keys import is_safe_storage_key, validate_storage_key
 from langgraph_automation.integrations.artifact.memory_store import MemoryArtifactStore
 
@@ -45,7 +46,5 @@ def test_validate_storage_key_rejects_unsafe_keys(storage_key: str) -> None:
 
 def test_memory_artifact_store_rejects_unsafe_storage_keys() -> None:
     store = MemoryArtifactStore()
-    artifact = ArtifactWriteResult(storage_key='/tmp/output.md', name='report', kind='text')
-
-    with pytest.raises(ValueError):
-        store.put(artifact)
+    with pytest.raises(ArtifactValidationError):
+        store.put(ArtifactWriteRequest(run_id=1, storage_key='/tmp/output.md', body=b'report', name='report', kind='text'))

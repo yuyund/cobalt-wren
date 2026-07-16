@@ -183,8 +183,11 @@ These contracts describe the current internal foundation surface. If parts of th
 ## ArtifactStore Contract
 
 - artifact store は metadata と body を分離する
-- body は将来の永続化設計まで bounded に扱う
-- current memory store は EPHEMERAL で、same identity / different content の conflict を保証しない
+- body is bytes
+- request / descriptor / read result are separated
+- current memory store is EPHEMERAL and guarantees immutable write / idempotent write / conflict detection
+- size and digest are store-derived
+- metadata は normalized / redacted / defensive copy で扱う
 - raw secrets / raw provider payload を保存しない
 - DB metadata には body copy を入れない
 

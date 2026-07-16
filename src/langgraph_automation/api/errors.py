@@ -8,6 +8,11 @@ from typing import Any
 __all__ = [
     'FrameworkError',
     'ConfigError',
+    'ArtifactStoreError',
+    'ArtifactValidationError',
+    'ArtifactConflictError',
+    'ArtifactIntegrityError',
+    'ArtifactPersistenceError',
     'PluginRegistrationError',
     'PluginResolutionError',
     'PluginValidationError',
@@ -71,6 +76,98 @@ class ConfigError(FrameworkError):
             safe_message,
             code=code,
             category='config',
+            component=component,
+            retryable=retryable,
+            metadata=metadata,
+        )
+
+
+class ArtifactStoreError(FrameworkError):
+    def __init__(
+        self,
+        safe_message: str,
+        *,
+        code: str,
+        component: str | None = None,
+        retryable: bool | None = None,
+        metadata: Mapping[str, Any] | None = None,
+    ) -> None:
+        super().__init__(
+            safe_message,
+            code=code,
+            category='artifact_store',
+            component=component,
+            retryable=retryable,
+            metadata=metadata,
+        )
+
+
+class ArtifactValidationError(ArtifactStoreError):
+    def __init__(
+        self,
+        safe_message: str,
+        *,
+        code: str,
+        component: str | None = None,
+        metadata: Mapping[str, Any] | None = None,
+    ) -> None:
+        super().__init__(
+            safe_message,
+            code=code,
+            component=component,
+            metadata=metadata,
+        )
+
+
+class ArtifactConflictError(ArtifactStoreError):
+    def __init__(
+        self,
+        safe_message: str,
+        *,
+        code: str,
+        component: str | None = None,
+        metadata: Mapping[str, Any] | None = None,
+    ) -> None:
+        super().__init__(
+            safe_message,
+            code=code,
+            component=component,
+            metadata=metadata,
+        )
+
+
+class ArtifactIntegrityError(ArtifactStoreError):
+    def __init__(
+        self,
+        safe_message: str,
+        *,
+        code: str,
+        component: str | None = None,
+        retryable: bool | None = None,
+        metadata: Mapping[str, Any] | None = None,
+    ) -> None:
+        super().__init__(
+            safe_message,
+            code=code,
+            component=component,
+            retryable=retryable,
+            metadata=metadata,
+        )
+
+
+class ArtifactPersistenceError(ArtifactStoreError):
+    def __init__(
+        self,
+        safe_message: str,
+        *,
+        code: str,
+        component: str | None = None,
+        retryable: bool | None = None,
+        metadata: Mapping[str, Any] | None = None,
+    ) -> None:
+        super().__init__(
+            safe_message,
+            code=code,
             component=component,
             retryable=retryable,
             metadata=metadata,

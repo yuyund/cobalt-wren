@@ -190,8 +190,10 @@ Target:
 
 Current:
 
-- `MemoryArtifactStore.put()` overwrites by storage key
-- no conflict detection exists
+- `MemoryArtifactStore.put()` is body-aware, immutable, idempotent, and conflict-aware
+- `MemoryArtifactStore.get()` returns a descriptor plus body
+- `MemoryArtifactStore.list_for_run()` returns descriptors only
+- the current memory backend is still EPHEMERAL and does not provide restart durability
 
 Evidence:
 
@@ -226,7 +228,7 @@ Target contract:
 
 Current behavior:
 
-- artifact store: last write wins by storage key
+- artifact store: idempotent success for canonical repeats and conflict for canonical differences
 - checkpoint store: last write wins by run id
 - no checksum-based idempotency check exists
 
@@ -254,7 +256,7 @@ Forbidden:
 
 Current gap:
 
-- `ArtifactWriteResult` exposes `content_type`, `size`, `metadata`, but no checksum or serializer
+- `StoredArtifact` exposes `content_type`, `size`, `digest`, and `metadata`
 - `CheckpointWriteResult` exposes `thread_id`, `checkpoint_namespace`, `backend`, `node_name`, `state_summary`, but no checksum, serializer, or backend reference
 
 ## Failure-Mode Matrix
@@ -278,9 +280,9 @@ Evidence:
 ## Artifact Semantics
 
 - identity: storage key
-- current body plane: in-memory metadata object only
-- current metadata plane: `Artifact` model
-- overwrite behavior: current memory store overwrites by key
+- current body plane: actual bytes body in the store
+- current metadata plane: normalized stored descriptor
+- overwrite behavior: current memory store is immutable per canonical request
 - retention/delete: no durable backend behavior yet
 
 ## Checkpoint Semantics
@@ -298,10 +300,10 @@ Evidence:
 | durability level | EPHEMERAL | EPHEMERAL | PROCESS_DURABLE or DEPLOYMENT_DURABLE |
 | atomic object publication | no explicit guarantee | no explicit guarantee | required |
 | conditional create | no | no | required |
-| immutable write | no | no | required |
-| idempotent put | no | no | required |
-| checksum support | no | no | required |
-| size support | partial metadata only | no | required |
+| immutable write | yes | no | required |
+| idempotent put | yes | no | required |
+| checksum support | yes | no | required |
+| size support | yes | no | required |
 | listing | `list_for_run()` | no list API | required by use case |
 | deletion | no | yes, in-memory only | required as a backend capability |
 | versioning | no | no | required for checkpoint lineages |

@@ -232,10 +232,17 @@ Persistence contract test harness:
 Artifact protocol sufficiency / durable backend design:
 
 - Block V: complete
-- protocol decision: BLOCKED_BY_PROTOCOL
+- protocol decision: APPROVED_FOR_IMPLEMENTATION
 - selected backend candidate: FilesystemArtifactStore
 - durability target: PROCESS_DURABLE
-- next block: Artifact Store Protocol Evolution Block V2
+- next block: Filesystem Artifact Backend Implementation Block V3
+
+Artifact Store Protocol Evolution Block V2:
+
+- complete
+- body-aware ArtifactStore contract: complete
+- MemoryArtifactStore reference implementation: complete
+- FilesystemArtifactStore implementation: deferred
 
 Later:
 
@@ -258,6 +265,7 @@ P1 safety exposure hardening:
 
 - admin/UI redaction assurance: complete
 - observability metadata safety: complete
+- artifact/store body safety: complete
 - safe error exposure: complete
 - persistence durability: deferred
 

@@ -132,6 +132,9 @@ Guidance:
 Current candidates:
 
 - `ArtifactStore`
+- `ArtifactWriteRequest`
+- `StoredArtifact`
+- `ArtifactReadResult`
 - `CheckpointStore`
 
 Future concepts:
@@ -144,7 +147,11 @@ Future concepts:
 
 Guidance:
 
-- Persistent stores are future work.
+- Persistent stores are still provisional, but `ArtifactStore` now has a body-aware breaking revision that supports immutable/idempotent/conflict-aware writes.
+- `ArtifactWriteRequest` owns caller serialization.
+- `StoredArtifact` is the normalized descriptor returned from `put()`.
+- `ArtifactReadResult` returns descriptor plus body from `get()`.
+- `api.stores` remains the minimal public store facade.
 - Storage keys and file paths must remain redaction-safe.
 - Absolute local file paths must not appear in UI or API output.
 
@@ -248,6 +255,9 @@ Guidance:
 - `langgraph_automation.api.engine`
 
 These modules re-export selected stable interfaces only. They do not expose runtime concrete implementation, plugin loader, config loader, or public error taxonomy.
+
+`api.stores` is a provisional breaking revision for the artifact surface, not a stable storage API.
+It is a body-aware breaking revision that keeps the public facade minimal while exposing `ArtifactWriteRequest`, `StoredArtifact`, and `ArtifactReadResult`.
 
 ## Deferred public surfaces
 
