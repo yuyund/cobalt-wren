@@ -3,14 +3,14 @@
 This document defines the acceptance plan for the first durable artifact backend.
 
 The protocol sufficiency blocker is resolved.
-The backend implementation is still deferred.
+The filesystem backend is implemented and must be verified against the contract suite.
 
 ## Baseline Contract Activation
 
 - reuse `tests/contract/persistence/`
 - keep the baseline suite black-box
 - keep characterization tests separate
-- keep the body-aware artifact contract executable against `MemoryArtifactStore`
+- keep the body-aware artifact contract executable against `MemoryArtifactStore` and `FilesystemArtifactStore`
 
 ## Advanced Contract Activation
 
@@ -44,7 +44,7 @@ The backend implementation is still deferred.
 - two-instance concurrency test: two store instances on the same root
 - process concurrency test: concurrent writers on the same host
 - backend registration test: concrete backend must be registered in the test registry
-- runtime wiring test: runtime should be able to select the backend explicitly
+- runtime wiring test: runtime should continue to default to memory
 - config validation test: root must be injected as trusted config
 
 ## Xfail Policy
@@ -56,16 +56,15 @@ The backend implementation is still deferred.
 ## Acceptance Criteria
 
 - durable backend is registered
-- baseline suite passes
-- advanced durable contract suite passes
+- baseline suite passes for memory and filesystem
+- advanced durable contract suite passes for filesystem
 - restart and concurrency tests pass
 - safe diagnostics pass
 - protocol sufficiency is approved for implementation
-- default backend remains memory until the filesystem backend is explicitly opted in
+- default backend remains memory
 
 ## Deferred Work
 
-- implementation is deferred until the backend block starts
 - checkpoint durability is deferred
 - body/metadata orchestration is deferred
 - true resume is deferred

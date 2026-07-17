@@ -25,6 +25,7 @@ def test_runtime_wires_ephemeral_memory_persistence_backends() -> None:
     assert isinstance(runtime.artifact_store, MemoryArtifactStore)
     assert isinstance(runtime.checkpoint_store, MemoryCheckpointStore)
     assert artifact_backend_specs()[0].durability == DurabilityLevel.EPHEMERAL
+    assert {spec.name for spec in artifact_backend_specs()} == {'memory', 'filesystem'}
     assert checkpoint_backend_specs()[0].durability == DurabilityLevel.EPHEMERAL
     assert runtime.artifact_store is not None
     assert runtime.checkpoint_store is not None

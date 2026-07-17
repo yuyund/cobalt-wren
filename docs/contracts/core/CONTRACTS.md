@@ -186,6 +186,8 @@ These contracts describe the current internal foundation surface. If parts of th
 - body is bytes
 - request / descriptor / read result are separated
 - current memory store is EPHEMERAL and guarantees immutable write / idempotent write / conflict detection
+- current filesystem store is PROCESS_DURABLE and guarantees content-addressed immutable body publication, deterministic manifest writes, idempotent retry, and conflict detection
+- `FilesystemArtifactStore` verifies manifest and body integrity on read
 - size and digest are store-derived
 - metadata は normalized / redacted / defensive copy で扱う
 - raw secrets / raw provider payload を保存しない

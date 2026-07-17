@@ -87,7 +87,7 @@ Reason:
 
 ## First Durable Backend Candidate
 
-The first durable backend candidate remains a local filesystem backend:
+The first durable backend candidate is now implemented as a local filesystem backend:
 
 - target name: `FilesystemArtifactStore`
 - target durability: `PROCESS_DURABLE`
@@ -95,7 +95,7 @@ The first durable backend candidate remains a local filesystem backend:
 
 The default backend remains memory-backed `MemoryArtifactStore`.
 
-This is now implementable under the current protocol, but the backend itself remains unimplemented in this block.
+The protocol decision remains `APPROVED_FOR_IMPLEMENTATION`, and the backend implementation now exists.
 
 ## Protocol Evolution Options
 
@@ -115,8 +115,6 @@ Reason:
 
 ## Deferred Work
 
-- durable artifact backend implementation is deferred
-- FilesystemArtifactStore is deferred
 - checkpoint durability is deferred
 - body/metadata orchestration is deferred
 - true resume is deferred

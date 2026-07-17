@@ -27,6 +27,7 @@ def test_persistence_durability_audit_docs_exist_and_cover_core_terms() -> None:
         'ephemeral',
         'process_durable',
         'deployment_durable',
+        'filesystemartifactstore',
         'absent',
         'valid',
         'orphan_body',
@@ -74,7 +75,7 @@ def test_persistence_durability_audit_docs_exist_and_cover_core_terms() -> None:
         'p2',
         'production behavior was not changed',
         'next block',
-        'durable artifact/checkpoint backend is deferred',
+        'durable checkpoint backend is deferred',
         'artifactstore protocol evolution is complete',
     ):
         assert token in gaps_text

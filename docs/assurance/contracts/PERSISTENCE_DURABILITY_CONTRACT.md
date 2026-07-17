@@ -16,7 +16,6 @@ Docs describe intent and the target contract.
 
 ## Non-Goals
 
-- durable ArtifactStore implementation
 - durable CheckpointStore implementation
 - DB schema changes or migrations
 - true resume
@@ -80,6 +79,7 @@ Forbidden:
 ### Current classification
 
 - MemoryArtifactStore: `EPHEMERAL` `CODE_CONFIRMED`
+- FilesystemArtifactStore: `PROCESS_DURABLE` `CODE_CONFIRMED`
 - MemoryCheckpointStore: `EPHEMERAL` `CODE_CONFIRMED`
 
 Evidence:
@@ -143,6 +143,9 @@ Advanced durable semantics remain deferred until durable backends exist.
 - `GraphRuntime` carries the stores
 - no execution path currently writes artifact or checkpoint bodies through these store protocols
 - Django observability emits metadata rows through `DjangoEventSink`
+- `FilesystemArtifactStore` publishes content-addressed bodies and deterministic manifests on the local filesystem
+- `FilesystemArtifactStore` verifies manifest and body integrity on read
+- `FilesystemArtifactStore` provides process-durable reads on the same host/root
 
 Evidence:
 
@@ -194,6 +197,8 @@ Current:
 - `MemoryArtifactStore.get()` returns a descriptor plus body
 - `MemoryArtifactStore.list_for_run()` returns descriptors only
 - the current memory backend is still EPHEMERAL and does not provide restart durability
+- `FilesystemArtifactStore` is PROCESS_DURABLE and restart-safe on the same host/root
+- `FilesystemArtifactStore` uses content-addressed immutable body publication and deterministic manifests
 
 Evidence:
 

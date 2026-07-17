@@ -1,10 +1,9 @@
 # Durable Artifact Backend Design
 
-This document defines the target design for the first durable artifact backend.
+This document defines the design for the first durable artifact backend.
 
-The implementation is not added in this block.
-The design is now protocol-sufficient because `ArtifactStore` is body-aware and conflict-aware.
-The protocol is now protocol-sufficient for backend implementation work.
+The implementation now lives in `src/langgraph_automation/integrations/artifact/filesystem_store.py`.
+The design remains the reference contract for that backend.
 
 ## Selected Backend Candidate
 
@@ -56,11 +55,11 @@ Target root layout:
   bodies/
     sha256/
       <shard>/
-        <content-digest>
+        <content-digest>.blob
   records/
-    <shard>/
-      <storage-key-digest>.json
-  tmp/
+    sha256/
+      <shard>/
+        <storage-key-digest>.json
 ```
 
 This layout preserves metadata / body separation.
@@ -75,15 +74,16 @@ This layout preserves metadata / body separation.
 ### Suggested Manifest Fields
 
 - `schema_version`
-- `storage_key`
 - `run_id`
-- `content_digest`
-- `size`
+- `storage_key`
+- `name`
+- `kind`
 - `content_type`
+- `size`
+- `digest`
 - `metadata`
-- `created_at`
 
-`schema_version` and `content_digest` are backend-internal or derivable until protocol evolution supplies a body-bearing seam.
+`schema_version` and `digest` are backend-internal and are now encoded in the filesystem manifest contract.
 
 ## Write Flow
 
@@ -226,8 +226,6 @@ Current orchestration remains deferred:
 
 ## Protocol Dependency
 
-This backend design is now protocol-sufficient.
+This backend design is now implemented.
 
-The backend itself remains unimplemented in this block.
-
-Default backend remains memory-backed `MemoryArtifactStore` until the filesystem backend is introduced explicitly.
+Default backend remains memory-backed `MemoryArtifactStore`.

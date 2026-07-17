@@ -37,7 +37,7 @@ def test_artifact_store_protocol_evolution_docs_exist_and_cover_core_terms() -> 
         assert token in protocol_text
 
     for token in (
-        'protocol is now protocol-sufficient',
+        'this backend design is now implemented',
         'metadata / body separation',
         'temp file + hard-link publication',
         'safe errors',
@@ -55,6 +55,7 @@ def test_artifact_store_protocol_evolution_docs_exist_and_cover_core_terms() -> 
         'digest correctness',
         'repr safety',
         'protocol sufficiency is approved for implementation',
+        'filesystem backend is implemented',
     ):
         assert token in test_plan_text
 

@@ -18,8 +18,8 @@ def test_artifact_backend_registry_covers_all_concrete_implementations() -> None
     discovered = discover_concrete_artifact_store_types()
 
     assert discovered == registered
-    assert {spec.name for spec in specs} == {'memory'}
-    assert {spec.durability for spec in specs} == {DurabilityLevel.EPHEMERAL}
+    assert {spec.name for spec in specs} == {'memory', 'filesystem'}
+    assert {spec.durability for spec in specs} == {DurabilityLevel.EPHEMERAL, DurabilityLevel.PROCESS_DURABLE}
     assert {
         ContractCapability.BASELINE,
         ContractCapability.DEFENSIVE_COPY,
@@ -28,6 +28,10 @@ def test_artifact_backend_registry_covers_all_concrete_implementations() -> None
         ContractCapability.IMMUTABLE_WRITE,
         ContractCapability.IDEMPOTENT_WRITE,
         ContractCapability.CONFLICT_DETECTION,
+        ContractCapability.INTEGRITY_VERIFICATION,
+        ContractCapability.RESTART_DURABILITY,
+        ContractCapability.SHARED_INSTANCE,
+        ContractCapability.CONCURRENT_WRITE,
     } <= set().union(*(spec.capabilities for spec in specs))
 
 

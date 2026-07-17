@@ -49,7 +49,7 @@ def test_durable_artifact_backend_design_docs_exist_and_cover_core_terms() -> No
         'safe errors',
         'protocol dependency',
         'default backend remains memory-backed',
-        'protocol is now protocol-sufficient',
+        'this backend design is now implemented',
     ):
         assert token in design_text
 
@@ -74,6 +74,7 @@ def test_durable_artifact_backend_design_docs_exist_and_cover_core_terms() -> No
         'runtime wiring test',
         'xfail policy',
         'default backend remains memory',
+        'filesystem backend is implemented',
         'protocol sufficiency is approved for implementation',
         'checkpoint durability is deferred',
         'body/metadata orchestration is deferred',

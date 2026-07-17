@@ -242,7 +242,7 @@ Artifact Store Protocol Evolution Block V2:
 - complete
 - body-aware ArtifactStore contract: complete
 - MemoryArtifactStore reference implementation: complete
-- FilesystemArtifactStore implementation: deferred
+- FilesystemArtifactStore implementation: complete
 
 Later:
 
@@ -267,19 +267,21 @@ P1 safety exposure hardening:
 - observability metadata safety: complete
 - artifact/store body safety: complete
 - safe error exposure: complete
-- persistence durability: deferred
+- persistence durability: artifact complete / checkpoint deferred
 
 Persistence durability audit:
 
 - Block T: complete
-- durable backend: deferred
+- durable artifact backend: complete
+- durable checkpoint backend: deferred
 - next block: Persistence Contract Test Harness Block U
 
 Persistence contract test harness:
 
 - Block U: complete
-- durable backend: still deferred
-- next block: Durable Artifact / Checkpoint Backend Block V
+- durable artifact backend: complete
+- durable checkpoint backend: deferred
+- next block: Durable Checkpoint Backend Block V
 
 Package Complete+ future work:
 

@@ -152,6 +152,7 @@ Guidance:
 - `StoredArtifact` is the normalized descriptor returned from `put()`.
 - `ArtifactReadResult` returns descriptor plus body from `get()`.
 - `api.stores` remains the minimal public store facade.
+- `FilesystemArtifactStore` is the first durable backend, but it is not exported from `api.stores`.
 - Storage keys and file paths must remain redaction-safe.
 - Absolute local file paths must not appear in UI or API output.
 

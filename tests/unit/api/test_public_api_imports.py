@@ -43,6 +43,13 @@ def test_store_api_exports() -> None:
     assert CheckpointStore is not None
 
 
+def test_store_api_does_not_export_concrete_backends() -> None:
+    import langgraph_automation.api.stores as stores_api
+
+    assert 'FilesystemArtifactStore' not in stores_api.__all__
+    assert not hasattr(stores_api, 'FilesystemArtifactStore')
+
+
 def test_store_api_all() -> None:
     import langgraph_automation.api.stores as stores_api
 

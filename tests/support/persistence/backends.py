@@ -5,10 +5,12 @@ from __future__ import annotations
 import importlib
 import inspect
 import pkgutil
+import tempfile
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Callable
 
-from langgraph_automation.integrations.artifact import ArtifactStore, MemoryArtifactStore
+from langgraph_automation.integrations.artifact import ArtifactStore, FilesystemArtifactStore, MemoryArtifactStore
 from langgraph_automation.integrations.checkpoint import CheckpointStore, MemoryCheckpointStore
 
 from .capabilities import ContractCapability, DurabilityLevel
@@ -48,6 +50,27 @@ def artifact_backend_specs() -> tuple[ArtifactBackendSpec, ...]:
                     ContractCapability.IMMUTABLE_WRITE,
                     ContractCapability.IDEMPOTENT_WRITE,
                     ContractCapability.CONFLICT_DETECTION,
+                }
+            ),
+        ),
+        ArtifactBackendSpec(
+            name='filesystem',
+            implementation=FilesystemArtifactStore,
+            factory=lambda: FilesystemArtifactStore(Path(tempfile.mkdtemp(prefix='langgraph-automation-artifact-'))),
+            durability=DurabilityLevel.PROCESS_DURABLE,
+            capabilities=frozenset(
+                {
+                    ContractCapability.BASELINE,
+                    ContractCapability.DEFENSIVE_COPY,
+                    ContractCapability.SAFE_REFERENCE,
+                    ContractCapability.RUN_ISOLATION,
+                    ContractCapability.IMMUTABLE_WRITE,
+                    ContractCapability.IDEMPOTENT_WRITE,
+                    ContractCapability.CONFLICT_DETECTION,
+                    ContractCapability.INTEGRITY_VERIFICATION,
+                    ContractCapability.RESTART_DURABILITY,
+                    ContractCapability.SHARED_INSTANCE,
+                    ContractCapability.CONCURRENT_WRITE,
                 }
             ),
         ),
