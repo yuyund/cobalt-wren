@@ -82,6 +82,15 @@ Forbidden:
 - FilesystemArtifactStore: `PROCESS_DURABLE` `CODE_CONFIRMED`
 - MemoryCheckpointStore: `EPHEMERAL` `CODE_CONFIRMED`
 
+### Artifact backend runtime selection
+
+- `stores.artifact` is the runtime selection boundary for built-in artifact backends
+- section absence normalizes to `MemoryArtifactStore`
+- explicit filesystem selection requires an absolute trusted root
+- runtime selection is startup-only
+- filesystem initialization errors fail startup instead of falling back to memory
+- one filesystem root is one artifact identity domain
+
 Evidence:
 
 - `src/langgraph_automation/integrations/artifact/memory_store.py`
@@ -140,6 +149,7 @@ Advanced durable semantics remain deferred until durable backends exist.
 ### Current
 
 - runtime assembly wires `MemoryArtifactStore` and `MemoryCheckpointStore`
+- artifact backend selection is canonicalized through typed config and a single runtime builder
 - `GraphRuntime` carries the stores
 - no execution path currently writes artifact or checkpoint bodies through these store protocols
 - Django observability emits metadata rows through `DjangoEventSink`

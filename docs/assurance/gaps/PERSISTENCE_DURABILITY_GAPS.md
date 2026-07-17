@@ -32,11 +32,10 @@ This document ranks the remaining persistence gaps after the current code-first 
 
 ## Recommended Closure Order
 
-1. Durable artifact backend
-2. Durable checkpoint backend
-3. Orchestration integration with body-first / metadata-second writes
-4. Restart durability tests
-5. Reconciliation and cleanup policy
+1. Durable checkpoint backend
+2. Orchestration integration with body-first / metadata-second writes
+3. Restart durability tests
+4. Reconciliation and cleanup policy
 
 ## Deferred Work
 
@@ -47,7 +46,7 @@ This document ranks the remaining persistence gaps after the current code-first 
 - run_workflow is deferred
 - api.runtime is deferred
 - persistence contract test harness is complete
-- next block: durable checkpoint backend
+- runtime artifact backend selection is complete
 - ArtifactStore protocol evolution is complete
 
 ## Block Status

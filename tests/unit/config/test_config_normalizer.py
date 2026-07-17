@@ -37,7 +37,7 @@ def test_normalize_package_config_normalizes_nested_sections() -> None:
                 }
             },
             "tools": {"allowlist": ["echo"], "configs": {"echo": {"mode": "safe"}}},
-            "stores": {"artifact": {"backend": "memory", "config": {"root": "var/artifacts"}}},
+            "stores": {"artifact": {"backend": "filesystem", "config": {"root": "/srv/langgraph-automation/artifacts"}}},
             "event_sinks": {"stdout": {"backend": "stdout", "config": {"format": "json"}}},
             "limits": {"max_steps": 5},
             "observability": {"capture": {"input_summary": True}},
@@ -54,13 +54,46 @@ def test_normalize_package_config_normalizes_nested_sections() -> None:
     assert normalized.providers["default"].model == "gpt-4.1-mini"
     assert normalized.providers["default"].parameters == {"temperature": 0.2}
     assert normalized.providers["default"].secrets == {"api_key": SecretRef(source="env", name="LLM_API_KEY")}
-    assert normalized.stores["artifact"].backend == "memory"
-    assert normalized.stores["artifact"].config == {"root": "var/artifacts"}
+    assert normalized.stores["artifact"].backend == "filesystem"
+    assert normalized.stores["artifact"].config == {"root": "/srv/langgraph-automation/artifacts"}
     assert normalized.event_sinks["stdout"].backend == "stdout"
     assert normalized.event_sinks["stdout"].config == {"format": "json"}
     assert normalized.limits.values == {"max_steps": 5}
     assert normalized.observability == {"capture": {"input_summary": True}}
     assert normalized.metadata == {"team": "platform"}
+
+
+def test_load_normalized_package_config_from_mapping_validates_artifact_store_section() -> None:
+    normalized = load_normalized_package_config_from_mapping(
+        {
+            "version": 1,
+            "stores": {
+                "artifact": {
+                    "backend": "filesystem",
+                    "config": {"root": "/srv/langgraph-automation/artifacts"},
+                }
+            },
+        }
+    )
+
+    assert normalized.stores["artifact"].backend == "filesystem"
+
+
+def test_load_normalized_package_config_from_mapping_rejects_invalid_artifact_store_section() -> None:
+    with pytest.raises(ConfigError) as excinfo:
+        load_normalized_package_config_from_mapping(
+            {
+                "version": 1,
+                "stores": {
+                    "artifact": {
+                        "backend": "filesystem",
+                        "config": {"root": "./artifacts"},
+                    }
+                },
+            }
+        )
+
+    assert excinfo.value.code == "CONFIG_ARTIFACT_STORE_INVALID_ROOT"
 
 
 @pytest.mark.parametrize(

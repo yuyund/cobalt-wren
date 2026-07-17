@@ -31,6 +31,7 @@ def test_config_core_modules_do_not_import_forbidden_boundaries() -> None:
 
     for relative in (
         Path("src/langgraph_automation/config/__init__.py"),
+        Path("src/langgraph_automation/config/artifact_store.py"),
         Path("src/langgraph_automation/config/loader.py"),
         Path("src/langgraph_automation/config/models.py"),
         Path("src/langgraph_automation/config/normalizer.py"),

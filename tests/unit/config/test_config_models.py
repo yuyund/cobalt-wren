@@ -1,13 +1,16 @@
 from __future__ import annotations
 
 from dataclasses import FrozenInstanceError
+from pathlib import Path
 
 import pytest
 
 from langgraph_automation.config.models import (
+    FilesystemArtifactStoreSettings,
     EventSinkBackendConfig,
     LimitsConfig,
     NormalizedPackageConfig,
+    MemoryArtifactStoreSettings,
     PluginsConfig,
     ProviderProfileConfig,
     RawPackageConfig,
@@ -90,3 +93,16 @@ def test_normalized_package_config_copies_mappings() -> None:
     assert normalized.event_sinks == {"stdout": EventSinkBackendConfig(backend="stdout")}
     assert normalized.observability == {"capture": {"input_summary": True}}
     assert normalized.metadata == {"team": "platform"}
+
+
+def test_artifact_store_settings_are_frozen_and_hide_sensitive_root() -> None:
+    memory = MemoryArtifactStoreSettings()
+    filesystem = FilesystemArtifactStoreSettings(root=Path("/srv/private/artifacts"))
+
+    assert memory.backend == "memory"
+    assert filesystem.backend == "filesystem"
+    assert filesystem.root == Path("/srv/private/artifacts")
+    assert "/srv/private/artifacts" not in repr(filesystem)
+
+    with pytest.raises(FrozenInstanceError):
+        filesystem.backend = "memory"  # type: ignore[misc]

@@ -244,6 +244,14 @@ Artifact Store Protocol Evolution Block V2:
 - MemoryArtifactStore reference implementation: complete
 - FilesystemArtifactStore implementation: complete
 
+Artifact Backend Runtime Selection and Configuration Block V4:
+
+- complete
+- typed artifact store settings: complete
+- canonical runtime builder: complete
+- explicit filesystem opt-in: complete
+- no fallback semantics: complete
+
 Later:
 
 - Minimal Application Workflow Example

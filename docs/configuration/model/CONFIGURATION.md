@@ -238,6 +238,38 @@ Future implementation note:
 
 - Package MVP should use explicit / manual registration
 - Package Complete may consider Python entry points or other discovery mechanisms
+
+### 6. Artifact store runtime selection
+
+Purpose:
+
+- choose the built-in artifact backend through typed config and a single runtime composition point
+
+Raw config path:
+
+- `stores.artifact`
+
+Permitted:
+
+- omit the section entirely, which normalizes to `MemoryArtifactStoreSettings`
+- set `backend: memory`
+- set `backend: filesystem` with an absolute `root`
+
+Forbidden:
+
+- unknown backend names
+- mixed memory/filesystem fields
+- filesystem root exposure in repr / diagnostics
+- silent fallback from filesystem to memory
+
+Runtime rules:
+
+- artifact backend selection is startup-only
+- runtime assembly builds the artifact store exactly once
+- default remains `MemoryArtifactStore`
+- explicit filesystem selection is opt-in
+- `FilesystemArtifactStore` root is constructor-injected and not read from Django settings or environment directly
+- one filesystem root is one artifact identity domain
 - Plugin-specific config validation is defined by the plugin type in `../../plugins/PLUGINS.md`.
 - `plugins.enabled` selects from manually registered plugins and is not an import path, install instruction, or discovery mechanism.
 

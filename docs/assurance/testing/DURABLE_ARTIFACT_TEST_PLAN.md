@@ -11,6 +11,9 @@ The filesystem backend is implemented and must be verified against the contract 
 - keep the baseline suite black-box
 - keep characterization tests separate
 - keep the body-aware artifact contract executable against `MemoryArtifactStore` and `FilesystemArtifactStore`
+- keep runtime selection tests in the config/runtime suite
+- keep `MemoryArtifactStore` as the default backend when `stores.artifact` is absent
+- keep `FilesystemArtifactStore` as an explicit opt-in that must fail startup on initialization errors
 
 ## Advanced Contract Activation
 
@@ -65,6 +68,7 @@ The filesystem backend is implemented and must be verified against the contract 
 - safe diagnostics pass
 - protocol sufficiency is approved for implementation
 - default backend remains memory
+- runtime selection is typed, startup-only, and no-fallback
 
 ## Deferred Work
 

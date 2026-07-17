@@ -5,8 +5,10 @@ from __future__ import annotations
 from collections.abc import Callable, Mapping
 
 from langgraph_automation.api.errors import RuntimeAssemblyError
+from langgraph_automation.config.artifact_store import normalize_artifact_store_settings
 from langgraph_automation.config.models import ValidatedPackageConfig
 
+from .artifact_store import build_artifact_store
 from .context import FactoryContext
 from .dependencies import RuntimeDependencies
 from .secrets import EnvSecretResolver, SecretResolver
@@ -32,9 +34,10 @@ class RuntimeAssembler:
             safety=config.normalized.safety,
         )
 
+        artifact_store = self._assemble_artifact_store(config)
         providers = self._assemble_providers(config, context)
         tools = self._assemble_tools(config, context)
-        artifact_store, checkpoint_store = self._assemble_stores(config, context)
+        _, checkpoint_store = self._assemble_stores(config, context)
         event_sinks = self._assemble_event_sinks(config, context)
 
         return RuntimeDependencies(
@@ -67,6 +70,10 @@ class RuntimeAssembler:
             )
             assembled[profile_name] = client
         return assembled
+
+    def _assemble_artifact_store(self, config: ValidatedPackageConfig) -> object:
+        settings = normalize_artifact_store_settings(config.normalized.stores.get("artifact"))
+        return build_artifact_store(settings)
 
     def _assemble_tools(self, config: ValidatedPackageConfig, context: FactoryContext) -> dict[str, object]:
         assembled: dict[str, object] = {}
@@ -103,10 +110,11 @@ class RuntimeAssembler:
         return assembled
 
     def _assemble_stores(self, config: ValidatedPackageConfig, context: FactoryContext) -> tuple[object | None, object | None]:
-        artifact_store: object | None = None
         checkpoint_store: object | None = None
         for store_type, store_config in config.normalized.stores.items():
-            if store_type not in {"artifact", "checkpoint"}:
+            if store_type == "artifact":
+                continue
+            if store_type != "checkpoint":
                 raise self._assembly_error(
                     f"Runtime assembly failed: unsupported store type '{store_type}'.",
                     code="RUNTIME_ASSEMBLY_UNSUPPORTED_STORE_TYPE",
@@ -129,11 +137,8 @@ class RuntimeAssembler:
                 contribution_scope="store",
                 contribution_name=f"{store_type}:{store_config.backend}",
             )
-            if store_type == "artifact":
-                artifact_store = store
-            else:
-                checkpoint_store = store
-        return artifact_store, checkpoint_store
+            checkpoint_store = store
+        return None, checkpoint_store
 
     def _assemble_event_sinks(self, config: ValidatedPackageConfig, context: FactoryContext) -> dict[str, object]:
         assembled: dict[str, object] = {}

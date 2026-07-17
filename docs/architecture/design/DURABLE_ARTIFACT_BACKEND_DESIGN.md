@@ -39,10 +39,13 @@ The backend root must be injected by trusted configuration.
 
 Target integration shape:
 
-- `StoreBackendConfig.backend = 'filesystem'`
-- `StoreBackendConfig.config['root'] = <trusted filesystem root>`
-- the factory receives the normalized store config and runtime context
+- `stores.artifact.backend = 'filesystem'`
+- `stores.artifact.config.root = <trusted filesystem root>`
+- raw package config normalizes into typed artifact store settings
+- the canonical runtime builder constructs the backend exactly once per runtime assembly
 - the backend must not read environment variables or Django settings directly
+- section absence normalizes to `MemoryArtifactStore`
+- filesystem selection is explicit opt-in and startup-only
 
 Current default behavior remains memory-backed and unchanged.
 

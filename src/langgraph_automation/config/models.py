@@ -4,17 +4,21 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from dataclasses import dataclass, field
-from typing import Any
+from pathlib import Path
+from typing import Any, Literal
 
 __all__ = [
+    "ArtifactStoreSettings",
     "EffectivePluginSet",
     "EventSinkBackendConfig",
+    "FilesystemArtifactStoreSettings",
     "LimitsConfig",
     "NormalizedPackageConfig",
     "PluginsConfig",
     "ProviderProfileConfig",
     "RawPackageConfig",
     "SafetyConfig",
+    "MemoryArtifactStoreSettings",
     "SecretRef",
     "StoreBackendConfig",
     "ToolsConfig",
@@ -140,6 +144,26 @@ class EventSinkBackendConfig:
     def __post_init__(self) -> None:
         object.__setattr__(self, "config", _copy_mapping(self.config))
         object.__setattr__(self, "metadata", _copy_mapping(self.metadata))
+
+
+@dataclass(frozen=True, slots=True)
+class MemoryArtifactStoreSettings:
+    backend: Literal["memory"] = "memory"
+
+
+@dataclass(frozen=True, slots=True)
+class FilesystemArtifactStoreSettings:
+    root: Path = field(repr=False)
+    backend: Literal["filesystem"] = "filesystem"
+
+    def __post_init__(self) -> None:
+        root = self.root
+        if not isinstance(root, Path):
+            root = Path(root)
+        object.__setattr__(self, "root", root)
+
+
+ArtifactStoreSettings = MemoryArtifactStoreSettings | FilesystemArtifactStoreSettings
 
 
 @dataclass(frozen=True, slots=True)

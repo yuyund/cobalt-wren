@@ -74,6 +74,16 @@ Evidence:
 - `src/langgraph_automation/apps/automation/services/execution.py`
 - `src/langgraph_automation/apps/automation/services/runs.py`
 
+## Runtime Selection Boundary
+
+The protocol is now paired with typed runtime configuration:
+
+- `stores.artifact` normalizes to `MemoryArtifactStoreSettings` when absent
+- explicit `stores.artifact.backend = memory` selects memory-backed runtime composition
+- explicit `stores.artifact.backend = filesystem` selects `FilesystemArtifactStore`
+- runtime assembly constructs the artifact store once during startup
+- filesystem initialization failures are startup failures, not memory fallbacks
+
 ## Protocol Sufficiency Decision
 
 Decision: `APPROVED_FOR_IMPLEMENTATION`

@@ -153,6 +153,10 @@ Guidance:
 - `ArtifactReadResult` returns descriptor plus body from `get()`.
 - `api.stores` remains the minimal public store facade.
 - `FilesystemArtifactStore` is the first durable backend, but it is not exported from `api.stores`.
+- artifact runtime selection is controlled by typed config under `stores.artifact`
+- `MemoryArtifactStore` remains the default when the section is absent
+- `FilesystemArtifactStore` is explicit opt-in and must fail startup on initialization errors
+- the filesystem root is trusted configuration and must not be echoed in runtime diagnostics
 - Storage keys and file paths must remain redaction-safe.
 - Absolute local file paths must not appear in UI or API output.
 

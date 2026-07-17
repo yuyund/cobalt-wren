@@ -19,7 +19,7 @@ def _store_plugin(*, validate_config=None, create_store=None) -> Plugin:
             stores=(
                 StoreContribution(
                     backend_name="memory",
-                    store_type="artifact",
+                    store_type="vector",
                     validate_config=validate_config,
                     create_store=create_store,
                 ),
@@ -34,14 +34,14 @@ def _store_plugin(*, validate_config=None, create_store=None) -> Plugin:
     )
 
 
-def _normalized_config(*, enabled_plugins: tuple[str, ...], artifact_backend: str = "memory", checkpoint_backend: str = "memory") -> NormalizedPackageConfig:
+def _normalized_config(*, enabled_plugins: tuple[str, ...], vector_backend: str = "memory", checkpoint_backend: str = "memory") -> NormalizedPackageConfig:
     raw = RawPackageConfig(
         version=1,
         plugins={"enabled": enabled_plugins},
         providers={},
         tools={"allowlist": ()},
         stores={
-            "artifact": {"backend": artifact_backend, "config": {"root": "var/artifacts"}},
+            "vector": {"backend": vector_backend, "config": {"path": "var/vectors.sqlite"}},
             "checkpoint": {"backend": checkpoint_backend, "config": {"path": "var/checkpoints.sqlite"}},
         },
         event_sinks={},
@@ -75,19 +75,19 @@ def test_same_backend_different_store_types_are_supported() -> None:
 
     validated = validator.validate(config)
 
-    assert set(validated.effective_plugins.stores) == {("artifact", "memory"), ("checkpoint", "memory")}
+    assert set(validated.effective_plugins.stores) == {("vector", "memory"), ("checkpoint", "memory")}
 
 
 def test_unknown_store_backend_fails() -> None:
     registry = PluginRegistry([_store_plugin()])
     validator = ConfigValidator(registry)
-    config = _normalized_config(enabled_plugins=("store-plugin",), artifact_backend="sqlite")
+    config = _normalized_config(enabled_plugins=("store-plugin",), vector_backend="sqlite")
 
     with pytest.raises(PluginResolutionError) as excinfo:
         validator.validate(config)
 
     assert excinfo.value.code == "PLUGIN_UNKNOWN_STORE"
-    assert excinfo.value.metadata == {"store_type": "artifact", "backend": "sqlite"}
+    assert excinfo.value.metadata == {"store_type": "vector", "backend": "sqlite"}
 
 
 def test_empty_store_mapping_is_allowed() -> None:

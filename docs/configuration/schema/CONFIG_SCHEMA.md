@@ -245,6 +245,10 @@ Similar examples:
 stores:
   artifact:
     backend: memory
+    # explicit filesystem selection:
+    # backend: filesystem
+    # config:
+    #   root: /srv/langgraph-automation/artifacts
 observability:
   backend: none
 worker:
@@ -258,6 +262,39 @@ Boundary:
 - runtime assembly instantiates concrete implementations
 
 Arbitrary Python imports and arbitrary callable paths are forbidden.
+
+## Artifact store backend boundary
+
+The built-in artifact store is selected through `stores.artifact`.
+
+Canonical variants:
+
+```yaml
+stores:
+  artifact:
+    backend: memory
+```
+
+```yaml
+stores:
+  artifact:
+    backend: filesystem
+    config:
+      root: /srv/langgraph-automation/artifacts
+```
+
+Rules:
+
+- section absence normalizes to `memory`
+- section presence requires `backend`
+- accepted backends are exactly `memory` and `filesystem`
+- `memory` accepts no backend-specific options
+- `filesystem` requires an absolute `root`
+- root existence is not checked at config time
+- backend selection is startup-only
+- runtime selection does not fall back from filesystem to memory
+- filesystem root is sensitive configuration and must not be echoed in diagnostics
+- the canonical composition point is the runtime builder, not the config parser
 
 ## Workflow-specific config boundary
 

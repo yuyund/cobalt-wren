@@ -38,7 +38,7 @@ def _build_plugin(name: str, *, include_litellm: bool = False, include_openai: b
         providers.append(ProviderContribution(name="litellm", provider_type="llm"))
     if include_openai:
         providers.append(ProviderContribution(name="openai", provider_type="llm"))
-    stores = [StoreContribution(backend_name="memory", store_type="artifact")] if include_store else []
+    stores = [StoreContribution(backend_name="memory", store_type="vector")] if include_store else []
     event_sinks = []
     if include_stdout:
         event_sinks.append(EventSinkContribution(backend_name="stdout"))
@@ -61,7 +61,7 @@ def _build_normalized_config(*, enabled_plugins: tuple[str, ...]) -> NormalizedP
             "default": {"provider": "litellm", "model": "gpt-4.1-mini"},
         },
         tools={"allowlist": ("github.search_issues",)},
-        stores={"artifact": {"backend": "memory"}},
+        stores={"vector": {"backend": "memory"}},
         event_sinks={"stdout": {"backend": "stdout"}},
         safety={"redaction_enabled": True, "safe_errors": True},
     )
@@ -111,7 +111,7 @@ def test_effective_plugin_set_collects_enabled_plugin_contributions_only() -> No
         plugins=PluginsConfig(enabled=("github",)),
         providers={"default": ProviderProfileConfig(provider="litellm", model="gpt-4.1-mini")},
         tools=ToolsConfig(allowlist=("github.search_issues",)),
-        stores={"artifact": StoreBackendConfig(backend="memory")},
+        stores={"vector": StoreBackendConfig(backend="memory")},
         event_sinks={"stdout": EventSinkBackendConfig(backend="stdout")},
         limits=config.limits,
         observability=config.observability,
@@ -124,7 +124,7 @@ def test_effective_plugin_set_collects_enabled_plugin_contributions_only() -> No
     assert validated.effective_plugins.plugin_names == ("github",)
     assert set(validated.effective_plugins.tools) == {"github.search_issues"}
     assert set(validated.effective_plugins.providers) == {"litellm"}
-    assert set(validated.effective_plugins.stores) == {("artifact", "memory")}
+    assert set(validated.effective_plugins.stores) == {("vector", "memory")}
     assert set(validated.effective_plugins.event_sinks) == {"stdout"}
 
 

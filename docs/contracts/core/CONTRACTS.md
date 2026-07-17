@@ -59,6 +59,10 @@ These contracts describe the current internal foundation surface. If parts of th
 - `Run.input_payload` is a single execution input, not runtime config.
 - Normalized runtime config is package config plus validated `Workflow.definition_payload`.
 - `Run.input_payload` must not be used to read model, `api_key`, `base_url`, or `tools.allowed`.
+- artifact backend selection is represented by `stores.artifact`
+- missing `stores.artifact` normalizes to `MemoryArtifactStore`
+- explicit filesystem selection requires an absolute root and startup-only construction
+- runtime selection must not silently fall back from filesystem to memory
 
 ## Configuration Schema Contract
 
@@ -68,6 +72,7 @@ These contracts describe the current internal foundation surface. If parts of th
 - `Run.input_payload` is execution input, not config override.
 - `RuntimeAssembly` resolves names to concrete dependencies.
 - `GraphRuntimeConfig` contains only graph-local safe config.
+- artifact store config is typed and selected once during runtime assembly
 
 ## api.plugins Contract
 
@@ -192,6 +197,8 @@ These contracts describe the current internal foundation surface. If parts of th
 - metadata は normalized / redacted / defensive copy で扱う
 - raw secrets / raw provider payload を保存しない
 - DB metadata には body copy を入れない
+- `MemoryArtifactStore` remains the default artifact backend
+- `FilesystemArtifactStore` is explicit opt-in and is constructed from typed config exactly once per runtime assembly
 
 ## CheckpointStore Contract
 

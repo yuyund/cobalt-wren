@@ -74,7 +74,7 @@ def test_persistence_durability_audit_docs_exist_and_cover_core_terms() -> None:
         'p1',
         'p2',
         'production behavior was not changed',
-        'next block',
+        'recommended closure order',
         'durable checkpoint backend is deferred',
         'artifactstore protocol evolution is complete',
     ):

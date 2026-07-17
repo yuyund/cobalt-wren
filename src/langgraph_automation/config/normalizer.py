@@ -8,6 +8,7 @@ from typing import Any
 from langgraph_automation.api.errors import ConfigError
 
 from .loader import SUPPORTED_VERSION, load_package_config_from_mapping
+from .artifact_store import normalize_artifact_store_settings
 from .models import (
     EventSinkBackendConfig,
     LimitsConfig,
@@ -49,6 +50,7 @@ def normalize_package_config(raw: RawPackageConfig) -> NormalizedPackageConfig:
     tools = _normalize_tools(raw.tools)
     providers = _normalize_providers(raw.providers)
     stores = _normalize_store_backends(raw.stores)
+    normalize_artifact_store_settings(stores.get("artifact"))
     event_sinks = _normalize_event_sinks(raw.event_sinks)
     safety = _normalize_safety(raw.safety)
 

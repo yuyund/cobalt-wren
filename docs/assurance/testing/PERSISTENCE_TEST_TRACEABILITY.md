@@ -8,6 +8,7 @@ This traceability matrix links the durability contract to the current code and t
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | Store protocols remain minimal | API surface drift | `src/langgraph_automation/api/stores.py` | `tests/unit/api/test_public_api_imports.py` | L1 protocol test | `TEST_CONFIRMED` | none | low |
 | ArtifactStore protocol is body-aware | protocol sufficiency | `src/langgraph_automation/api/stores.py`, `src/langgraph_automation/integrations/artifact/base.py` | `tests/unit/architecture/test_artifact_store_protocol_sufficiency.py` | L1 protocol sufficiency audit | `APPROVED_FOR_IMPLEMENTATION` | durable backend implementation still deferred | medium |
+| Artifact backend runtime selection is typed and startup-only | config/runtime composition | `src/langgraph_automation/config/artifact_store.py`, `src/langgraph_automation/runtime/artifact_store.py`, `src/langgraph_automation/runtime/assembly.py` | `tests/unit/config/test_artifact_store_settings.py`, `tests/unit/runtime/test_runtime_assembler_stores.py` | L1 / L3 / L5 | `TEST_CONFIRMED` | filesystem selection remains explicit opt-in; durable default is not enabled | medium |
 | FilesystemArtifactStore list path is metadata-bounded | list-time metadata validation | `src/langgraph_automation/integrations/artifact/filesystem_store.py` | `tests/contract/persistence/test_filesystem_artifact_store_contract.py`, `tests/unit/docs/test_filesystem_artifact_store_docs.py` | L2 / L7 | `TEST_CONFIRMED` | full body digest verification intentionally excluded from listing | medium |
 | Reusable baseline persistence contract suite exists | baseline contract drift | `tests/contract/persistence/test_artifact_store_baseline_contract.py`, `tests/contract/persistence/test_checkpoint_store_baseline_contract.py` | new contract harness | L2 reusable backend contract suite | `TEST_CONFIRMED` | durable restart / integrity / concurrency profiles remain deferred | high |
 | Memory stores are EPHEMERAL | restart durability loss | `src/langgraph_automation/integrations/artifact/memory_store.py`, `src/langgraph_automation/integrations/checkpoint/memory_store.py` | `tests/unit/artifact/test_memory_store.py`, `tests/unit/integrations/test_checkpoint_summary.py`, `tests/unit/runtime/test_persistence_runtime_wiring.py` | L2 reusable backend contract suite | `TEST_CONFIRMED` | durable restart coverage absent | high |
@@ -67,6 +68,7 @@ Capability-based assertions:
 - current tests do not prove body-store orchestration through the execution path
 - current tests now prove the reusable baseline contract harness, backend registry guard, and deterministic fault harness
 - current tests now prove the ArtifactStore protocol is body-aware and ready for implementation
+- current tests now prove artifact backend runtime selection is typed, startup-only, and explicit
 - current tests now prove filesystem listing is metadata-bounded and body full verification remains a get-time responsibility
 
 ## Deferred Work
