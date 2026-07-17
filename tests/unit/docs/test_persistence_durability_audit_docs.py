@@ -9,14 +9,16 @@ def test_persistence_durability_audit_docs_exist_and_cover_core_terms() -> None:
     root = Path('docs')
     contract = root / 'assurance' / 'contracts' / 'PERSISTENCE_DURABILITY_CONTRACT.md'
     audit = root / 'architecture' / 'audit' / 'PERSISTENCE_FAILURE_MODE_AUDIT.md'
+    checkpoint_audit = root / 'architecture' / 'audit' / 'CHECKPOINT_STORE_PROTOCOL_SUFFICIENCY_AUDIT.md'
     traceability = root / 'assurance' / 'testing' / 'PERSISTENCE_TEST_TRACEABILITY.md'
     gaps = root / 'assurance' / 'gaps' / 'PERSISTENCE_DURABILITY_GAPS.md'
 
-    for path in (contract, audit, traceability, gaps):
+    for path in (contract, audit, checkpoint_audit, traceability, gaps):
         assert path.exists()
 
     contract_text = contract.read_text().lower()
     audit_text = audit.read_text().lower()
+    checkpoint_audit_text = checkpoint_audit.read_text().lower()
     traceability_text = traceability.read_text().lower()
     gaps_text = gaps.read_text().lower()
 
@@ -40,6 +42,7 @@ def test_persistence_durability_audit_docs_exist_and_cover_core_terms() -> None:
         'artifact semantics',
         'checkpoint semantics',
         'true resume',
+        '`checkpointstore` is currently a latest-state store keyed by `run_id`',
     ):
         assert token in contract_text
 
@@ -66,6 +69,7 @@ def test_persistence_durability_audit_docs_exist_and_cover_core_terms() -> None:
         'safety exposure regression',
         'body-aware',
         'approved_for_implementation',
+        'blocked_by_protocol',
     ):
         assert token in traceability_text
 
@@ -76,6 +80,17 @@ def test_persistence_durability_audit_docs_exist_and_cover_core_terms() -> None:
         'production behavior was not changed',
         'recommended closure order',
         'durable checkpoint backend is deferred',
+        'checkpoint protocol evolution is deferred',
         'artifactstore protocol evolution is complete',
     ):
         assert token in gaps_text
+
+    for token in (
+        'checkpoint store protocol sufficiency audit',
+        'versioned checkpoint identity',
+        'serializer identity/version',
+        'specific-version read',
+        'history listing',
+        'blocked_by_protocol',
+    ):
+        assert token in checkpoint_audit_text

@@ -24,8 +24,10 @@ def test_docs_navigation_entries_exist_and_point_to_subsections() -> None:
     architecture_audit_index = root / 'architecture' / 'audit' / 'index.md'
     architecture_persistence_audit = root / 'architecture' / 'audit' / 'PERSISTENCE_FAILURE_MODE_AUDIT.md'
     architecture_artifact_protocol_audit = root / 'architecture' / 'audit' / 'ARTIFACT_STORE_PROTOCOL_SUFFICIENCY_AUDIT.md'
+    architecture_checkpoint_protocol_audit = root / 'architecture' / 'audit' / 'CHECKPOINT_STORE_PROTOCOL_SUFFICIENCY_AUDIT.md'
     architecture_design_index = root / 'architecture' / 'design' / 'index.md'
     architecture_design_artifact = root / 'architecture' / 'design' / 'DURABLE_ARTIFACT_BACKEND_DESIGN.md'
+    architecture_design_checkpoint = root / 'architecture' / 'design' / 'DURABLE_CHECKPOINT_BACKEND_DESIGN.md'
     api_index = root / 'api' / 'index.md'
     api_surface_index = root / 'api' / 'surface' / 'index.md'
     api_errors_index = root / 'api' / 'errors' / 'index.md'
@@ -50,6 +52,7 @@ def test_docs_navigation_entries_exist_and_point_to_subsections() -> None:
     assurance_testing_index = root / 'assurance' / 'testing' / 'index.md'
     assurance_persistence_harness = root / 'assurance' / 'testing' / 'PERSISTENCE_CONTRACT_TEST_HARNESS.md'
     assurance_artifact_test_plan = root / 'assurance' / 'testing' / 'DURABLE_ARTIFACT_TEST_PLAN.md'
+    assurance_checkpoint_test_plan = root / 'assurance' / 'testing' / 'DURABLE_CHECKPOINT_TEST_PLAN.md'
 
     for path in (
         docs_index,
@@ -69,8 +72,10 @@ def test_docs_navigation_entries_exist_and_point_to_subsections() -> None:
         architecture_audit_index,
         architecture_persistence_audit,
         architecture_artifact_protocol_audit,
+        architecture_checkpoint_protocol_audit,
         architecture_design_index,
         architecture_design_artifact,
+        architecture_design_checkpoint,
         api_index,
         api_surface_index,
         api_errors_index,
@@ -95,6 +100,7 @@ def test_docs_navigation_entries_exist_and_point_to_subsections() -> None:
         assurance_testing_index,
         assurance_persistence_harness,
         assurance_artifact_test_plan,
+        assurance_checkpoint_test_plan,
     ):
         assert path.exists()
 
@@ -141,7 +147,9 @@ def test_docs_navigation_entries_exist_and_point_to_subsections() -> None:
     assert 'PERSISTENCE_FAILURE_MODE_AUDIT.md' in architecture_index_text
     assert 'design/index.md' in architecture_index_text
     assert 'ARTIFACT_STORE_PROTOCOL_SUFFICIENCY_AUDIT.md' in architecture_audit_index_text
+    assert 'CHECKPOINT_STORE_PROTOCOL_SUFFICIENCY_AUDIT.md' in architecture_audit_index_text
     assert 'DURABLE_ARTIFACT_BACKEND_DESIGN.md' in architecture_design_index_text
+    assert 'DURABLE_CHECKPOINT_BACKEND_DESIGN.md' in architecture_design_index_text
     assert 'surface/index.md' in api_index_text
     assert 'errors/index.md' in api_index_text
     assert 'model/index.md' in configuration_index_text
@@ -159,3 +167,4 @@ def test_docs_navigation_entries_exist_and_point_to_subsections() -> None:
     assert 'testing/index.md' in assurance_index_text
     assert 'PERSISTENCE_CONTRACT_TEST_HARNESS.md' in assurance_testing_text
     assert 'DURABLE_ARTIFACT_TEST_PLAN.md' in assurance_testing_text
+    assert 'DURABLE_CHECKPOINT_TEST_PLAN.md' in assurance_testing_text

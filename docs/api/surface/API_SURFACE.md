@@ -159,6 +159,8 @@ Guidance:
 - the filesystem root is trusted configuration and must not be echoed in runtime diagnostics
 - Storage keys and file paths must remain redaction-safe.
 - Absolute local file paths must not appear in UI or API output.
+- `CheckpointStore` remains a provisional latest-state store and is not sufficient for versioned durable execution state yet.
+- versioned checkpoint protocol evolution is blocked until the checkpoint sufficiency audit clears the protocol gap.
 
 ## Observability API surface
 

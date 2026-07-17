@@ -10,6 +10,7 @@ This document ranks the remaining persistence gaps after the current code-first 
 
 | Gap | Evidence | Why it matters | Risk |
 | --- | --- | --- | --- |
+| CheckpointStore protocol is latest-state only | `src/langgraph_automation/integrations/checkpoint/base.py`, `src/langgraph_automation/integrations/checkpoint/memory_store.py` | The current protocol cannot represent versioned checkpoint identity, lineage, serializer compatibility, or specific-version reads. | High |
 | No durable checkpoint backend | `src/langgraph_automation/integrations/checkpoint/memory_store.py`, `src/langgraph_automation/apps/automation/services/runtime.py` | Checkpoint bodies are not restart-safe or deployment-shared. | High |
 | No body/metadata orchestration path | `src/langgraph_automation/apps/automation/services/execution.py`, `src/langgraph_automation/apps/automation/services/runs.py`, `src/langgraph_automation/graphs/runner.py` | The execution path does not write or verify artifact/checkpoint bodies today. | High |
 | No reconciliation path for orphan body / dangling metadata | current code has metadata-only models and EPHEMERAL stores | Crash windows and repair semantics are undefined. | High |
@@ -32,14 +33,16 @@ This document ranks the remaining persistence gaps after the current code-first 
 
 ## Recommended Closure Order
 
-1. Durable checkpoint backend
-2. Orchestration integration with body-first / metadata-second writes
-3. Restart durability tests
-4. Reconciliation and cleanup policy
+1. CheckpointStore protocol evolution
+2. Durable checkpoint backend
+3. Orchestration integration with body-first / metadata-second writes
+4. Restart durability tests
+5. Reconciliation and cleanup policy
 
 ## Deferred Work
 
 - durable checkpoint backend is deferred
+- checkpoint protocol evolution is deferred
 - reconciliation worker is deferred
 - cleanup command is deferred
 - true resume is deferred

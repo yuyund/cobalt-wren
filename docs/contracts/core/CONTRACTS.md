@@ -202,10 +202,13 @@ These contracts describe the current internal foundation surface. If parts of th
 
 ## CheckpointStore Contract
 
-- checkpoint state は safe summary / metadata のみ
+- checkpoint state は current contract では `run_id` ごとの latest-state replacement である
+- `thread_id` と `checkpoint_namespace` は write-result metadata だが、versioned identity ではない
 - raw input / raw response / raw output を保存しない
 - true resume は別途 contract が固まるまで未実装
 - current memory store は EPHEMERAL で、restart durability と versioned lineage を保証しない
+- current protocol は versioned checkpoint identity, parent / lineage, serializer identity/version, specific-version read, history listing, and deterministic latest selection を表現できない
+- `CheckpointStore` audit result is `BLOCKED_BY_PROTOCOL`
 - DB metadata には checkpoint body copy を入れない
 
 ## P0-B Public Facade Contract

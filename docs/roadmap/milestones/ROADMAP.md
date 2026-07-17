@@ -252,6 +252,13 @@ Artifact Backend Runtime Selection and Configuration Block V4:
 - explicit filesystem opt-in: complete
 - no fallback semantics: complete
 
+Checkpoint Durability Contract and Protocol Sufficiency Audit Block W1:
+
+- blocked_by_protocol
+- checkpoint protocol sufficiency audit: complete
+- versioned execution state contract: blocked
+- next block: Checkpoint Store Protocol Evolution Block W2
+
 Later:
 
 - Minimal Application Workflow Example

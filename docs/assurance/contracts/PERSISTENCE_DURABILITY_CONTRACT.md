@@ -98,6 +98,22 @@ Evidence:
 - `tests/unit/artifact/test_memory_store.py`
 - `tests/unit/integrations/test_checkpoint_summary.py`
 
+### Checkpoint store protocol sufficiency
+
+- `CheckpointStore` is currently a latest-state store keyed by `run_id`
+- `thread_id` and `checkpoint_namespace` are carried as metadata, not durable version identity
+- the current protocol does not express immutable checkpoint versions, parent / lineage, serializer identity/version, specific-version reads, or history listing
+- `CheckpointStore` sufficiency audit result is `BLOCKED_BY_PROTOCOL`
+- durable checkpoint implementation remains deferred until the protocol evolves
+- checkpoint protocol evolution is deferred until the audit can be reopened
+
+Evidence:
+
+- `src/langgraph_automation/integrations/checkpoint/base.py`
+- `src/langgraph_automation/integrations/checkpoint/memory_store.py`
+- `tests/contract/persistence/test_checkpoint_store_baseline_contract.py`
+- `tests/unit/integrations/test_checkpoint_summary.py`
+
 ## Validation Harness
 
 The reusable baseline contract suite lives in `tests/contract/persistence/` and exercises the public/provisional store methods as black-box behavior.
