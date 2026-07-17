@@ -144,7 +144,8 @@ Advanced durable semantics remain deferred until durable backends exist.
 - no execution path currently writes artifact or checkpoint bodies through these store protocols
 - Django observability emits metadata rows through `DjangoEventSink`
 - `FilesystemArtifactStore` publishes content-addressed bodies and deterministic manifests on the local filesystem
-- `FilesystemArtifactStore` verifies manifest and body integrity on read
+- `FilesystemArtifactStore` verifies manifest integrity and body metadata during listing
+- `FilesystemArtifactStore` verifies full body integrity on read
 - `FilesystemArtifactStore` provides process-durable reads on the same host/root
 
 Evidence:

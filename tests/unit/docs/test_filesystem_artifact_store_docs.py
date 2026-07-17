@@ -36,6 +36,9 @@ def test_filesystem_artifact_store_contract_docs_exist_and_cover_core_terms() ->
         'deterministic json',
         'artifactintegrityerror',
         'artifactconflicterror',
+        '`list_for_run()` scans manifests, verifies manifest integrity, checks body existence, symlink/non-regular status, and manifest/body size equality',
+        '`list_for_run()` does not read full body bytes or digest-verify artifact content',
+        '`get()` performs full body integrity verification',
         'runtime backend selection is deferred',
         'body/metadata orchestration is deferred',
     ):

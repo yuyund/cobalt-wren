@@ -36,7 +36,8 @@ It is process-durable, immutable, idempotent, conflict-aware, and integrity-veri
 ## Read Contract
 
 - `get()` performs full body integrity verification
-- `list_for_run()` scans manifests, verifies manifest integrity, and returns descriptors only
+- `list_for_run()` scans manifests, verifies manifest integrity, checks body existence, symlink/non-regular status, and manifest/body size equality, then returns descriptors only
+- `list_for_run()` does not read full body bytes or digest-verify artifact content
 - missing manifest returns `None`
 - dangling manifest or body corruption raises `ArtifactIntegrityError`
 

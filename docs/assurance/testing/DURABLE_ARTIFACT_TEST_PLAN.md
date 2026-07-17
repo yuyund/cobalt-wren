@@ -29,6 +29,7 @@ The filesystem backend is implemented and must be verified against the contract 
 - body round-trip: write bytes, read descriptor + body back
 - corruption test: manifest/body mismatch must fail safely
 - missing body test: manifest exists but body is absent
+- list test: listing validates manifest and body metadata without full body reads
 - same-key/same-content test: idempotent success
 - same-key/different-content test: deterministic conflict
 - same-key/different-run test: deterministic conflict
@@ -59,6 +60,8 @@ The filesystem backend is implemented and must be verified against the contract 
 - baseline suite passes for memory and filesystem
 - advanced durable contract suite passes for filesystem
 - restart and concurrency tests pass
+- list_for_run() stays on bounded metadata validation
+- get() remains the full body integrity path
 - safe diagnostics pass
 - protocol sufficiency is approved for implementation
 - default backend remains memory

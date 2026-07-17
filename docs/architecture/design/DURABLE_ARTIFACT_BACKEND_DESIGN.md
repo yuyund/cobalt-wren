@@ -134,8 +134,9 @@ They must not be returned as empty objects.
 
 This is intentionally simple:
 
-- initial complexity: `O(number of records)`
+- initial complexity: `O(number of records + manifest bytes + filesystem stat operations)`
 - suitable for the first process-durable reference backend
+- body content is not read or digest-verified during listing
 - future optimization: per-run index, database index, or object-store listing
 
 ## Immutability, Idempotency, Conflict
@@ -155,7 +156,8 @@ Target contract:
 - verify manifest structure
 - verify logical key binding
 - verify size
-- verify digest
+- verify body existence and regular-file metadata during listing
+- verify digest during `get()`
 - verify schema version compatibility
 
 Failure modes:

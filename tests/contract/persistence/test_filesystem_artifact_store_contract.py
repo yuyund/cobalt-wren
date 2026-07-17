@@ -362,6 +362,31 @@ def test_filesystem_artifact_store_list_detects_wrong_filename_mapping(tmp_path:
         store.list_for_run(request.run_id)
 
 
+def test_filesystem_artifact_store_list_does_not_full_read_body(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    root = tmp_path / 'artifact-store'
+    store = FilesystemArtifactStore(root)
+    request = _request(storage_key='run-1/list-summary.md', body=b'list-body', metadata={'phase': 'run'})
+    store.put(request)
+
+    manifest_path = _manifest_path(root, request.storage_key)
+    body_path = _body_path(root, request.body)
+    body_path.write_bytes(b'X' * len(request.body))
+
+    original_full_read = FilesystemArtifactStore._read_body_for_digest
+
+    def fail_if_called(*args: object, **kwargs: object) -> bytes:
+        raise AssertionError('list_for_run() must not full-read artifact bodies')
+
+    monkeypatch.setattr(FilesystemArtifactStore, '_read_body_for_digest', fail_if_called)
+    listed = store.list_for_run(request.run_id)
+    assert [artifact.storage_key for artifact in listed] == [request.storage_key]
+    assert manifest_path.exists()
+
+    monkeypatch.setattr(FilesystemArtifactStore, '_read_body_for_digest', original_full_read)
+    with pytest.raises(ArtifactIntegrityError):
+        store.get(request.storage_key)
+
+
 def test_filesystem_artifact_store_safe_errors_hide_sensitive_paths(tmp_path: Path) -> None:
     root = tmp_path / 'SUPER_SECRET_ROOT_SENTINEL'
     store = FilesystemArtifactStore(root)

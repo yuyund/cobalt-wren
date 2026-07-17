@@ -50,6 +50,8 @@ def test_durable_artifact_backend_design_docs_exist_and_cover_core_terms() -> No
         'protocol dependency',
         'default backend remains memory-backed',
         'this backend design is now implemented',
+        'initial complexity: `o(number of records + manifest bytes + filesystem stat operations)`',
+        'body content is not read or digest-verified during listing',
     ):
         assert token in design_text
 

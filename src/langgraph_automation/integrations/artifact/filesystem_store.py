@@ -273,7 +273,7 @@ class FilesystemArtifactStore(ArtifactStore):
             if artifact.run_id != normalized_run_id:
                 continue
             body_path = self._body_path_for_digest(artifact.digest)
-            self._verify_body_exists_and_size(body_path, artifact.size, artifact.digest, storage_key=artifact.storage_key)
+            self._validate_body_entry_metadata(body_path, artifact.size, storage_key=artifact.storage_key)
             artifacts.append(_clone_artifact(artifact))
 
         return sorted(artifacts, key=lambda item: item.storage_key)
@@ -511,26 +511,59 @@ class FilesystemArtifactStore(ArtifactStore):
         self._verify_body_bytes(body, digest, storage_key=storage_key)
         return body
 
-    def _verify_body_exists_and_size(self, body_path: Path, expected_size: int, digest: str, *, storage_key: str) -> None:
-        body = self._read_regular_file_bytes(
-            body_path,
-            purpose='body',
-            storage_key=storage_key,
-            max_bytes=expected_size + 1 if expected_size >= 0 else None,
-        )
-        if body is None:
+    def _validate_body_entry_metadata(self, body_path: Path, expected_size: int, *, storage_key: str) -> None:
+        if body_path.is_symlink():
+            raise self._integrity_error(
+                'Filesystem artifact store detected a body symlink.',
+                storage_key=storage_key,
+                code='ARTIFACT_STORE_SYMLINK',
+            )
+        flags = os.O_RDONLY
+        if hasattr(os, 'O_CLOEXEC'):
+            flags |= os.O_CLOEXEC
+        if hasattr(os, 'O_NOFOLLOW'):
+            flags |= os.O_NOFOLLOW
+        try:
+            fd = os.open(body_path, flags)
+        except FileNotFoundError:
             raise self._integrity_error(
                 'Filesystem artifact store detected a missing body.',
                 storage_key=storage_key,
                 code='ARTIFACT_STORE_MISSING_BODY',
-            )
-        if len(body) != expected_size:
-            raise self._integrity_error(
-                'Filesystem artifact store detected a body size mismatch.',
-                storage_key=storage_key,
-                code='ARTIFACT_STORE_SIZE_MISMATCH',
-            )
-        self._verify_body_bytes(body, digest, storage_key=storage_key)
+            ) from None
+        except OSError:
+            raise ArtifactPersistenceError(
+                'Filesystem artifact read failed.',
+                code='ARTIFACT_STORE_READ_FAILED',
+                component=_ARTIFACT_COMPONENT,
+            ) from None
+
+        try:
+            try:
+                st = os.fstat(fd)
+            except OSError:
+                raise ArtifactPersistenceError(
+                    'Filesystem artifact read failed.',
+                    code='ARTIFACT_STORE_READ_FAILED',
+                    component=_ARTIFACT_COMPONENT,
+                ) from None
+            if not stat.S_ISREG(st.st_mode):
+                raise self._integrity_error(
+                    'Filesystem artifact store detected a non-regular body.',
+                    storage_key=storage_key,
+                    code='ARTIFACT_STORE_NONREGULAR_BODY',
+                )
+            if st.st_size != expected_size:
+                raise self._integrity_error(
+                    'Filesystem artifact store detected a body size mismatch.',
+                    storage_key=storage_key,
+                    code='ARTIFACT_STORE_SIZE_MISMATCH',
+                )
+        finally:
+            try:
+                os.close(fd)
+            except OSError:
+                pass
 
     def _verify_body_bytes(self, body: bytes, digest: str, *, storage_key: str) -> None:
         if _sha256_digest(body) != digest:
