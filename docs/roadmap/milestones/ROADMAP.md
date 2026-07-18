@@ -327,6 +327,13 @@ Persistence Orchestration Sufficiency Audit X1:
 - control-plane projection audit: complete
 - next blocks sequenced: complete
 
+Persistence Runtime Propagation Closure X1C:
+
+- complete
+- selected artifact/checkpoint stores now propagate into `GraphRuntime`: complete
+- direct concrete store construction in application runtime: removed
+- next block: Artifact Emission and Identity Contract X2
+
 Package Complete+ future work:
 
 - `run_workflow`

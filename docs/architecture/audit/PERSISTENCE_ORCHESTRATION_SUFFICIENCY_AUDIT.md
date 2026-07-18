@@ -14,7 +14,7 @@ The durable backend layer is complete, but execution persistence orchestration i
 
 Final decision:
 
-- artifact orchestration: `BLOCKED_BY_EXECUTION_LIFECYCLE`
+- artifact orchestration: `NEEDS_PUBLIC_OR_PLUGIN_CONTRACT`, `BLOCKED_BY_ARTIFACT_IDENTITY`, and `NEEDS_INTERNAL_ORCHESTRATION_CONTRACT`
 - checkpoint adapter: `BLOCKED_BY_PENDING_WRITES` and `BLOCKED_BY_RUN_THREAD_MAPPING`
 - control-plane projection: `BLOCKED_BY_CONTROL_PLANE_SCHEMA`
 - true resume: not approved
@@ -166,14 +166,16 @@ For the execution plane, the actual owner is `GraphRuntime`:
   -> `src/langgraph_automation/apps/automation/services/execution.py:dispatch_run_execution`
   -> `src/langgraph_automation/graphs/runner.py:LangGraphRunner`
 
+The application runtime now selects artifact and checkpoint stores from the workflow payload and delegates construction to the canonical runtime builders before handing the exact instances to `GraphRuntime`.
+
 Classification:
 
 - `RuntimeDependencies.artifact_store`: `REACHES_APPLICATION_ONLY`
 - `RuntimeDependencies.checkpoint_store`: `REACHES_APPLICATION_ONLY`
-- `GraphRuntime.artifact_store`: `REACHES_EXECUTION_OWNER`
-- `GraphRuntime.checkpoint_store`: `REACHES_EXECUTION_OWNER`
+- `GraphRuntime.artifact_store`: `REACHES_EXECUTION_OWNER_UNUSED`
+- `GraphRuntime.checkpoint_store`: `REACHES_EXECUTION_OWNER_UNUSED`
 
-The current execution owner receives the stores, but no production code uses them to persist artifacts or checkpoints yet.
+The current execution owner receives the selected stores, but no production code uses them to persist artifacts or checkpoints yet.
 
 ## Run Lifecycle Matrix
 
@@ -314,7 +316,7 @@ Relevant installed types:
 | specific lookup | `load_checkpoint()` | `SUPPORTED_DIRECTLY` at storage layer | adapter still missing |
 | listing | `list_for_run()` | `SUPPORTED_DIRECTLY` at storage layer | `before` / `limit` / filter bridging missing |
 | `put` | `save()` | `SUPPORTED_BY_ADAPTER` | adapter must translate `RunnableConfig` to request |
-| `put_writes` | none | `REQUIRES_SEPARATE_STORE_OR_CONTRACT` | pending writes are not modeled in current `CheckpointStore` |
+| `put_writes` | none | `BLOCKED_BY_PENDING_WRITES_CONTRACT` | pending writes are not modeled in current `CheckpointStore` |
 | async API | sync store | `SUPPORTED_BY_ADAPTER` | thread wrapper or native async needed for async execution |
 | delete thread | no delete | `OUT_OF_SCOPE` | deletion was intentionally removed from the checkpoint store contract |
 | version generation | store revision | `SUPPORTED_DIRECTLY` at storage layer | adapter must not reinterpret revision as LangGraph version identity |
@@ -323,7 +325,7 @@ Relevant installed types:
 
 - current checkpoint storage protocol is ready for a future adapter
 - current code is not ready for a full LangGraph checkpoint adapter
-- pending writes remain the main blocker for true resume
+- pending writes remain an open blocker for true resume
 
 ## run_id / thread_id Analysis
 
@@ -385,13 +387,14 @@ Reason:
 
 Decision:
 
-- `REQUIRES_SEPARATE_STORE_OR_CONTRACT`
+- `BLOCKED_BY_PENDING_WRITES_CONTRACT`
 
 Reason:
 
 - the installed LangGraph API exposes `put_writes` and `pending_writes`
 - the current `CheckpointStore` protocol intentionally excludes pending writes
 - true resume cannot be approved without a pending-write strategy
+- the separate-store-vs-protocol choice remains open and is deferred to `X3`
 
 ## Serialization Ownership
 
@@ -568,24 +571,24 @@ Execution persistence should remain behind a package-internal orchestrator and a
 | Gap | Affected component | Evidence | Consequence | Minimum next change | Public API impact | Migration impact | Ordering dependency | Classification |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | no execution persistence calls | `runs.py`, `execution.py`, `runtime.py`, `graphs/runner.py` | code-first call graph | artifacts/checkpoints are not persisted from execution | add an explicit orchestration contract | none yet | none yet | before any save wiring | `NEEDS_INTERNAL_ORCHESTRATION_CONTRACT` |
-| artifact emission owner undefined | workflow / application layer | no explicit emission site exists | no stable artifact identity owner | define emission owner and logical slot policy | possible later facade addition | none yet | before artifact save wiring | `BLOCKED_BY_EXECUTION_LIFECYCLE` |
+| artifact emission owner undefined | workflow / application layer | no explicit emission site exists | no stable artifact identity owner | define emission owner and logical slot policy | possible later facade addition | none yet | before artifact save wiring | `NEEDS_PUBLIC_OR_PLUGIN_CONTRACT` |
 | checkpoint adapter missing | package / LangGraph boundary | storage contract differs from LangGraph `BaseCheckpointSaver` | no adapter to runtime config shape | define adapter contract and mapping | possible adapter facade later | none yet | before resume | `BLOCKED_BY_PENDING_WRITES` |
 | thread mapping not isolated | run model / checkpoint adapter | `Run.thread_id` is separate from `Run.pk` | no explicit lifecycle mapping owner | define mapping owner and stable policy | none yet | none yet | before adapter | `BLOCKED_BY_RUN_THREAD_MAPPING` |
 | checkpoint namespace policy missing | adapter / subgraph integration | no subgraph policy exists | namespace semantics can drift | define namespace reconstruction policy | none yet | none yet | before adapter | `REQUIRES_NAMESPACE_POLICY` |
 | control-plane projection incomplete | Django models / sink | rows are metadata-only | no durable safe reference table for the new persistence boundary | extend projection schema or add a new model | migration later | yes later | after orchestration contract | `BLOCKED_BY_CONTROL_PLANE_SCHEMA` |
-| pending writes absent | LangGraph adapter | installed API exposes `put_writes` and `pending_writes` | true resume is not expressible | separate pending-write contract or protocol evolution | later adapter surface | maybe later | before true resume | `BLOCKED_BY_PENDING_WRITES` |
-| async adapter not defined | adapter / execution mode | installed API includes async methods | async graph execution bridge is unclear | define sync-only initial scope or thread wrapper | no public API yet | none yet | before async adapter | `BLOCKED_BY_ASYNC_EXECUTION` |
+| pending writes absent | LangGraph adapter | installed API exposes `put_writes` and `pending_writes` | true resume is not expressible | separate pending-write contract or protocol evolution | later adapter surface | maybe later | before true resume | `BLOCKED_BY_PENDING_WRITES_CONTRACT` |
+| async adapter not defined | adapter / execution mode | installed API includes async methods | async graph execution bridge is unclear | define sync-only initial scope or thread wrapper | no public API yet | none yet | before async adapter | `OUT_OF_INITIAL_SCOPE` |
 
 ## Recommended Implementation Sequence
 
-1. `X2` Artifact Emission and Persistence Orchestration Contract
+1. `X2` Artifact Emission and Identity Contract
    - objective: define who emits artifacts and what the stable artifact identity is
    - prerequisites: none
    - production changes: none
    - non-goals: execution wiring and DB schema changes
 
-2. `X3` LangGraph Checkpointer Sufficiency Audit or adapter protocol evolution
-   - objective: define the adapter contract between LangGraph and `CheckpointStore`
+2. `X3` Pending Write and Checkpoint Identity Protocol Design
+   - objective: define the adapter contract between LangGraph and `CheckpointStore`, including pending-write handling and run/thread mapping policy
    - prerequisites: current checkpoint storage contract
    - production changes: none
    - non-goals: true resume implementation
@@ -602,21 +605,15 @@ Execution persistence should remain behind a package-internal orchestrator and a
    - production changes: control-plane projection only
    - non-goals: raw body persistence in Django
 
-5. `X6` LangGraph Checkpointer Adapter Implementation
-   - objective: bridge LangGraph checkpoint semantics to `CheckpointStore`
+5. `X6` Sync LangGraph Checkpointer Adapter
+   - objective: bridge LangGraph checkpoint semantics to `CheckpointStore` for the initial sync scope
    - prerequisites: adapter contract and pending-write decision
    - production changes: adapter only
    - non-goals: true resume unless pending-write semantics exist
 
-6. `X7` Checkpoint Control-Plane Projection
-   - objective: persist safe checkpoint references for UI / audit indexing
-   - prerequisites: adapter contract and schema extension
-   - production changes: control-plane projection only
-   - non-goals: raw checkpoint body exposure
-
-7. `X8` Cross-System Reconciliation and Failure Hardening
-   - objective: reconcile durable store objects with control-plane references
-   - prerequisites: orchestration and projection contracts
+6. `X7` Reconciliation and Resume Hardening
+   - objective: reconcile durable store objects with control-plane references and harden resume semantics
+   - prerequisites: orchestration, adapter, and projection contracts
    - production changes: recovery / reconciliation only
    - non-goals: new persistence protocols
 
@@ -624,13 +621,13 @@ Execution persistence should remain behind a package-internal orchestrator and a
 
 Artifact:
 
-- orchestration readiness: `BLOCKED_BY_EXECUTION_LIFECYCLE`
+- orchestration readiness: `NEEDS_PUBLIC_OR_PLUGIN_CONTRACT` and `BLOCKED_BY_ARTIFACT_IDENTITY`
 
 Checkpoint:
 
 - adapter readiness: `BLOCKED_BY_PENDING_WRITES`
 - mapping readiness: `BLOCKED_BY_RUN_THREAD_MAPPING`
-- async readiness: `BLOCKED_BY_ASYNC_EXECUTION`
+- async readiness: `OUT_OF_INITIAL_SCOPE`
 
 Control plane:
 

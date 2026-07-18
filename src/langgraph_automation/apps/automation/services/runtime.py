@@ -8,6 +8,7 @@ it does not execute graphs or mutate Run lifecycle state.
 from __future__ import annotations
 
 import logging
+from collections.abc import Mapping
 
 from langgraph_automation.apps.automation.models.run import Run
 from langgraph_automation.apps.automation.services.errors import WorkflowConfigurationError
@@ -18,7 +19,9 @@ from langgraph_automation.apps.automation.services.workflow_config import (
     validate_workflow_runtime_config,
 )
 from langgraph_automation.config import settings as app_settings
-from langgraph_automation.config.models import MemoryCheckpointStoreSettings
+from langgraph_automation.config.artifact_store import normalize_artifact_store_settings
+from langgraph_automation.config.checkpoint_store import normalize_checkpoint_store_settings
+from langgraph_automation.config.models import StoreBackendConfig
 from langgraph_automation.graphs.config import (
     GraphRuntimeConfig,
     GraphRuntimeGraphConfig,
@@ -28,7 +31,6 @@ from langgraph_automation.graphs.config import (
 from langgraph_automation.graphs.registry import GraphRegistry, default_graph_kind
 from langgraph_automation.graphs.runtime import GraphRuntime
 from langgraph_automation.integrations.artifact.base import ArtifactStore
-from langgraph_automation.integrations.artifact.memory_store import MemoryArtifactStore
 from langgraph_automation.integrations.llm import LiteLLMClient, ObservedLLMClient
 from langgraph_automation.integrations.llm.base import LLMClient
 from langgraph_automation.integrations.observability.base import EventSink
@@ -46,6 +48,7 @@ from langgraph_automation.integrations.tools import (
 )
 from langgraph_automation.workflows.catalog import build_builtin_graph_registry
 
+from langgraph_automation.runtime.artifact_store import build_artifact_store as build_package_artifact_store
 from langgraph_automation.runtime.checkpoint_store import build_checkpoint_store as build_package_checkpoint_store
 
 
@@ -68,6 +71,37 @@ def _format_configuration_issues(issues: tuple[WorkflowConfigIssue, ...]) -> str
 
 def _runtime_config(run: Run) -> WorkflowRuntimeConfig:
     return parse_workflow_runtime_config(run.workflow.definition_payload, default_graph_kind=default_graph_kind())
+
+
+def _store_backend_config(definition_payload: Mapping[str, object] | None, store_name: str) -> StoreBackendConfig | None:
+    if not isinstance(definition_payload, Mapping):
+        return None
+    stores = definition_payload.get("stores")
+    if stores is None:
+        return None
+    if not isinstance(stores, Mapping):
+        raise WorkflowConfigurationError("Workflow store configuration must be a mapping.")
+    raw_store_config = stores.get(store_name)
+    if raw_store_config is None:
+        return None
+    if not isinstance(raw_store_config, Mapping):
+        raise WorkflowConfigurationError(f"Workflow {store_name} store configuration must be a mapping.")
+
+    backend = raw_store_config.get("backend")
+    if not isinstance(backend, str) or not backend.strip():
+        raise WorkflowConfigurationError(f"Workflow {store_name} store backend is invalid.")
+    config = raw_store_config.get("config", {})
+    if config is None:
+        config = {}
+    if not isinstance(config, Mapping):
+        raise WorkflowConfigurationError(f"Workflow {store_name} store config must be a mapping.")
+    metadata = raw_store_config.get("metadata", {})
+    if metadata is None:
+        metadata = {}
+    if not isinstance(metadata, Mapping):
+        raise WorkflowConfigurationError(f"Workflow {store_name} store metadata must be a mapping.")
+
+    return StoreBackendConfig(backend=backend, config=config, metadata=metadata)
 
 
 def _to_graph_runtime_config(workflow_config: WorkflowRuntimeConfig) -> GraphRuntimeConfig:
@@ -154,19 +188,27 @@ def build_tool_registry(
 def build_artifact_store(run: Run, event_sink: EventSink | None = None) -> ArtifactStore:
     """Build the artifact store dependency.
 
-    The current artifact store is in-memory only. It does not persist artifact
-    bodies and does not use ARTIFACT_ROOT yet.
+    The store is selected from the workflow payload and then constructed through
+    the canonical runtime builder so the chosen instance reaches the execution
+    owner unchanged.
     """
 
-    del run, event_sink
-    return MemoryArtifactStore()
+    del event_sink
+    settings = normalize_artifact_store_settings(_store_backend_config(run.workflow.definition_payload, "artifact"))
+    return build_package_artifact_store(settings)
 
 
 def build_checkpoint_store(run: Run, event_sink: EventSink | None = None) -> object:
-    """Build the default checkpoint store for execution-plane wiring."""
+    """Build the checkpoint store dependency for a run.
 
-    del run, event_sink
-    return build_package_checkpoint_store(MemoryCheckpointStoreSettings())
+    The store is selected from the workflow payload and then constructed through
+    the canonical runtime builder so the chosen instance reaches the execution
+    owner unchanged.
+    """
+
+    del event_sink
+    settings = normalize_checkpoint_store_settings(_store_backend_config(run.workflow.definition_payload, "checkpoint"))
+    return build_package_checkpoint_store(settings)
 
 
 def build_graph_runtime(run: Run) -> GraphRuntime:
