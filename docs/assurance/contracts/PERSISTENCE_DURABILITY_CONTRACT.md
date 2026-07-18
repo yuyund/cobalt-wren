@@ -92,10 +92,22 @@ Forbidden:
 - filesystem initialization errors fail startup instead of falling back to memory
 - one filesystem root is one artifact identity domain
 
+### Checkpoint backend runtime selection
+
+- `stores.checkpoint` is the runtime selection boundary for built-in checkpoint backends
+- section absence normalizes to `MemoryCheckpointStoreSettings`
+- explicit filesystem selection requires an absolute trusted root
+- runtime selection is startup-only
+- filesystem initialization errors fail startup instead of falling back to memory
+- one filesystem root is one checkpoint identity domain
+- `build_checkpoint_store()` is the canonical construction point for checkpoint backends
+
 Evidence:
 
 - `src/langgraph_automation/integrations/artifact/memory_store.py`
 - `src/langgraph_automation/integrations/checkpoint/memory_store.py`
+- `src/langgraph_automation/config/checkpoint_store.py`
+- `src/langgraph_automation/runtime/checkpoint_store.py`
 - `tests/unit/artifact/test_memory_store.py`
 - `tests/unit/integrations/test_checkpoint_summary.py`
 
@@ -121,8 +133,11 @@ Evidence:
 - `CheckpointStore` sufficiency audit result is `APPROVED_FOR_IMPLEMENTATION`
 - durable checkpoint implementation is now closed for the first durable backend
 - `FilesystemCheckpointStore` is implemented in `langgraph_automation.integrations.checkpoint`
-- filesystemcheckpointstore is implemented in `langgraph_automation.integrations.checkpoint`
-- checkpoint runtime selection remains deferred to W4
+- `FilesystemCheckpointStore` is implemented in `langgraph_automation.integrations.checkpoint` and is not re-exported from `api.stores`
+- FilesystemCheckpointStore is implemented in `langgraph_automation.integrations.checkpoint`.
+- `checkpoint runtime selection is implemented through typed config and the canonical builder`
+- checkpoint runtime selection is implemented through typed config and the canonical builder
+- `FilesystemCheckpointStore` is implemented in `langgraph_automation.integrations.checkpoint` and is not re-exported from `api.stores`
 - true resume remains deferred until the adapter layer is designed
 
 Evidence:
@@ -367,7 +382,7 @@ Evidence:
 
 ## Deferred Work
 
-- checkpoint runtime selection remains deferred to W4
+- checkpoint runtime selection is implemented through typed config and the canonical builder
 - artifact runtime selection remains the current state for artifact backends
 - api.runtime is deferred
 - run_workflow is deferred

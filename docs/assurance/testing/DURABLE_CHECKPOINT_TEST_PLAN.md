@@ -54,8 +54,10 @@ Status: implemented and approved for implementation.
 - filesystem backend is implemented
 - baseline suite passes for memory and filesystem
 - advanced durable contract suite passes for filesystem
+- default checkpoint backend remains memory
 - default backend remains memory
-- filesystem runtime selection remains deferred to W4
+- filesystem runtime selection is explicit opt-in and typed
+- runtime selection is covered by config / runtime assembly tests
 
 ## Failure-Mode Focus
 
@@ -79,7 +81,7 @@ Status: implemented and approved for implementation.
 - filesystem backend is implemented and process durable
 - durable checkpoint backend implementation is now complete
 - checkpoint protocol evolution is complete
-- runtime selection remains deferred to W4
+- checkpoint runtime selection is complete
 - true resume remains separate from storage durability
 - metadata orchestration remains deferred
 

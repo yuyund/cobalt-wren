@@ -41,7 +41,7 @@ def test_checkpoint_store_contract_docs_exist_and_cover_core_terms() -> None:
         'mapping key order is not semantically significant',
         'list order is semantically significant',
         'returned metadata is defensively isolated',
-        'checkpoint runtime selection remains deferred to w4',
+        'checkpoint runtime selection is implemented through typed config and the canonical runtime builder',
     ):
         assert token in contract_text
 

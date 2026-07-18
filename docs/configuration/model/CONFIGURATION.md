@@ -273,6 +273,38 @@ Runtime rules:
 - Plugin-specific config validation is defined by the plugin type in `../../plugins/PLUGINS.md`.
 - `plugins.enabled` selects from manually registered plugins and is not an import path, install instruction, or discovery mechanism.
 
+### 7. Checkpoint store runtime selection
+
+Purpose:
+
+- choose the built-in checkpoint backend through typed config and a single runtime composition point
+
+Raw config path:
+
+- `stores.checkpoint`
+
+Permitted:
+
+- omit the section entirely, which normalizes to `MemoryCheckpointStoreSettings`
+- set `backend: memory`
+- set `backend: filesystem` with an absolute `root`
+
+Forbidden:
+
+- unknown backend names
+- mixed memory/filesystem fields
+- filesystem root exposure in repr / diagnostics
+- silent fallback from filesystem to memory
+
+Runtime rules:
+
+- checkpoint backend selection is startup-only
+- runtime assembly builds the checkpoint store exactly once
+- default remains `MemoryCheckpointStore`
+- explicit filesystem selection is opt-in
+- `FilesystemCheckpointStore` root is constructor-injected and not read from Django settings or environment directly
+- one filesystem root is one checkpoint identity domain
+
 Example:
 
 ```yaml

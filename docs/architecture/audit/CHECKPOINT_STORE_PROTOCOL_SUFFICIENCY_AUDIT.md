@@ -4,7 +4,7 @@ This audit determines whether the current `CheckpointStore` protocol can express
 
 The checkpoint store contract is now versioned, linear, serializer-aware, idempotent, and conflict-aware.
 It is a request / descriptor / read-result separation rather than a destructive latest snapshot contract.
-The filesystem checkpoint backend is now implemented, but checkpoint runtime selection remains deferred to W4.
+The filesystem checkpoint backend is now implemented, and checkpoint runtime selection is typed and startup-only.
 
 Code is the source of truth.
 Tests are the source of truth.
@@ -150,7 +150,7 @@ Option D, an internal repository plus LangGraph adapter, remains a good later in
 
 ## Deferred Work
 
-- checkpoint runtime selection remains deferred to W4
+- checkpoint runtime selection is typed and canonical
 - true resume is deferred
 - pending writes / interrupts / task replay are deferred
 - body / metadata orchestration is deferred

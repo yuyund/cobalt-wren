@@ -9,6 +9,7 @@ from langgraph_automation.api.errors import ConfigError
 
 from .loader import SUPPORTED_VERSION, load_package_config_from_mapping
 from .artifact_store import normalize_artifact_store_settings
+from .checkpoint_store import normalize_checkpoint_store_settings
 from .models import (
     EventSinkBackendConfig,
     LimitsConfig,
@@ -53,6 +54,7 @@ def normalize_package_config(raw: RawPackageConfig) -> NormalizedPackageConfig:
     normalize_artifact_store_settings(stores.get("artifact"))
     event_sinks = _normalize_event_sinks(raw.event_sinks)
     safety = _normalize_safety(raw.safety)
+    checkpoint_store = normalize_checkpoint_store_settings(stores.get("checkpoint"))
 
     return NormalizedPackageConfig(
         version=raw.version,
@@ -66,6 +68,7 @@ def normalize_package_config(raw: RawPackageConfig) -> NormalizedPackageConfig:
         observability=dict(raw.observability),
         safety=safety,
         metadata=dict(raw.metadata),
+        checkpoint_store=checkpoint_store,
     )
 
 

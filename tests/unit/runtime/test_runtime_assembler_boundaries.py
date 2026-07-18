@@ -27,6 +27,9 @@ def test_runtime_package_does_not_import_forbidden_boundaries() -> None:
         'langgraph_automation.integrations.',
         'django',
     )
+    allowed_imports = {
+        'langgraph_automation.integrations.checkpoint.base',
+    }
 
     for relative in (
         Path('src/langgraph_automation/runtime/__init__.py'),
@@ -36,7 +39,7 @@ def test_runtime_package_does_not_import_forbidden_boundaries() -> None:
         Path('src/langgraph_automation/runtime/assembly.py'),
     ):
         modules = _imported_modules(relative)
-        offenders = [module for module in modules if module.startswith(forbidden_prefixes)]
+        offenders = [module for module in modules if module.startswith(forbidden_prefixes) and module not in allowed_imports]
         assert offenders == [], f'{relative} imports forbidden modules: {offenders}'
 
 

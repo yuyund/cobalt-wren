@@ -162,7 +162,6 @@ def test_missing_tool_requirement_is_safe(monkeypatch: pytest.MonkeyPatch) -> No
 @pytest.mark.parametrize(
     ("workflow_kind", "requirements", "missing_type", "missing_name"),
     [
-        ("integration.needs_checkpoint_store", WorkflowRequirements(checkpoint_store=True), "checkpoint_store", "checkpoint"),
         ("integration.needs_event_sink", WorkflowRequirements(event_sinks=("stdout",)), "event_sink", "stdout"),
     ],
 )

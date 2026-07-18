@@ -9,9 +9,11 @@ from typing import Any, Literal
 
 __all__ = [
     "ArtifactStoreSettings",
+    "CheckpointStoreSettings",
     "EffectivePluginSet",
     "EventSinkBackendConfig",
     "FilesystemArtifactStoreSettings",
+    "FilesystemCheckpointStoreSettings",
     "LimitsConfig",
     "NormalizedPackageConfig",
     "PluginsConfig",
@@ -19,6 +21,7 @@ __all__ = [
     "RawPackageConfig",
     "SafetyConfig",
     "MemoryArtifactStoreSettings",
+    "MemoryCheckpointStoreSettings",
     "SecretRef",
     "StoreBackendConfig",
     "ToolsConfig",
@@ -167,6 +170,26 @@ ArtifactStoreSettings = MemoryArtifactStoreSettings | FilesystemArtifactStoreSet
 
 
 @dataclass(frozen=True, slots=True)
+class MemoryCheckpointStoreSettings:
+    backend: Literal["memory"] = "memory"
+
+
+@dataclass(frozen=True, slots=True)
+class FilesystemCheckpointStoreSettings:
+    root: Path = field(repr=False)
+    backend: Literal["filesystem"] = "filesystem"
+
+    def __post_init__(self) -> None:
+        root = self.root
+        if not isinstance(root, Path):
+            root = Path(root)
+        object.__setattr__(self, "root", root)
+
+
+CheckpointStoreSettings = MemoryCheckpointStoreSettings | FilesystemCheckpointStoreSettings
+
+
+@dataclass(frozen=True, slots=True)
 class NormalizedPackageConfig:
     """Normalized package-level config with defaults applied."""
 
@@ -181,6 +204,7 @@ class NormalizedPackageConfig:
     observability: Mapping[str, Any]
     safety: SafetyConfig
     metadata: Mapping[str, Any]
+    checkpoint_store: CheckpointStoreSettings = field(default_factory=MemoryCheckpointStoreSettings)
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "providers", _copy_mapping(self.providers))

@@ -49,7 +49,7 @@ def test_durable_checkpoint_backend_design_docs_exist_and_cover_core_terms() -> 
         'durable checkpoint storage is necessary but not sufficient for true resume',
         'lossless logical json value',
         'filesystem checkpoint backend is now implemented',
-        'checkpoint runtime selection remains deferred to w4',
+        'checkpoint runtime selection is implemented through typed config and the canonical builder',
     ):
         assert token in design_text
 
@@ -63,7 +63,7 @@ def test_durable_checkpoint_backend_design_docs_exist_and_cover_core_terms() -> 
         'history listing',
         'lost-update detection',
         'metadata fidelity',
-        'runtime selection remains deferred to w4',
+        'filesystem runtime selection is explicit opt-in and typed',
     ):
         assert token in test_plan_text
 

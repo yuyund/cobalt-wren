@@ -63,6 +63,11 @@ These contracts describe the current internal foundation surface. If parts of th
 - missing `stores.artifact` normalizes to `MemoryArtifactStore`
 - explicit filesystem selection requires an absolute root and startup-only construction
 - runtime selection must not silently fall back from filesystem to memory
+- checkpoint backend selection is represented by `stores.checkpoint`
+- missing `stores.checkpoint` normalizes to `MemoryCheckpointStore`
+- explicit filesystem checkpoint selection requires an absolute root and startup-only construction
+- checkpoint runtime selection must not silently fall back from filesystem to memory
+- FilesystemCheckpointStore is implemented in `langgraph_automation.integrations.checkpoint`.
 
 ## Configuration Schema Contract
 
@@ -220,8 +225,9 @@ These contracts describe the current internal foundation surface. If parts of th
 - `MemoryCheckpointStore` is the EPHEMERAL semantic reference implementation
 - `CheckpointStore` audit result is `APPROVED_FOR_IMPLEMENTATION`
 - `FilesystemCheckpointStore` is implemented in `langgraph_automation.integrations.checkpoint` and is `PROCESS_DURABLE`
-- filesystemcheckpointstore is implemented in `langgraph_automation.integrations.checkpoint`
-- checkpoint runtime selection remains deferred to the W4 composition block
+- checkpoint runtime selection is controlled by typed config and the canonical builder
+- `MemoryCheckpointStore` remains the default checkpoint backend when the section is absent
+- `FilesystemCheckpointStore` is explicit opt-in and is constructed from typed config exactly once per runtime assembly
 - true resume is still deferred
 - DB metadata には checkpoint body copy を入れない
 

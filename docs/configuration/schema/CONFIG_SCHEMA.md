@@ -296,6 +296,39 @@ Rules:
 - filesystem root is sensitive configuration and must not be echoed in diagnostics
 - the canonical composition point is the runtime builder, not the config parser
 
+## Checkpoint store backend boundary
+
+The built-in checkpoint store is selected through `stores.checkpoint`.
+
+Canonical variants:
+
+```yaml
+stores:
+  checkpoint:
+    backend: memory
+```
+
+```yaml
+stores:
+  checkpoint:
+    backend: filesystem
+    config:
+      root: /srv/langgraph-automation/checkpoints
+```
+
+Rules:
+
+- section absence normalizes to `memory`
+- section presence requires `backend`
+- accepted backends are exactly `memory` and `filesystem`
+- `memory` accepts no backend-specific options
+- `filesystem` requires an absolute `root`
+- root existence is not checked at config time
+- backend selection is startup-only
+- runtime selection does not fall back from filesystem to memory
+- filesystem root is sensitive configuration and must not be echoed in diagnostics
+- the canonical composition point is the checkpoint runtime builder, not the config parser
+
 ## Workflow-specific config boundary
 
 Recommended shape:

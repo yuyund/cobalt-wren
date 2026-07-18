@@ -6,6 +6,8 @@ from collections.abc import Mapping
 from dataclasses import dataclass, field
 from typing import Any
 
+from langgraph_automation.integrations.checkpoint.base import CheckpointStore
+
 __all__ = ["RuntimeDependencies"]
 
 
@@ -18,7 +20,7 @@ class RuntimeDependencies:
     providers: Mapping[str, object]
     tools: Mapping[str, object]
     artifact_store: object | None = None
-    checkpoint_store: object | None = None
+    checkpoint_store: CheckpointStore | None = None
     event_sinks: Mapping[str, object] = field(default_factory=dict)
 
     def __post_init__(self) -> None:

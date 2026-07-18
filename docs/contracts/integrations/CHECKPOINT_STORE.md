@@ -12,12 +12,12 @@ This document fixes the contract that durable backends must satisfy.
 - `MemoryCheckpointStore` is the EPHEMERAL semantic reference implementation and remains the default runtime wiring
 - `FilesystemCheckpointStore` is implemented, `PROCESS_DURABLE`, and exported from `langgraph_automation.integrations.checkpoint`
 - `FilesystemCheckpointStore` is implemented in `langgraph_automation.integrations.checkpoint`
-- filesystemcheckpointstore is implemented in `langgraph_automation.integrations.checkpoint`
-- filesystemcheckpointstore is implemented in `langgraph_automation.integrations.checkpoint`
-- filesystemcheckpointstore is implemented in `langgraph_automation.integrations.checkpoint`
-- filesystemcheckpointstore is implemented in `langgraph_automation.integrations.checkpoint`
+- `FilesystemCheckpointStore` is implemented in `langgraph_automation.integrations.checkpoint` and is not re-exported from `api.stores`
+- FilesystemCheckpointStore is implemented in `langgraph_automation.integrations.checkpoint`.
 - pending append intent is part of the crash-window recovery contract
-- checkpoint runtime selection remains deferred to W4
+- checkpoint runtime selection is implemented through typed config and the canonical runtime builder
+- checkpoint runtime selection is implemented through typed config and the canonical builder
+- runtime / composition work is execution persistence orchestration
 - true resume remains deferred
 
 ## Execution Stream Identity
@@ -131,6 +131,17 @@ It does not guarantee:
 
 The filesystem root is trusted configuration and must not be echoed in diagnostics.
 
+## Runtime Selection
+
+Checkpoint backend selection is startup-only and explicit.
+
+- `stores.checkpoint` controls the built-in checkpoint backend
+- `MemoryCheckpointStoreSettings` is the default when the section is absent
+- `FilesystemCheckpointStoreSettings` requires an absolute trusted `root`
+- `build_checkpoint_store()` is the canonical construction point
+- `MemoryCheckpointStore` remains the default runtime wiring
+- filesystem selection is explicit opt-in and does not fall back silently
+
 ## Delete Contract
 
 - `delete(run_id)` is removed from the versioned protocol
@@ -153,11 +164,11 @@ It is not restart durable.
 ## Durable Backend Target
 
 `FilesystemCheckpointStore` is the first durable backend target and is now implemented.
-The remaining runtime/composition work is checkpoint backend selection, which is still deferred to W4.
+The remaining runtime/composition work is execution persistence orchestration, not checkpoint backend selection.
 
 ## Deferred Work
 
-- checkpoint runtime selection
+- execution persistence orchestration
 - Django orchestration
 - reconciliation and retention
 - true resume

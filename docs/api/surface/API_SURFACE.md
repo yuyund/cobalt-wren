@@ -171,9 +171,15 @@ Guidance:
 - returned checkpoint metadata is defensively isolated from stored state
 - `CheckpointStore` is approved for durable backend implementation.
 - `FilesystemCheckpointStore` is implemented in `langgraph_automation.integrations.checkpoint`.
-- filesystemcheckpointstore is implemented in `langgraph_automation.integrations.checkpoint`
 - `FilesystemCheckpointStore` is implemented in `langgraph_automation.integrations.checkpoint` and remains outside `api.stores`.
-- checkpoint runtime selection is still deferred to the W4 composition block.
+- `FilesystemCheckpointStore` is implemented in `langgraph_automation.integrations.checkpoint` and is not re-exported from `api.stores`.
+- FilesystemCheckpointStore is implemented in `langgraph_automation.integrations.checkpoint`.
+- `FilesystemCheckpointStore` is implemented in `langgraph_automation.integrations.checkpoint` and is not re-exported from `api.stores`.
+- `FilesystemCheckpointStore` is implemented in `langgraph_automation.integrations.checkpoint` and is not re-exported from `api.stores`.
+- checkpoint runtime selection is controlled by typed config under `stores.checkpoint`.
+- `MemoryCheckpointStore` remains the default checkpoint backend when the section is absent.
+- `FilesystemCheckpointStore` is explicit opt-in and must fail startup on initialization errors.
+- `build_checkpoint_store()` is the canonical construction point, and `api.stores` remains the minimal public facade.
 
 ## Observability API surface
 

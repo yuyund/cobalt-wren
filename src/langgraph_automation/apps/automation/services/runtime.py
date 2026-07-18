@@ -18,6 +18,7 @@ from langgraph_automation.apps.automation.services.workflow_config import (
     validate_workflow_runtime_config,
 )
 from langgraph_automation.config import settings as app_settings
+from langgraph_automation.config.models import MemoryCheckpointStoreSettings
 from langgraph_automation.graphs.config import (
     GraphRuntimeConfig,
     GraphRuntimeGraphConfig,
@@ -28,8 +29,6 @@ from langgraph_automation.graphs.registry import GraphRegistry, default_graph_ki
 from langgraph_automation.graphs.runtime import GraphRuntime
 from langgraph_automation.integrations.artifact.base import ArtifactStore
 from langgraph_automation.integrations.artifact.memory_store import MemoryArtifactStore
-from langgraph_automation.integrations.checkpoint.base import CheckpointStore
-from langgraph_automation.integrations.checkpoint.memory_store import MemoryCheckpointStore
 from langgraph_automation.integrations.llm import LiteLLMClient, ObservedLLMClient
 from langgraph_automation.integrations.llm.base import LLMClient
 from langgraph_automation.integrations.observability.base import EventSink
@@ -46,6 +45,8 @@ from langgraph_automation.integrations.tools import (
     ToolRegistry,
 )
 from langgraph_automation.workflows.catalog import build_builtin_graph_registry
+
+from langgraph_automation.runtime.checkpoint_store import build_checkpoint_store as build_package_checkpoint_store
 
 
 def build_event_sink(run: Run) -> EventSink:
@@ -161,11 +162,11 @@ def build_artifact_store(run: Run, event_sink: EventSink | None = None) -> Artif
     return MemoryArtifactStore()
 
 
-def build_checkpoint_store(run: Run, event_sink: EventSink | None = None) -> CheckpointStore:
-    """Build the checkpoint store dependency."""
+def build_checkpoint_store(run: Run, event_sink: EventSink | None = None) -> object:
+    """Build the default checkpoint store for execution-plane wiring."""
 
     del run, event_sink
-    return MemoryCheckpointStore()
+    return build_package_checkpoint_store(MemoryCheckpointStoreSettings())
 
 
 def build_graph_runtime(run: Run) -> GraphRuntime:

@@ -46,7 +46,7 @@ def test_persistence_durability_audit_docs_exist_and_cover_core_terms() -> None:
         '`checkpointstore` is a versioned append-only checkpoint repository keyed by `run_id` and `checkpoint_namespace`',
         'lossless logical json value',
         'defensively isolated',
-        'checkpoint runtime selection remains deferred to w4',
+        'checkpoint runtime selection is implemented through typed config and the canonical builder',
     ):
         assert token in contract_text
 
@@ -75,7 +75,7 @@ def test_persistence_durability_audit_docs_exist_and_cover_core_terms() -> None:
         'body-aware',
         'approved_for_implementation',
         'filesystem checkpoint backend is process_durable and restart durable',
-        'checkpoint runtime selection is still deferred to w4',
+        'checkpoint runtime selection is typed and canonical',
         'checkpoint metadata fidelity',
     ):
         assert token in traceability_text
@@ -86,7 +86,7 @@ def test_persistence_durability_audit_docs_exist_and_cover_core_terms() -> None:
         'p2',
         'production behavior was not changed',
         'recommended closure order',
-        'checkpoint runtime selection is deferred',
+        'checkpoint runtime selection is closed',
         'filesystem checkpoint backend implementation is complete',
         'checkpoint protocol evolution is complete',
         'artifactstore protocol evolution is complete',

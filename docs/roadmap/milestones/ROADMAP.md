@@ -299,7 +299,7 @@ P1 safety exposure hardening:
 - observability metadata safety: complete
 - artifact/store body safety: complete
 - safe error exposure: complete
-- persistence durability: artifact complete / checkpoint filesystem complete / checkpoint runtime selection deferred
+- persistence durability: artifact complete / checkpoint filesystem complete / checkpoint runtime selection complete
 
 Persistence durability audit:
 

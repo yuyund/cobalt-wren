@@ -10,7 +10,6 @@ This document ranks the remaining persistence gaps after the current code-first 
 
 | Gap | Evidence | Why it matters | Risk |
 | --- | --- | --- | --- |
-| Checkpoint runtime selection is still deferred | `src/langgraph_automation/apps/automation/services/runtime.py`, `src/langgraph_automation/runtime/assembly.py` | The filesystem checkpoint backend exists, but the startup composition boundary still wires `MemoryCheckpointStore`. | High |
 | No body/metadata orchestration path | `src/langgraph_automation/apps/automation/services/execution.py`, `src/langgraph_automation/apps/automation/services/runs.py`, `src/langgraph_automation/graphs/runner.py` | The execution path does not write or verify artifact/checkpoint bodies today. | High |
 | No reconciliation path for orphan body / dangling metadata | current code has metadata-only models and explicit pending recovery only | Crash windows and repair semantics are still bounded to the store layer. | High |
 
@@ -31,15 +30,15 @@ This document ranks the remaining persistence gaps after the current code-first 
 
 ## Recommended Closure Order
 
-1. Checkpoint runtime selection
-2. Orchestration integration with body-first / metadata-second writes
-3. Restart durability tests under the selected checkpoint backend
-4. Reconciliation and cleanup policy
+1. Orchestration integration with body-first / metadata-second writes
+2. Restart durability tests under the selected checkpoint backend
+3. Reconciliation and cleanup policy
 
 ## Deferred Work
 
-- checkpoint runtime selection remains deferred to W4
-- checkpoint runtime selection is deferred
+- checkpoint runtime selection is typed and canonical
+- checkpoint runtime selection is complete
+- checkpoint runtime selection is closed
 - reconciliation worker is deferred
 - cleanup command is deferred
 - true resume is deferred

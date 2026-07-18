@@ -7,10 +7,12 @@ import pytest
 
 from langgraph_automation.config.models import (
     FilesystemArtifactStoreSettings,
+    FilesystemCheckpointStoreSettings,
     EventSinkBackendConfig,
     LimitsConfig,
     NormalizedPackageConfig,
     MemoryArtifactStoreSettings,
+    MemoryCheckpointStoreSettings,
     PluginsConfig,
     ProviderProfileConfig,
     RawPackageConfig,
@@ -86,6 +88,7 @@ def test_normalized_package_config_copies_mappings() -> None:
         observability={"capture": {"input_summary": True}},
         safety=SafetyConfig(),
         metadata={"team": "platform"},
+        checkpoint_store=MemoryCheckpointStoreSettings(),
     )
 
     assert normalized.providers == {"default": ProviderProfileConfig(provider="litellm")}
@@ -93,6 +96,20 @@ def test_normalized_package_config_copies_mappings() -> None:
     assert normalized.event_sinks == {"stdout": EventSinkBackendConfig(backend="stdout")}
     assert normalized.observability == {"capture": {"input_summary": True}}
     assert normalized.metadata == {"team": "platform"}
+    assert normalized.checkpoint_store == MemoryCheckpointStoreSettings()
+
+
+def test_checkpoint_store_settings_are_frozen_and_hide_root() -> None:
+    memory = MemoryCheckpointStoreSettings()
+    filesystem = FilesystemCheckpointStoreSettings(root=Path("/srv/private/checkpoints"))
+
+    assert memory.backend == "memory"
+    assert filesystem.backend == "filesystem"
+    assert filesystem.root == Path("/srv/private/checkpoints")
+    assert "/srv/private/checkpoints" not in repr(filesystem)
+
+    with pytest.raises(FrozenInstanceError):
+        filesystem.backend = "memory"  # type: ignore[misc]
 
 
 def test_artifact_store_settings_are_frozen_and_hide_sensitive_root() -> None:

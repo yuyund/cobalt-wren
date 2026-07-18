@@ -163,7 +163,7 @@ Any capability that the current protocol cannot express remains a gap until the 
 ## Deferred Work
 
 - durable ArtifactStore implementation is deferred for deployment-level durability
-- checkpoint runtime selection is deferred
+- checkpoint runtime selection is typed and canonical
 - production capability model is not added
 - body/metadata orchestration is deferred
 - true resume is deferred

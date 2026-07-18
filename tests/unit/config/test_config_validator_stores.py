@@ -34,7 +34,7 @@ def _store_plugin(*, validate_config=None, create_store=None) -> Plugin:
     )
 
 
-def _normalized_config(*, enabled_plugins: tuple[str, ...], vector_backend: str = "memory", checkpoint_backend: str = "memory") -> NormalizedPackageConfig:
+def _normalized_config(*, enabled_plugins: tuple[str, ...], vector_backend: str = "memory") -> NormalizedPackageConfig:
     raw = RawPackageConfig(
         version=1,
         plugins={"enabled": enabled_plugins},
@@ -42,7 +42,6 @@ def _normalized_config(*, enabled_plugins: tuple[str, ...], vector_backend: str 
         tools={"allowlist": ()},
         stores={
             "vector": {"backend": vector_backend, "config": {"path": "var/vectors.sqlite"}},
-            "checkpoint": {"backend": checkpoint_backend, "config": {"path": "var/checkpoints.sqlite"}},
         },
         event_sinks={},
         safety={"redaction_enabled": True, "safe_errors": True},
@@ -63,9 +62,8 @@ def test_enabled_store_backend_passes_and_invokes_hook() -> None:
     validated = validator.validate(config)
 
     assert validated.normalized is config
-    assert len(calls) == 2
+    assert len(calls) == 1
     assert calls[0][0].backend == "memory"
-    assert calls[1][0].backend == "memory"
 
 
 def test_same_backend_different_store_types_are_supported() -> None:

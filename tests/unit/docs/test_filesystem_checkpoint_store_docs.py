@@ -28,8 +28,8 @@ def test_filesystem_checkpoint_store_docs_exist_and_cover_core_terms() -> None:
         'mutable head advancement',
         'pending append intent',
         'crash-window recovery',
-        'checkpoint runtime selection remains deferred to w4',
-        'runtime/composition work is checkpoint backend selection',
+        'checkpoint runtime selection is implemented through typed config and the canonical builder',
+        'runtime/composition work is execution persistence orchestration',
     ):
         assert token in contract_text
 
@@ -55,7 +55,7 @@ def test_filesystem_checkpoint_store_docs_exist_and_cover_core_terms() -> None:
         'baseline suite passes for memory and filesystem',
         'advanced durable contract suite passes for filesystem',
         'default backend remains memory',
-        'filesystem runtime selection remains deferred to w4',
+        'filesystem runtime selection is explicit opt-in and typed',
     ):
         assert token in test_plan_text
 

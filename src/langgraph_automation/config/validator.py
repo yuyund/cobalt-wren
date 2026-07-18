@@ -25,6 +25,7 @@ from langgraph_automation.config.models import (
     ValidatedPackageConfig,
 )
 from langgraph_automation.config.artifact_store import normalize_artifact_store_settings
+from langgraph_automation.config.checkpoint_store import normalize_checkpoint_store_settings
 from langgraph_automation.plugins.registry import PluginRegistry
 
 _CONFIG_COMPONENT = "config_validator"
@@ -47,6 +48,7 @@ class ConfigValidator:
 
         context = _ValidationContext(environment=config.environment, enabled_plugins=config.plugins.enabled)
         normalize_artifact_store_settings(config.stores.get("artifact"))
+        normalize_checkpoint_store_settings(config.stores.get("checkpoint"))
         effective_plugins = self._build_effective_plugin_set(config.plugins, context)
 
         self._validate_tools(config.tools, effective_plugins, context)
@@ -143,7 +145,7 @@ class ConfigValidator:
         context: _ValidationContext,
     ) -> None:
         for store_type, store_config in stores.items():
-            if store_type == "artifact":
+            if store_type in {"artifact", "checkpoint"}:
                 continue
             key = (store_type, store_config.backend)
             contribution = effective_plugins.stores.get(key)

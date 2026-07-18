@@ -39,7 +39,7 @@ def test_checkpoint_store_protocol_sufficiency_docs_exist_and_cover_core_terms()
         'defensively isolated',
         'request / descriptor / read-result separation',
         'filesystem checkpoint backend is now implemented',
-        'checkpoint runtime selection remains deferred to w4',
+        'checkpoint runtime selection is typed and startup-only',
     ):
         assert token in audit_text
 
@@ -73,7 +73,7 @@ def test_checkpoint_store_protocol_sufficiency_docs_exist_and_cover_core_terms()
         'history listing',
         'lost-update detection',
         'metadata fidelity',
-        'runtime selection remains deferred to w4',
+        'filesystem runtime selection is explicit opt-in and typed',
     ):
         assert token in test_plan_text
 
@@ -86,6 +86,7 @@ def test_checkpoint_store_protocol_sufficiency_docs_exist_and_cover_core_terms()
         'durable checkpoint implementation is now closed for the first durable backend',
         'filesystemcheckpointstore is implemented in `langgraph_automation.integrations.checkpoint`',
         'lossless logical json value',
+        'checkpoint runtime selection is implemented through typed config and the canonical builder',
     ):
         assert token in contract_text
 
@@ -93,12 +94,13 @@ def test_checkpoint_store_protocol_sufficiency_docs_exist_and_cover_core_terms()
         'checkpointstore protocol is versioned and approved for implementation',
         'checkpoint protocol is versioned and approved for implementation',
         'filesystem checkpoint backend is process_durable and restart durable',
-        'checkpoint runtime selection remains deferred',
+        'checkpoint runtime selection is typed and canonical',
     ):
         assert token in traceability_text
 
     for token in (
-        'checkpoint runtime selection is deferred',
+        'checkpoint runtime selection is typed and canonical',
+        'checkpoint runtime selection is complete',
         'filesystem checkpoint backend implementation is complete',
         'checkpoint protocol evolution is complete',
         'recommended closure order',

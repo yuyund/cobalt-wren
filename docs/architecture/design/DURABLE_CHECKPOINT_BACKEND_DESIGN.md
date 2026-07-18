@@ -68,9 +68,20 @@ The store must not infer Python object structure or import serializer classes fr
 
 The filesystem backend uses content-addressed bodies, stream-scoped records, and a mutable head record.
 
-filesystem checkpoint backend is now implemented.
-The record indexes are records/by-id and records/by-revision.
-checkpoint runtime selection remains deferred to w4.
+The filesystem checkpoint backend is now implemented.
+The record indexes are `records/by-id` and `records/by-revision`.
+
+## Runtime Selection
+
+Runtime selection is typed and startup-only.
+
+- raw config path: `stores.checkpoint`
+- `MemoryCheckpointStoreSettings` is the default when the section is absent
+- `FilesystemCheckpointStoreSettings` requires an absolute trusted `root`
+- `build_checkpoint_store()` is the canonical construction point
+- `RuntimeAssembler` injects the built checkpoint store once per assembly
+- filesystem selection is explicit opt-in and does not fall back silently
+- checkpoint runtime selection is implemented through typed config and the canonical builder
 
 ```text
 <root>/
@@ -181,6 +192,5 @@ True resume additionally needs:
 
 ## Deferred Work
 
-- checkpoint runtime selection
 - true resume
 - metadata orchestration
