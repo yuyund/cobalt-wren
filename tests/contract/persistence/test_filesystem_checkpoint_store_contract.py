@@ -11,7 +11,8 @@ from pathlib import Path
 import pytest
 
 from langgraph_automation.api.errors import CheckpointConflictError, CheckpointIntegrityError
-from langgraph_automation.integrations.checkpoint import CheckpointReadResult, CheckpointWriteRequest, FilesystemCheckpointStore
+from langgraph_automation.integrations.checkpoint import CheckpointReadResult, CheckpointWriteRequest, FilesystemCheckpointStore, StoredCheckpoint
+import langgraph_automation.integrations.checkpoint.filesystem_store as filesystem_store
 from tests.support.persistence import FaultPlan, FaultTiming, FaultingCheckpointStore
 
 
@@ -244,6 +245,26 @@ def test_filesystem_checkpoint_store_after_save_retry_is_idempotent(tmp_path: Pa
     assert inner.save(request) == retry
 
 
+def test_filesystem_checkpoint_store_same_size_body_mutation_is_list_safe_but_read_unsafe(tmp_path: Path) -> None:
+    root = tmp_path / 'checkpoint-store'
+    store = FilesystemCheckpointStore(root)
+    store.save(_request(checkpoint_id='checkpoint-a', body=b'a'))
+    written = store.save(_request(checkpoint_id='checkpoint-b', parent_checkpoint_id='checkpoint-a', body=b'body-b'))
+
+    body_path = store._body_path(written.digest)
+    body_path.write_bytes(b'X' * len(b'body-b'))
+
+    listed = store.list_for_run(1, checkpoint_namespace='default')
+
+    assert [checkpoint.revision for checkpoint in listed] == [1, 2]
+
+    with pytest.raises(CheckpointIntegrityError):
+        store.load_checkpoint(1, 'checkpoint-b', checkpoint_namespace='default')
+
+    with pytest.raises(CheckpointIntegrityError):
+        store.load_latest(1, checkpoint_namespace='default')
+
+
 def test_filesystem_checkpoint_store_list_does_not_full_read_body(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     root = tmp_path / 'checkpoint-store'
     store = FilesystemCheckpointStore(root)
@@ -256,6 +277,36 @@ def test_filesystem_checkpoint_store_list_does_not_full_read_body(tmp_path: Path
     monkeypatch.setattr(FilesystemCheckpointStore, '_verify_record_body', fail_if_called)
     listed = store.list_for_run(1, checkpoint_namespace='default')
     assert [checkpoint.revision for checkpoint in listed] == [1, 2]
+
+
+def test_filesystem_checkpoint_store_detects_finalized_orphan_record_in_listing(tmp_path: Path) -> None:
+    root = tmp_path / 'checkpoint-store'
+    store = FilesystemCheckpointStore(root)
+    store.save(_request(checkpoint_id='checkpoint-a', body=b'a'))
+    store.save(_request(checkpoint_id='checkpoint-b', parent_checkpoint_id='checkpoint-a', body=b'b'))
+
+    stream_key = store._stream_key(1, 'default')
+    committed = store._load_record_by_revision(stream_key, 2, verify_body=False)
+    assert committed is not None
+    orphan = StoredCheckpoint(
+        run_id=committed.run_id,
+        checkpoint_namespace=committed.checkpoint_namespace,
+        checkpoint_id='checkpoint-orphan',
+        parent_checkpoint_id=committed.checkpoint_id,
+        revision=3,
+        serializer_name=committed.serializer_name,
+        serializer_version=committed.serializer_version,
+        content_type=committed.content_type,
+        size=committed.size,
+        digest=committed.digest,
+        metadata=dict(committed.metadata),
+    )
+    orphan_path = store._by_id_path(stream_key, orphan.checkpoint_id)
+    orphan_path.parent.mkdir(parents=True, exist_ok=True)
+    orphan_path.write_bytes(filesystem_store._json_bytes(filesystem_store._safe_record_payload(orphan)))
+
+    with pytest.raises(CheckpointIntegrityError):
+        store.list_for_run(1, checkpoint_namespace='default')
 
 
 @pytest.mark.parametrize(

@@ -899,6 +899,48 @@ class FilesystemCheckpointStore(CheckpointStore):
             )
         return committed
 
+    def _audit_no_extra_finalized_records(
+        self,
+        stream_key: tuple[int | str, str],
+        committed: list[StoredCheckpoint],
+    ) -> None:
+        committed_by_id = {record.checkpoint_id: record for record in committed}
+        committed_by_revision = {record.revision: record for record in committed}
+        stream_dir = self._stream_dir(stream_key)
+        by_id_root = stream_dir / 'records' / 'by-id'
+        by_revision_root = stream_dir / 'records' / 'by-revision'
+
+        for path in by_id_root.rglob('*.json') if by_id_root.exists() else ():
+            record = self._record_from_path(path)
+            expected = self._by_id_path(stream_key, record.checkpoint_id)
+            if path != expected:
+                raise _integrity_error(
+                    'Filesystem checkpoint store detected a record path mismatch.',
+                    code='CHECKPOINT_STORE_RECORD_PATH_MISMATCH',
+                )
+            committed_record = committed_by_id.get(record.checkpoint_id)
+            if committed_record is None or committed_record != record:
+                raise _integrity_error(
+                    'Filesystem checkpoint store detected an unexpected finalized record.',
+                    code='CHECKPOINT_STORE_FINALIZED_RECORD_MISMATCH',
+                )
+            self._verify_hard_link_pair(expected, self._by_revision_path(stream_key, record.revision), purpose='record')
+
+        for path in by_revision_root.rglob('*.json') if by_revision_root.exists() else ():
+            record = self._record_from_path(path)
+            expected = self._by_revision_path(stream_key, record.revision)
+            if path != expected:
+                raise _integrity_error(
+                    'Filesystem checkpoint store detected a record path mismatch.',
+                    code='CHECKPOINT_STORE_RECORD_PATH_MISMATCH',
+                )
+            committed_record = committed_by_revision.get(record.revision)
+            if committed_record is None or committed_record != record:
+                raise _integrity_error(
+                    'Filesystem checkpoint store detected an unexpected finalized record.',
+                    code='CHECKPOINT_STORE_FINALIZED_RECORD_MISMATCH',
+                )
+
     def _recover_stream(self, stream_key: tuple[int | str, str], *, verify_body: bool) -> None:
         pending = self._load_pending(stream_key)
         head = self._load_head(stream_key)
@@ -1244,7 +1286,8 @@ class FilesystemCheckpointStore(CheckpointStore):
             head = self._load_head(stream_key)
             if head is None:
                 return []
-            self._validate_committed_chain(stream_key, head, verify_body=False)
+            committed = self._validate_committed_chain(stream_key, head, verify_body=False)
+            self._audit_no_extra_finalized_records(stream_key, committed)
             descriptors: list[StoredCheckpoint] = []
             for revision in range(1, head.revision + 1):
                 record = self._load_record_by_revision(stream_key, revision, verify_body=False)
