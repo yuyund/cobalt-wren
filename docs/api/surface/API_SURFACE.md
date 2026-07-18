@@ -136,6 +136,9 @@ Current candidates:
 - `StoredArtifact`
 - `ArtifactReadResult`
 - `CheckpointStore`
+- `CheckpointWriteRequest`
+- `StoredCheckpoint`
+- `CheckpointReadResult`
 
 Future concepts:
 
@@ -159,8 +162,13 @@ Guidance:
 - the filesystem root is trusted configuration and must not be echoed in runtime diagnostics
 - Storage keys and file paths must remain redaction-safe.
 - Absolute local file paths must not appear in UI or API output.
-- `CheckpointStore` remains a provisional latest-state store and is not sufficient for versioned durable execution state yet.
-- versioned checkpoint protocol evolution is blocked until the checkpoint sufficiency audit clears the protocol gap.
+- `CheckpointStore` is now a versioned append-only checkpoint repository contract.
+- `CheckpointWriteRequest` owns caller serialization.
+- `StoredCheckpoint` is the normalized descriptor returned from `save()`.
+- `CheckpointReadResult` returns descriptor plus body from `load_latest()` / `load_checkpoint()`.
+- `CheckpointStore` uses caller-issued checkpoint IDs, store-assigned revisions, and linear parent/head preconditions.
+- `CheckpointStore` is approved for durable backend implementation.
+- `FilesystemCheckpointStore` remains unimplemented until the durable backend work lands.
 
 ## Observability API surface
 

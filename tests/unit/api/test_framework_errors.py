@@ -7,6 +7,11 @@ import pytest
 from langgraph_automation.api.errors import (
     ConfigError,
     FrameworkError,
+    CheckpointConflictError,
+    CheckpointIntegrityError,
+    CheckpointPersistenceError,
+    CheckpointStoreError,
+    CheckpointValidationError,
     PluginRegistrationError,
     PluginResolutionError,
     PluginValidationError,
@@ -103,6 +108,11 @@ def test_framework_error_validates_required_fields(kwargs: dict[str, str], messa
 
 def test_category_specific_errors_fix_categories() -> None:
     assert ConfigError('x', code='CONFIG_INVALID').category == 'config'
+    assert CheckpointStoreError('x', code='CHECKPOINT_INVALID').category == 'checkpoint_store'
+    assert CheckpointValidationError('x', code='CHECKPOINT_INVALID').category == 'checkpoint_store'
+    assert CheckpointConflictError('x', code='CHECKPOINT_INVALID').category == 'checkpoint_store'
+    assert CheckpointIntegrityError('x', code='CHECKPOINT_INVALID').category == 'checkpoint_store'
+    assert CheckpointPersistenceError('x', code='CHECKPOINT_INVALID').category == 'checkpoint_store'
     assert PluginRegistrationError('x', code='PLUGIN_INVALID').category == 'plugin_registration'
     assert PluginResolutionError('x', code='PLUGIN_UNKNOWN').category == 'plugin_resolution'
     assert PluginValidationError('x', code='PLUGIN_VALIDATION_FAILED').category == 'plugin_validation'

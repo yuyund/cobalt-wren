@@ -34,13 +34,25 @@ def test_tool_api_all() -> None:
 
 
 def test_store_api_exports() -> None:
-    from langgraph_automation.api.stores import ArtifactReadResult, ArtifactStore, ArtifactWriteRequest, CheckpointStore, StoredArtifact
+    from langgraph_automation.api.stores import (
+        ArtifactReadResult,
+        ArtifactStore,
+        ArtifactWriteRequest,
+        CheckpointReadResult,
+        CheckpointStore,
+        CheckpointWriteRequest,
+        StoredArtifact,
+        StoredCheckpoint,
+    )
 
     assert ArtifactStore is not None
     assert ArtifactWriteRequest is not None
     assert StoredArtifact is not None
     assert ArtifactReadResult is not None
     assert CheckpointStore is not None
+    assert CheckpointWriteRequest is not None
+    assert StoredCheckpoint is not None
+    assert CheckpointReadResult is not None
 
 
 def test_store_api_does_not_export_concrete_backends() -> None:
@@ -59,6 +71,9 @@ def test_store_api_all() -> None:
         'StoredArtifact',
         'ArtifactReadResult',
         'CheckpointStore',
+        'CheckpointWriteRequest',
+        'StoredCheckpoint',
+        'CheckpointReadResult',
     }
 
 

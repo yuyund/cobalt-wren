@@ -42,7 +42,7 @@ def test_persistence_durability_audit_docs_exist_and_cover_core_terms() -> None:
         'artifact semantics',
         'checkpoint semantics',
         'true resume',
-        '`checkpointstore` is currently a latest-state store keyed by `run_id`',
+        '`checkpointstore` is a versioned append-only checkpoint repository keyed by `run_id` and `checkpoint_namespace`',
     ):
         assert token in contract_text
 
@@ -80,7 +80,7 @@ def test_persistence_durability_audit_docs_exist_and_cover_core_terms() -> None:
         'production behavior was not changed',
         'recommended closure order',
         'durable checkpoint backend is deferred',
-        'checkpoint protocol evolution is deferred',
+        'checkpoint protocol evolution is complete',
         'artifactstore protocol evolution is complete',
     ):
         assert token in gaps_text
@@ -91,6 +91,6 @@ def test_persistence_durability_audit_docs_exist_and_cover_core_terms() -> None:
         'serializer identity/version',
         'specific-version read',
         'history listing',
-        'blocked_by_protocol',
+        'approved_for_implementation',
     ):
         assert token in checkpoint_audit_text

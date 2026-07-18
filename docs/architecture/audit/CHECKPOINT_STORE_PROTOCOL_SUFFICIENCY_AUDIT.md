@@ -2,6 +2,9 @@
 
 This audit determines whether the current `CheckpointStore` protocol can express versioned durable execution state for future restart and resume work.
 
+The checkpoint store contract is now versioned, linear, serializer-aware, idempotent, and conflict-aware.
+It is a request / descriptor / read-result separation rather than a destructive latest snapshot contract.
+
 Code is the source of truth.
 Tests are the source of truth.
 Docs record the current decision and the target boundary.
@@ -12,20 +15,32 @@ The current public store facade re-exports the checkpoint protocol from `src/lan
 
 The current protocol surface is:
 
-- `CheckpointStore.save(run_id, state, *, thread_id='', checkpoint_namespace='', backend='', node_name='') -> CheckpointWriteResult`
-- `CheckpointStore.load(run_id) -> dict[str, Any] | None`
-- `CheckpointStore.delete(run_id) -> None`
+- `CheckpointStore.save(request: CheckpointWriteRequest) -> StoredCheckpoint`
+- `CheckpointStore.load_latest(run_id: int | str, *, checkpoint_namespace='') -> CheckpointReadResult | None`
+- `CheckpointStore.load_checkpoint(run_id: int | str, checkpoint_id: str, *, checkpoint_namespace='') -> CheckpointReadResult | None`
+- `CheckpointStore.list_for_run(run_id: int | str, *, checkpoint_namespace='') -> list[StoredCheckpoint]`
 
-The current normalized write result is `CheckpointWriteResult` with fields:
+The current request / descriptor / read-result types are:
 
-- `checkpoint_id`
-- `thread_id`
+- `CheckpointWriteRequest`
+- `StoredCheckpoint`
+- `CheckpointReadResult`
+
+The current descriptor fields include:
+
+- `run_id`
 - `checkpoint_namespace`
-- `backend`
-- `node_name`
-- `state_summary`
+- `checkpoint_id`
+- `parent_checkpoint_id`
+- `revision`
+- `serializer_name`
+- `serializer_version`
+- `content_type`
+- `size`
+- `digest`
+- `metadata`
 
-There are no versioned checkpoint descriptor, read-result, serializer, size, digest, or lineage fields in the current protocol surface.
+The current protocol does not expose destructive delete, latest-state replacement, or any hidden versioned side channel.
 
 ## Current Call Sites
 
@@ -39,76 +54,77 @@ Current code-first evidence shows:
 - `src/langgraph_automation/apps/automation/services/runs.py` does not write checkpoint bodies
 - `src/langgraph_automation/graphs/runner.py` does not call the checkpoint store
 
-No current production execution path in `src/` calls `CheckpointStore.save`, `load`, or `delete` from the graph execution path.
+No current production execution path in `src/` calls checkpoint persistence from the graph execution path.
 
 ## Current Behavior Characterization
 
-The current memory backend behaves as a destructive latest snapshot store:
+The current memory backend now behaves as a linear append-only versioned checkpoint store:
 
-- `save(run_id, state)` replaces the previously stored state for that `run_id`
-- `load(run_id)` returns the latest state or `None`
-- `delete(run_id)` removes the latest state for that `run_id`
-- there is no history listing
-- there is no specific-version read
-- there is no parent / lineage tracking
-- there is no deterministic latest ordering contract beyond overwrite order
+- `save(request)` appends immutable versions
+- `load_latest(run_id, namespace)` returns the current head
+- `load_checkpoint(run_id, checkpoint_id, namespace)` returns a specific version
+- `list_for_run(run_id, namespace)` returns descriptors ordered by revision
+- same identity / same canonical request is idempotent
+- same identity / different canonical request is a conflict
+- stale-parent writes are conflicts
+- there is no destructive overwrite contract
+- there is no versioned delete contract
+- there is no history shortcut that bypasses revision ordering
 
-That behavior is useful as a characterization of the current memory backend, but it is not sufficient for a versioned durable checkpoint contract.
+That behavior is the reference checkpoint contract for future durable backends.
 
 ## Identity / Lineage Mapping
 
-Current code exposes only a partial execution identity:
+Current code exposes the execution stream and checkpoint identity explicitly:
 
 Framework concept | Current code concept | Current mapping | Problem
 --- | --- | --- | ---
-`run_id` | store key | `run_id` is the only lookup key | cannot identify multiple versions within the same run
-`thread_id` | metadata only | passed through to the write result and event metadata | not part of checkpoint identity
-`checkpoint_namespace` | metadata only | passed through to the write result and event metadata | not part of checkpoint identity or lookup
-`checkpoint_id` | generated label | `MemoryCheckpointStore` fabricates `checkpoint-N` in memory only | not a durable identity or ordering contract
-`parent_checkpoint_id` | absent | no mapping | lineage cannot be represented
+`run_id` | stream identity | part of the execution stream key | none
+`checkpoint_namespace` | stream identity | part of the execution stream key | none
+`checkpoint_id` | checkpoint identity | caller-issued immutable version ID | none
+`parent_checkpoint_id` | lineage + expected head | persisted lineage and head precondition | none
+`revision` | ordering | store-assigned linear order | none
 
-Current `CheckpointMetadata` rows store `run`, `thread_id`, `checkpoint_id`, `checkpoint_namespace`, `backend`, `node_name`, `state_summary`, and timestamps, but they do not store checkpoint body, version ordering, serializer identity, or lineage.
+Current `CheckpointMetadata` rows still store metadata only. They do not store checkpoint bodies.
 
 ## Protocol Sufficiency Matrix
 
 Capability | Current protocol | Code-first evidence | Impact of missing capability | Decision
 --- | --- | --- | --- | ---
-Actual state body input | PARTIALLY_SUPPORTED | `save(..., state: dict[str, Any])` | state is a Python object, not a versioned body contract | insufficient
-Actual state body output | PARTIALLY_SUPPORTED | `load(run_id) -> dict[str, Any] | None` | no descriptor/body split | insufficient
-Stable checkpoint identity | NOT_SUPPORTED | `run_id` lookup only | cannot address multiple versions for one execution | insufficient
-Run association | PARTIALLY_SUPPORTED | `run_id` exists | one key is not enough for versioned execution state | insufficient
-Thread identity | PARTIALLY_SUPPORTED | `thread_id` is metadata only | not part of the lookup or ordering contract | insufficient
-Namespace | PARTIALLY_SUPPORTED | `checkpoint_namespace` is metadata only | not part of identity or history semantics | insufficient
-Parent / lineage | NOT_SUPPORTED | no parent field | cannot express branching or resume ancestry | insufficient
-Version / revision ordering | NOT_SUPPORTED | no revision field | latest selection is not contractual | insufficient
-Deterministic latest selection | NOT_SUPPORTED | overwrite order only | restart and concurrency semantics are undefined | insufficient
-Specific-version read | NOT_SUPPORTED | no versioned read API | cannot inspect or resume older checkpoint versions | insufficient
-History listing | NOT_SUPPORTED | no list API | cannot audit or traverse versions | insufficient
-Serializer identity | NOT_SUPPORTED | no serializer field | restart compatibility cannot be expressed | insufficient
-Serializer version | NOT_SUPPORTED | no serializer version field | compatibility upgrades cannot be represented | insufficient
-Size / digest | NOT_SUPPORTED | no size / digest field | integrity cannot be verified mechanically | insufficient
-Safe metadata | PARTIALLY_SUPPORTED | `state_summary` is bounded and redacted | metadata exists but is not a durable version descriptor | insufficient
-Immutable version write | NOT_SUPPORTED | current store overwrites by `run_id` | destructive replacement loses prior state | insufficient
-Idempotent retry | NOT_SUPPORTED | no canonical write contract | retry safety is undefined | insufficient
-Conflict detection | NOT_SUPPORTED | overwrite is silent | concurrent writers can clobber each other | insufficient
-Concurrent append | NOT_SUPPORTED | no append / branch semantics | lost updates are not detectable | insufficient
-Lost-update detection | NOT_SUPPORTED | no expected-parent or CAS contract | simultaneous writers can silently lose history | insufficient
-Restart durability | NOT_SUPPORTED | memory store is process-local only | restart destroys checkpoint state | insufficient
-Safe deletion scope | PARTIALLY_SUPPORTED | `delete(run_id)` exists | destructive latest-only semantics only | insufficient for versioned history
+Actual state body input | SUPPORTED | `save(request.body: bytes)` | none | supported
+Actual state body output | SUPPORTED | `load_latest()` / `load_checkpoint()` return `CheckpointReadResult` | none | supported
+Stable checkpoint identity | SUPPORTED | `run_id + checkpoint_namespace + checkpoint_id` | none | supported
+Run association | SUPPORTED | `run_id` exists | none | supported
+Namespace | SUPPORTED | `checkpoint_namespace` is part of identity | none | supported
+Parent / lineage | SUPPORTED | `parent_checkpoint_id` is stored and validated | none | supported
+Version / revision ordering | SUPPORTED | `revision` is store-assigned | none | supported
+Deterministic latest selection | SUPPORTED | `load_latest()` resolves the current head | none | supported
+Specific-version read | SUPPORTED | `load_checkpoint()` exists | none | supported
+History listing | SUPPORTED | `list_for_run()` returns revision-ordered descriptors | none | supported
+Serializer identity | SUPPORTED | `serializer_name` is persisted | none | supported
+Serializer version | SUPPORTED | `serializer_version` is persisted | none | supported
+Size / digest | SUPPORTED | `size` and `digest` are stored | none | supported
+Safe metadata | SUPPORTED | metadata is normalized, redacted, and defensively copied | none | supported
+Immutable version write | SUPPORTED | same identity does not overwrite prior versions | none | supported
+Idempotent retry | SUPPORTED | same canonical request returns the existing descriptor | none | supported
+Conflict detection | SUPPORTED | changed immutable identity or stale parent conflicts | none | supported
+Concurrent append | SUPPORTED | linear parent/head precondition supports same-parent conflict detection | none | supported
+Lost-update detection | SUPPORTED | stale-parent conflict is observable | none | supported
+Restart durability | NOT_SUPPORTED | `MemoryCheckpointStore` remains EPHEMERAL | checkpoint bodies are not process-restart durable | backend required
+Safe deletion scope | NOT_SUPPORTED | delete is removed from the versioned protocol | delete / prune / retention remain deferred | intentional
 
 ## Protocol Sufficiency Decision
 
-Decision: `BLOCKED_BY_PROTOCOL`
+Decision: `APPROVED_FOR_IMPLEMENTATION`
 
 Reason:
 
-- the current protocol only expresses a destructive latest snapshot keyed by `run_id`
-- versioned checkpoint identity is not expressible
-- parent / lineage / history are not expressible
-- specific-version read is not expressible
-- serializer identity and version are not expressible
-- idempotent retry and conflict detection for immutable checkpoint versions are not expressible
-- lost-update detection is not expressible
+- the current protocol now expresses versioned checkpoint identity
+- parent / lineage / revision ordering are explicit
+- serializer identity and version are explicit
+- specific-version reads and history listing are explicit
+- idempotent retry and conflict detection are executable
+- the protocol separates request / descriptor / read-result responsibilities
 
 ## Target Design Direction
 
@@ -128,7 +144,7 @@ Reason:
 - it makes immutable, versioned checkpoint records explicit
 - it gives a durable filesystem backend a stable target contract
 
-Option D, an internal repository plus LangGraph adapter, remains a good later integration layer for resume semantics, but it does not remove the need for a richer checkpoint storage protocol.
+Option D, an internal repository plus LangGraph adapter, remains a good later integration layer for resume semantics, but it does not replace the storage contract.
 
 ## Deferred Work
 
@@ -137,4 +153,3 @@ Option D, an internal repository plus LangGraph adapter, remains a good later in
 - true resume is deferred
 - pending writes / interrupts / task replay are deferred
 - body / metadata orchestration is deferred
-

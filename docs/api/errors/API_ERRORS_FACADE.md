@@ -43,6 +43,11 @@ Implemented public facade:
 
 - `FrameworkError`
 - `ConfigError`
+- `CheckpointStoreError`
+- `CheckpointValidationError`
+- `CheckpointConflictError`
+- `CheckpointIntegrityError`
+- `CheckpointPersistenceError`
 - `PluginRegistrationError`
 - `PluginResolutionError`
 - `PluginValidationError`
@@ -57,6 +62,11 @@ Initial public facade candidates:
 
 - `FrameworkError`
 - `ConfigError`
+- `CheckpointStoreError`
+- `CheckpointValidationError`
+- `CheckpointConflictError`
+- `CheckpointIntegrityError`
+- `CheckpointPersistenceError`
 - `PluginRegistrationError`
 - `PluginResolutionError`
 - `PluginValidationError`
@@ -70,6 +80,26 @@ Initial public facade candidates:
 ### ConfigError
 
 `ConfigError` covers config source, schema, and semantic validation failures.
+
+### CheckpointStoreError
+
+`CheckpointStoreError` covers versioned checkpoint repository failures.
+
+### CheckpointValidationError
+
+`CheckpointValidationError` covers invalid checkpoint identity or body requests.
+
+### CheckpointConflictError
+
+`CheckpointConflictError` covers immutable identity conflicts and stale-parent writes.
+
+### CheckpointIntegrityError
+
+`CheckpointIntegrityError` covers persisted checkpoint corruption.
+
+### CheckpointPersistenceError
+
+`CheckpointPersistenceError` covers backend I/O failures for checkpoint storage.
 
 ### PluginRegistrationError
 

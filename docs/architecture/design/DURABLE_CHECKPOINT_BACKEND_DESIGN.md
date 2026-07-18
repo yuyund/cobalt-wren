@@ -2,9 +2,9 @@
 
 This document describes the target design for a future durable checkpoint backend.
 
-Status: blocked by protocol.
+Status: approved for implementation.
 
-The current `CheckpointStore` protocol cannot yet express immutable checkpoint versions, lineage, serializer compatibility, specific-version reads, or history listing. This design remains provisional until the protocol is evolved.
+The checkpoint protocol now expresses immutable checkpoint versions, lineage, serializer compatibility, specific-version reads, and history listing. The durable backend implementation remains a later step.
 
 ## Purpose
 
@@ -33,12 +33,12 @@ Target checkpoint capabilities:
 
 ## Target Value Model
 
-Recommended checkpoint protocol shape:
+The current protocol already uses the request / descriptor / read-result split.
+That is the request / descriptor / read result separation the backend will preserve:
 
-- request / descriptor / read result separation
-- immutable checkpoint versions
-- explicit parent / lineage
-- explicit serializer identity and version
+- `CheckpointWriteRequest`
+- `StoredCheckpoint`
+- `CheckpointReadResult`
 
 Conceptual request:
 
@@ -46,12 +46,13 @@ Conceptual request:
 @dataclass(frozen=True, slots=True)
 class CheckpointWriteRequest:
     run_id: int | str
-    namespace: str
+    checkpoint_namespace: str = ''
     checkpoint_id: str
     parent_checkpoint_id: str | None
     body: bytes = field(repr=False)
     serializer_name: str
     serializer_version: int
+    content_type: str
     metadata: Mapping[str, JsonValue] = field(default_factory=dict, repr=False)
 ```
 
@@ -61,12 +62,13 @@ Conceptual stored descriptor:
 @dataclass(frozen=True, slots=True)
 class StoredCheckpoint:
     run_id: int | str
-    namespace: str
+    checkpoint_namespace: str
     checkpoint_id: str
     parent_checkpoint_id: str | None
-    revision: int | None
+    revision: int
     serializer_name: str
     serializer_version: int
+    content_type: str
     size: int
     digest: str
     metadata: Mapping[str, JsonValue] = field(repr=False)
@@ -81,22 +83,20 @@ class CheckpointReadResult:
     body: bytes = field(repr=False)
 ```
 
-These shapes are design targets only. The current protocol does not define them.
-
 ## Identity Model
 
-Recommended identity shape:
+Identity shape:
 
-- execution identity: `(run_id, namespace)`
+- execution identity: `(run_id, checkpoint_namespace)`
 - checkpoint identity: `checkpoint_id`
 - lineage parent: `parent_checkpoint_id`
 - ordering: `revision`
 
-The `run_id` alone is not sufficient for versioned checkpoint storage.
+`run_id` alone is not sufficient for versioned checkpoint storage.
 
 ## Serialization Boundary
 
-The checkpoint store should own bytes only.
+The checkpoint store owns bytes only.
 
 Recommended boundary:
 
@@ -104,11 +104,11 @@ Recommended boundary:
 - checkpoint store persists bytes and safe metadata only
 - serializer identity and serializer version are persisted alongside the bytes
 
-The store should not infer Python object structure or import serializer classes from arbitrary module paths.
+The store must not infer Python object structure or import serializer classes from arbitrary module paths.
 
 ## Target Filesystem Layout
 
-If and when the protocol evolves, the first durable backend should use content-addressed immutable files and explicit head records.
+The first durable backend target should use content-addressed immutable files and explicit head records.
 
 Suggested layout:
 
@@ -129,7 +129,7 @@ Suggested layout:
       <namespace-digest>.json
 ```
 
-This layout is provisional until identity and latest-selection semantics are finalized.
+This layout remains provisional until the W3 implementation lands.
 
 ## Publication Order
 
@@ -194,8 +194,7 @@ True resume additionally needs:
 
 ## Deferred Work
 
-- checkpoint protocol evolution is deferred
-- filesystem checkpoint backend implementation is deferred
-- checkpoint runtime selection is deferred
-- true resume is deferred
-- metadata orchestration is deferred
+- filesystem checkpoint backend implementation
+- checkpoint runtime selection
+- true resume
+- metadata orchestration

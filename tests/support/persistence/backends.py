@@ -88,7 +88,17 @@ def checkpoint_backend_specs() -> tuple[CheckpointBackendSpec, ...]:
                 {
                     ContractCapability.BASELINE,
                     ContractCapability.DEFENSIVE_COPY,
+                    ContractCapability.SAFE_REFERENCE,
                     ContractCapability.RUN_ISOLATION,
+                    ContractCapability.IMMUTABLE_VERSION,
+                    ContractCapability.IDEMPOTENT_WRITE,
+                    ContractCapability.CONFLICT_DETECTION,
+                    ContractCapability.SPECIFIC_VERSION_READ,
+                    ContractCapability.LATEST_SELECTION,
+                    ContractCapability.HISTORY_LISTING,
+                    ContractCapability.LINEAGE,
+                    ContractCapability.SERIALIZER_DESCRIPTOR,
+                    ContractCapability.THREAD_CONCURRENT_APPEND,
                 }
             ),
         ),

@@ -19,8 +19,8 @@ This document defines the reusable black-box contract test harness for ArtifactS
 ## Baseline Contract
 
 - ArtifactStore: body round-trip, missing behavior, run isolation, defensive copy, deterministic list ordering, idempotent write, conflict detection, safe reference rejection, diagnostic non-exposure.
-- CheckpointStore: round-trip, missing behavior, run isolation, defensive copy, delete contract, latest-state compatibility, diagnostic non-exposure.
-- The checkpoint baseline is a characterization of destructive latest-state replacement, not a versioned durable checkpoint contract.
+- CheckpointStore: genesis append, versioned round-trip, missing behavior, run isolation, namespace isolation, defensive copy, idempotent retry, conflict detection, ordered history listing, diagnostic non-exposure.
+- The checkpoint baseline is a characterization of versioned append-only history, not destructive latest-state replacement.
 - Baseline tests live under `tests/contract/persistence/`.
 
 ## Characterization Tests
@@ -143,9 +143,15 @@ These capabilities are documented for later backends and remain deferred until t
 - DEFENSIVE_COPY
 - RUN_ISOLATION
 - IDEMPOTENT_WRITE
+- CONFLICT_DETECTION
+- SPECIFIC_VERSION_READ
+- LATEST_SELECTION
+- HISTORY_LISTING
+- LINEAGE
+- SERIALIZER_DESCRIPTOR
 - INTEGRITY_VERIFICATION
 - RESTART_DURABILITY
-- VERSIONED_HISTORY
+- THREAD_CONCURRENT_APPEND
 
 Any capability that the current protocol cannot express remains a gap until the interface evolves.
 

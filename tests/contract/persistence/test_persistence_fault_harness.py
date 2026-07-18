@@ -6,6 +6,7 @@ import pytest
 
 from langgraph_automation.integrations.artifact.base import ArtifactWriteRequest
 from langgraph_automation.integrations.artifact.memory_store import MemoryArtifactStore
+from langgraph_automation.integrations.checkpoint.base import CheckpointWriteRequest
 from langgraph_automation.integrations.checkpoint.memory_store import MemoryCheckpointStore
 from tests.support.persistence import FaultPlan, FaultTiming, FaultingArtifactStore, FaultingCheckpointStore
 
@@ -63,10 +64,22 @@ def test_faulting_checkpoint_store_after_fault_runs_delegate_then_raises() -> No
         plan=FaultPlan(operation='save', timing=FaultTiming.AFTER, occurrence=1, exception_factory=lambda: RuntimeError('boom')),
     )
 
-    with pytest.raises(RuntimeError, match='boom'):
-        store.save(7, {'value': 'secret-token', 'path': '/tmp/secret.txt'})
+    request = CheckpointWriteRequest(
+        run_id=7,
+        checkpoint_namespace='default',
+        checkpoint_id='checkpoint-a',
+        parent_checkpoint_id=None,
+        body=b'checkpoint-body',
+        serializer_name='langgraph-json',
+        serializer_version=1,
+        content_type='application/vnd.langgraph.checkpoint+json',
+        metadata={'value': 'secret-token', 'path': '/tmp/secret.txt'},
+    )
 
-    assert inner.load(7) == {'value': 'secret-token', 'path': '/tmp/secret.txt'}
+    with pytest.raises(RuntimeError, match='boom'):
+        store.save(request)
+
+    assert inner.load_latest(7, checkpoint_namespace='default').body == b'checkpoint-body'
     assert store.records[-1].delegate_ran is True
     assert store.records[-1].call_count == 1
 
@@ -75,11 +88,11 @@ def test_faulting_checkpoint_store_before_fault_skips_delegate_and_keeps_diagnos
     inner = MemoryCheckpointStore()
     store = FaultingCheckpointStore(
         inner,
-        plan=FaultPlan(operation='load', timing=FaultTiming.BEFORE, occurrence=1, exception_factory=lambda: RuntimeError('boom')),
+        plan=FaultPlan(operation='load_latest', timing=FaultTiming.BEFORE, occurrence=1, exception_factory=lambda: RuntimeError('boom')),
     )
 
     with pytest.raises(RuntimeError, match='boom'):
-        store.load(42)
+        store.load_latest(42)
 
     record = store.records[-1]
     assert record.delegate_ran is False
@@ -97,6 +110,19 @@ def test_faulting_wrappers_delegate_normal_operations() -> None:
     assert artifact_store.get('run-4/report.md') is not None
     assert artifact_store.list_for_run(4) != []
 
-    checkpoint_store.save(4, {'value': 'ok'})
-    assert checkpoint_store.load(4) == {'value': 'ok'}
-    assert checkpoint_store.delete(4) is None
+    checkpoint_store.save(
+        CheckpointWriteRequest(
+            run_id=4,
+            checkpoint_namespace='default',
+            checkpoint_id='checkpoint-a',
+            parent_checkpoint_id=None,
+            body=b'ok',
+            serializer_name='langgraph-json',
+            serializer_version=1,
+            content_type='application/vnd.langgraph.checkpoint+json',
+            metadata={'value': 'ok'},
+        )
+    )
+    assert checkpoint_store.load_latest(4, checkpoint_namespace='default') is not None
+    assert checkpoint_store.load_checkpoint(4, 'checkpoint-a', checkpoint_namespace='default') is not None
+    assert checkpoint_store.list_for_run(4, checkpoint_namespace='default') != []

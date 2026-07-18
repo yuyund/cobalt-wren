@@ -26,21 +26,23 @@ def test_checkpoint_store_protocol_sufficiency_docs_exist_and_cover_core_terms()
 
     for token in (
         'checkpoint store protocol sufficiency audit',
-        'blocked_by_protocol',
-        'versioned checkpoint identity',
+        'approved_for_implementation',
+        'checkpointwriterequest',
+        'storedcheckpoint',
+        'checkpointreadresult',
         'parent / lineage',
         'serializer identity/version',
         'specific-version read',
         'history listing',
         'deterministic latest selection',
-        'destructive latest snapshot',
+        'request / descriptor / read-result separation',
     ):
         assert token in audit_text
 
     for token in (
         'durable checkpoint backend design',
-        'blocked by protocol',
-        'request / descriptor / read result separation',
+        'approved for implementation',
+        'request / descriptor / read-result split',
         'immutable checkpoint versions',
         'stable execution identity',
         'process_durable',
@@ -53,9 +55,9 @@ def test_checkpoint_store_protocol_sufficiency_docs_exist_and_cover_core_terms()
 
     for token in (
         'durable checkpoint test plan',
-        'blocked by protocol',
-        'current memory checkpoint store uses latest-state replacement by `run_id`',
-        'checkpoint protocol evolution is deferred',
+        'approved for implementation',
+        'current memory checkpoint store uses linear append-only versioned history',
+        'checkpoint protocol evolution is complete',
         'immutable checkpoint version write',
         'specific-version read',
         'history listing',
@@ -64,25 +66,25 @@ def test_checkpoint_store_protocol_sufficiency_docs_exist_and_cover_core_terms()
         assert token in test_plan_text
 
     for token in (
-        '`checkpointstore` is currently a latest-state store keyed by `run_id`',
-        '`checkpointstore` sufficiency audit result is `blocked_by_protocol`',
-        'current protocol does not express immutable checkpoint versions',
+        '`checkpointstore` is a versioned append-only checkpoint repository keyed by `run_id` and `checkpoint_namespace`',
+        '`checkpointstore` sufficiency audit result is `approved_for_implementation`',
+        'checkpoint_id is caller-issued and identifies an immutable checkpoint version',
         'specific-version reads',
         'history listing',
-        'durable checkpoint implementation remains deferred',
+        'durable checkpoint implementation is now unblocked',
     ):
         assert token in contract_text
 
     for token in (
-        'checkpoint store protocol sufficiency is blocked',
-        'missing versioned identity, history, lineage, serializer compatibility, and specific-version reads',
-        'checkpoint protocol is blocked',
+        'checkpointstore protocol is versioned and approved for implementation',
+        'checkpoint protocol is versioned and approved for implementation',
+        'durable backend implementation still deferred',
     ):
         assert token in traceability_text
 
     for token in (
-        'checkpointstore protocol is latest-state only',
-        'checkpoint protocol evolution is deferred',
+        'durable checkpoint backend is deferred',
+        'checkpoint protocol evolution is complete',
         'recommended closure order',
     ):
         assert token in gaps_text

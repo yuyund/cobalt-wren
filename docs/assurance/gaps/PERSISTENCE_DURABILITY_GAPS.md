@@ -10,7 +10,6 @@ This document ranks the remaining persistence gaps after the current code-first 
 
 | Gap | Evidence | Why it matters | Risk |
 | --- | --- | --- | --- |
-| CheckpointStore protocol is latest-state only | `src/langgraph_automation/integrations/checkpoint/base.py`, `src/langgraph_automation/integrations/checkpoint/memory_store.py` | The current protocol cannot represent versioned checkpoint identity, lineage, serializer compatibility, or specific-version reads. | High |
 | No durable checkpoint backend | `src/langgraph_automation/integrations/checkpoint/memory_store.py`, `src/langgraph_automation/apps/automation/services/runtime.py` | Checkpoint bodies are not restart-safe or deployment-shared. | High |
 | No body/metadata orchestration path | `src/langgraph_automation/apps/automation/services/execution.py`, `src/langgraph_automation/apps/automation/services/runs.py`, `src/langgraph_automation/graphs/runner.py` | The execution path does not write or verify artifact/checkpoint bodies today. | High |
 | No reconciliation path for orphan body / dangling metadata | current code has metadata-only models and EPHEMERAL stores | Crash windows and repair semantics are undefined. | High |
@@ -20,16 +19,15 @@ This document ranks the remaining persistence gaps after the current code-first 
 | Gap | Evidence | Why it matters | Risk |
 | --- | --- | --- | --- |
 | Durable body orchestration remains unimplemented | `src/langgraph_automation/apps/automation/services/execution.py`, `src/langgraph_automation/apps/automation/services/runs.py`, `src/langgraph_automation/graphs/runner.py` | The execution path still does not write or verify artifact/checkpoint bodies. | Medium |
-| Missing checksum / serializer / version fields in checkpoint store results | `src/langgraph_automation/integrations/checkpoint/base.py` | Checkpoint integrity cannot be verified mechanically today. | Medium |
 | Missing durable checkpoint backend capability model | current checkpoint protocol shapes are minimal | Future durable checkpoint backends need a shared capability vocabulary for contract tests. | Medium |
 
 ## Current EPHEMERAL Limitations
 
 - artifact bodies are bytes in process-local memory only
-- checkpoint bodies are process-local run-state dictionaries only
+- checkpoint bodies are serialized bytes in process-local memory only
 - restart destroys body state
 - no shared-instance durability exists
-- no checkpoint conditional create or conflict protocol exists
+- no checkpoint restart durability exists
 
 ## Recommended Closure Order
 
@@ -42,7 +40,7 @@ This document ranks the remaining persistence gaps after the current code-first 
 ## Deferred Work
 
 - durable checkpoint backend is deferred
-- checkpoint protocol evolution is deferred
+- checkpoint protocol evolution is complete
 - reconciliation worker is deferred
 - cleanup command is deferred
 - true resume is deferred

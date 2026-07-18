@@ -21,7 +21,8 @@ def test_durable_checkpoint_backend_design_docs_exist_and_cover_core_terms() -> 
     roadmap_text = roadmap.read_text().lower()
 
     for token in (
-        'blocked_by_protocol',
+        'approved_for_implementation',
+        'checkpoint store contract',
         'versioned checkpoint identity',
         'specific-version read',
         'history listing',
@@ -34,7 +35,7 @@ def test_durable_checkpoint_backend_design_docs_exist_and_cover_core_terms() -> 
 
     for token in (
         'durable checkpoint backend design',
-        'status: blocked by protocol',
+        'status: approved for implementation',
         'immutable checkpoint versions',
         'request / descriptor / read result separation',
         'checkpoint-bodies',
@@ -47,9 +48,9 @@ def test_durable_checkpoint_backend_design_docs_exist_and_cover_core_terms() -> 
 
     for token in (
         'durable checkpoint test plan',
-        'status: blocked by protocol',
-        'current memory checkpoint store uses latest-state replacement by `run_id`',
-        'no durable checkpoint backend implementation is attempted before protocol evolution',
+        'status: approved for implementation',
+        'current memory checkpoint store uses linear append-only versioned history',
+        'durable checkpoint backend implementation remains a later step',
         'specific-version read',
         'history listing',
         'lost-update detection',
@@ -58,9 +59,8 @@ def test_durable_checkpoint_backend_design_docs_exist_and_cover_core_terms() -> 
 
     for token in (
         'checkpoint durability contract and protocol sufficiency audit block w1',
-        'blocked_by_protocol',
-        'checkpoint protocol sufficiency audit: complete',
-        'next block: checkpoint store protocol evolution block w2',
+        'approved_for_implementation',
+        'checkpoint store protocol evolution block w2',
+        'next block: filesystem checkpoint backend implementation block w3',
     ):
         assert token in roadmap_text
-

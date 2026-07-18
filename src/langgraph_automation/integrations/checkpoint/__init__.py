@@ -1,12 +1,14 @@
 """Checkpoint integration package."""
 
-from .base import CheckpointStore, CheckpointWriteResult
+from .base import CheckpointReadResult, CheckpointStore, CheckpointWriteRequest, StoredCheckpoint
 from .memory_store import MemoryCheckpointStore
 from .summary import format_state_summary, summarize_state
 
 __all__ = [
     'CheckpointStore',
-    'CheckpointWriteResult',
+    'CheckpointWriteRequest',
+    'StoredCheckpoint',
+    'CheckpointReadResult',
     'MemoryCheckpointStore',
     'format_state_summary',
     'summarize_state',

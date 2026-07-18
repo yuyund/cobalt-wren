@@ -45,6 +45,7 @@ Coupling rules:
 - `ToolOutputSafetyError`
 - `ProviderExecutionError`
 - `StoreError`
+- `CheckpointStoreError`
 - `EventSinkError`
 - `SafetyBoundaryError`
 - `InternalInvariantError`
@@ -338,6 +339,31 @@ Do not expose:
 - raw checkpoint body
 - raw artifact content
 - secret-bearing storage URL
+
+## CheckpointStoreError
+
+`CheckpointStoreError` covers versioned checkpoint repository failures.
+
+Typical cases:
+
+- invalid checkpoint identity
+- immutable identity conflict
+- stale parent conflict
+- checkpoint body corruption
+- unsupported serializer version
+- storage backend unavailable
+
+Safe message examples:
+
+- `Checkpoint request is invalid.`
+- `Checkpoint identity conflicts with an existing immutable version.`
+- `Checkpoint persistence failed.`
+
+Boundary:
+
+- versioned checkpoint storage failures belong here
+- latest-state replacement is no longer part of the checkpoint contract
+- raw checkpoint body, identity, or metadata must not be exposed
 
 ## EventSinkError
 

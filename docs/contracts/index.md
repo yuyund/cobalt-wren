@@ -10,3 +10,4 @@ This folder holds the invariants that cross package and subsystem boundaries.
 ## Read Next
 - Read the core contracts doc before making broad refactors.
 - Use the error taxonomy when changing failure shapes or public exceptions.
+- Use the integration contracts when changing durable artifact or checkpoint storage.

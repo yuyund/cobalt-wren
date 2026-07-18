@@ -39,6 +39,7 @@ def test_docs_navigation_entries_exist_and_point_to_subsections() -> None:
     contracts_errors_index = root / 'contracts' / 'errors' / 'index.md'
     contracts_integrations_index = root / 'contracts' / 'integrations' / 'index.md'
     contracts_filesystem_artifact = root / 'contracts' / 'integrations' / 'FILESYSTEM_ARTIFACT_STORE.md'
+    contracts_checkpoint = root / 'contracts' / 'integrations' / 'CHECKPOINT_STORE.md'
     workflows_index = root / 'workflows' / 'index.md'
     workflows_authoring_index = root / 'workflows' / 'authoring' / 'index.md'
     workflows_readiness_index = root / 'workflows' / 'readiness' / 'index.md'
@@ -87,6 +88,7 @@ def test_docs_navigation_entries_exist_and_point_to_subsections() -> None:
         contracts_errors_index,
         contracts_integrations_index,
         contracts_filesystem_artifact,
+        contracts_checkpoint,
         workflows_index,
         workflows_authoring_index,
         workflows_readiness_index,
@@ -118,6 +120,7 @@ def test_docs_navigation_entries_exist_and_point_to_subsections() -> None:
     api_index_text = api_index.read_text()
     configuration_index_text = configuration_index.read_text()
     contracts_index_text = contracts_index.read_text()
+    contracts_integrations_text = contracts_integrations_index.read_text()
     workflows_index_text = workflows_index.read_text()
     roadmap_index_text = roadmap_index.read_text()
     assurance_index_text = assurance_index.read_text()
@@ -157,6 +160,7 @@ def test_docs_navigation_entries_exist_and_point_to_subsections() -> None:
     assert 'core/index.md' in contracts_index_text
     assert 'errors/index.md' in contracts_index_text
     assert 'integrations/index.md' in contracts_index_text
+    assert 'CHECKPOINT_STORE.md' in contracts_integrations_text
     assert 'authoring/index.md' in workflows_index_text
     assert 'readiness/index.md' in workflows_index_text
     assert 'milestones/index.md' in roadmap_index_text

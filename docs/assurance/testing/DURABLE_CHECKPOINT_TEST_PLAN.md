@@ -1,10 +1,8 @@
 # Durable Checkpoint Test Plan
 
-This document defines the acceptance plan for a future durable checkpoint backend.
+This document defines the acceptance plan for the versioned checkpoint protocol and the future durable backend.
 
-Status: blocked by protocol.
-
-The current `CheckpointStore` protocol is not sufficient to express versioned execution state, lineage, serializer compatibility, or specific-version history reads. The durable backend implementation remains deferred until the protocol is evolved.
+Status: approved for implementation.
 
 ## Baseline Contract Activation
 
@@ -15,23 +13,23 @@ The current `CheckpointStore` protocol is not sufficient to express versioned ex
 
 ## Current Characterization
 
-- current memory checkpoint store uses latest-state replacement by `run_id`
+- current memory checkpoint store uses linear append-only versioned history
 - current memory checkpoint store is EPHEMERAL
-- current checkpoint protocol does not expose versioned history
-- current checkpoint protocol does not expose serializer identity/version
+- current checkpoint protocol exposes versioned history
+- current checkpoint protocol exposes serializer identity / version
 
 ## Required Audit Tests
 
 - exact protocol signature inspection
 - exact field inventory inspection
-- current overwrite semantics characterization
+- current append semantics characterization
 - current missing behavior characterization
-- current delete scope characterization
+- current identity / namespace isolation characterization
 - current state-body shape characterization
 - current runtime wiring characterization
 - current Django metadata boundary characterization
 
-## Future Durable Acceptance Cases
+## Durable Acceptance Cases
 
 - immutable checkpoint version write
 - idempotent retry for same canonical checkpoint write
@@ -42,7 +40,7 @@ The current `CheckpointStore` protocol is not sufficient to express versioned ex
 - parent / lineage preservation
 - serializer compatibility / version compatibility
 - restart durability
-- safe deletion scope
+- safe deletion scope through omission
 - safe diagnostics
 - concurrency and lost-update detection
 
@@ -62,11 +60,12 @@ The current `CheckpointStore` protocol is not sufficient to express versioned ex
 
 ## Acceptance Criteria
 
-- protocol sufficiency audit is explicitly `BLOCKED_BY_PROTOCOL`
-- current checkpoint store remains latest-state only
+- protocol sufficiency audit is explicitly `APPROVED_FOR_IMPLEMENTATION`
+- current checkpoint store remains linear and versioned
 - current memory backend keeps its current semantics
-- checkpoint protocol evolution is deferred until the audit can be reopened
-- no durable checkpoint backend implementation is attempted before protocol evolution
+- durable checkpoint backend implementation remains a later step
+- checkpoint protocol evolution is complete
+- `FilesystemCheckpointStore` remains deferred until W3
 - true resume remains separate from storage durability
 - runtime selection remains deferred
 - metadata orchestration remains deferred
@@ -75,4 +74,4 @@ The current `CheckpointStore` protocol is not sufficient to express versioned ex
 
 - do not add permanent `xfail` markers for missing durable behavior
 - keep current characterization tests executable
-- add durable backend tests only after protocol evolution provides a sufficient contract
+- add durable backend tests only after the W3 implementation exists

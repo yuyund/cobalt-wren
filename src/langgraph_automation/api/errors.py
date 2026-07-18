@@ -13,6 +13,11 @@ __all__ = [
     'ArtifactConflictError',
     'ArtifactIntegrityError',
     'ArtifactPersistenceError',
+    'CheckpointStoreError',
+    'CheckpointValidationError',
+    'CheckpointConflictError',
+    'CheckpointIntegrityError',
+    'CheckpointPersistenceError',
     'PluginRegistrationError',
     'PluginResolutionError',
     'PluginValidationError',
@@ -156,6 +161,98 @@ class ArtifactIntegrityError(ArtifactStoreError):
 
 
 class ArtifactPersistenceError(ArtifactStoreError):
+    def __init__(
+        self,
+        safe_message: str,
+        *,
+        code: str,
+        component: str | None = None,
+        retryable: bool | None = None,
+        metadata: Mapping[str, Any] | None = None,
+    ) -> None:
+        super().__init__(
+            safe_message,
+            code=code,
+            component=component,
+            retryable=retryable,
+            metadata=metadata,
+        )
+
+
+class CheckpointStoreError(FrameworkError):
+    def __init__(
+        self,
+        safe_message: str,
+        *,
+        code: str,
+        component: str | None = None,
+        retryable: bool | None = None,
+        metadata: Mapping[str, Any] | None = None,
+    ) -> None:
+        super().__init__(
+            safe_message,
+            code=code,
+            category='checkpoint_store',
+            component=component,
+            retryable=retryable,
+            metadata=metadata,
+        )
+
+
+class CheckpointValidationError(CheckpointStoreError):
+    def __init__(
+        self,
+        safe_message: str,
+        *,
+        code: str,
+        component: str | None = None,
+        metadata: Mapping[str, Any] | None = None,
+    ) -> None:
+        super().__init__(
+            safe_message,
+            code=code,
+            component=component,
+            metadata=metadata,
+        )
+
+
+class CheckpointConflictError(CheckpointStoreError):
+    def __init__(
+        self,
+        safe_message: str,
+        *,
+        code: str,
+        component: str | None = None,
+        metadata: Mapping[str, Any] | None = None,
+    ) -> None:
+        super().__init__(
+            safe_message,
+            code=code,
+            component=component,
+            metadata=metadata,
+        )
+
+
+class CheckpointIntegrityError(CheckpointStoreError):
+    def __init__(
+        self,
+        safe_message: str,
+        *,
+        code: str,
+        component: str | None = None,
+        retryable: bool | None = None,
+        metadata: Mapping[str, Any] | None = None,
+    ) -> None:
+        super().__init__(
+            safe_message,
+            code=code,
+            component=component,
+            retryable=retryable,
+            metadata=metadata,
+        )
+
+
+class CheckpointPersistenceError(CheckpointStoreError):
     def __init__(
         self,
         safe_message: str,

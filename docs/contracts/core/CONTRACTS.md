@@ -202,13 +202,22 @@ These contracts describe the current internal foundation surface. If parts of th
 
 ## CheckpointStore Contract
 
-- checkpoint state は current contract では `run_id` ごとの latest-state replacement である
-- `thread_id` と `checkpoint_namespace` は write-result metadata だが、versioned identity ではない
-- raw input / raw response / raw output を保存しない
-- true resume は別途 contract が固まるまで未実装
-- current memory store は EPHEMERAL で、restart durability と versioned lineage を保証しない
-- current protocol は versioned checkpoint identity, parent / lineage, serializer identity/version, specific-version read, history listing, and deterministic latest selection を表現できない
-- `CheckpointStore` audit result is `BLOCKED_BY_PROTOCOL`
+- checkpoint storage is a versioned execution-state repository
+- `CheckpointWriteRequest`, `StoredCheckpoint`, and `CheckpointReadResult` separate request / descriptor / read-result responsibilities
+- execution stream identity is `run_id + checkpoint_namespace`
+- complete checkpoint identity is `run_id + checkpoint_namespace + checkpoint_id`
+- `checkpoint_id` is caller-issued and immutable
+- `revision` is store-assigned and orders versions within a stream
+- `parent_checkpoint_id` is the expected current head and records lineage
+- `save(request)` is append-only, idempotent for the same canonical request, and conflict-aware for stale parents or changed content
+- `load_latest()`, `load_checkpoint()`, and `list_for_run()` are the supported read operations
+- `list_for_run()` returns descriptors only and is ordered by revision
+- `delete(run_id)` is not part of the versioned checkpoint contract
+- serializer identity, serializer version, content type, size, digest, and safe JSON-compatible metadata are part of the durable descriptor
+- `MemoryCheckpointStore` is the EPHEMERAL semantic reference implementation
+- `CheckpointStore` audit result is `APPROVED_FOR_IMPLEMENTATION`
+- `FilesystemCheckpointStore` remains unimplemented until the durable backend work lands
+- true resume is still deferred
 - DB metadata には checkpoint body copy を入れない
 
 ## P0-B Public Facade Contract

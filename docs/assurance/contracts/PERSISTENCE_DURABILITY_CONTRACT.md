@@ -100,12 +100,21 @@ Evidence:
 
 ### Checkpoint store protocol sufficiency
 
-- `CheckpointStore` is currently a latest-state store keyed by `run_id`
-- `thread_id` and `checkpoint_namespace` are carried as metadata, not durable version identity
-- the current protocol does not express immutable checkpoint versions, parent / lineage, serializer identity/version, specific-version reads, or history listing
-- `CheckpointStore` sufficiency audit result is `BLOCKED_BY_PROTOCOL`
-- durable checkpoint implementation remains deferred until the protocol evolves
-- checkpoint protocol evolution is deferred until the audit can be reopened
+- `CheckpointStore` is a versioned append-only checkpoint repository keyed by `run_id` and `checkpoint_namespace`
+- `CheckpointWriteRequest`, `StoredCheckpoint`, and `CheckpointReadResult` separate request / descriptor / read-result responsibilities
+- `checkpoint_id` is caller-issued and identifies an immutable checkpoint version
+- checkpoint_id is caller-issued and identifies an immutable checkpoint version
+- `revision` is store-assigned and orders versions within a stream
+- `parent_checkpoint_id` is the expected current head and records lineage
+- `save(request)` is idempotent for the same canonical request and conflict-aware for stale parents or changed content
+- `load_latest()`, `load_checkpoint()`, and `list_for_run()` are the supported read operations
+- `list_for_run()` returns descriptors only and does not read full body bytes
+- specific-version reads are supported
+- history listing is supported
+- `CheckpointStore` sufficiency audit result is `APPROVED_FOR_IMPLEMENTATION`
+- durable checkpoint implementation is now unblocked for the first durable backend
+- `FilesystemCheckpointStore` remains deferred until W3
+- true resume remains deferred until the adapter layer is designed
 
 Evidence:
 

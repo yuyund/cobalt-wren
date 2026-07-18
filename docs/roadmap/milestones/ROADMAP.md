@@ -254,10 +254,18 @@ Artifact Backend Runtime Selection and Configuration Block V4:
 
 Checkpoint Durability Contract and Protocol Sufficiency Audit Block W1:
 
-- blocked_by_protocol
+- complete
 - checkpoint protocol sufficiency audit: complete
-- versioned execution state contract: blocked
+- versioned execution state contract: approved
 - next block: Checkpoint Store Protocol Evolution Block W2
+
+Checkpoint Store Protocol Evolution Block W2:
+
+- complete
+- checkpoint store protocol: versioned / immutable / serializer-aware / conflict-aware
+- MemoryCheckpointStore reference implementation: complete
+- filesystem backend readiness: approved
+- next block: Filesystem Checkpoint Backend Implementation Block W3
 
 Later:
 
@@ -288,6 +296,7 @@ Persistence durability audit:
 
 - Block T: complete
 - durable artifact backend: complete
+- durable checkpoint protocol: complete
 - durable checkpoint backend: deferred
 - next block: Persistence Contract Test Harness Block U
 
@@ -295,6 +304,7 @@ Persistence contract test harness:
 
 - Block U: complete
 - durable artifact backend: complete
+- durable checkpoint protocol: complete
 - durable checkpoint backend: deferred
 - next block: Durable Checkpoint Backend Block V
 

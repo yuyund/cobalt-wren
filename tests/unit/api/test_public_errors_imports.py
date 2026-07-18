@@ -10,6 +10,11 @@ def test_public_errors_api_exports() -> None:
         ArtifactPersistenceError,
         ArtifactStoreError,
         ArtifactValidationError,
+        CheckpointConflictError,
+        CheckpointIntegrityError,
+        CheckpointPersistenceError,
+        CheckpointStoreError,
+        CheckpointValidationError,
         ConfigError,
         FrameworkError,
         PluginRegistrationError,
@@ -25,6 +30,11 @@ def test_public_errors_api_exports() -> None:
     assert ArtifactConflictError is not None
     assert ArtifactIntegrityError is not None
     assert ArtifactPersistenceError is not None
+    assert CheckpointStoreError is not None
+    assert CheckpointValidationError is not None
+    assert CheckpointConflictError is not None
+    assert CheckpointIntegrityError is not None
+    assert CheckpointPersistenceError is not None
     assert ConfigError is not None
     assert PluginRegistrationError is not None
     assert PluginResolutionError is not None
@@ -43,6 +53,11 @@ def test_public_errors_api_all() -> None:
         'ArtifactConflictError',
         'ArtifactIntegrityError',
         'ArtifactPersistenceError',
+        'CheckpointStoreError',
+        'CheckpointValidationError',
+        'CheckpointConflictError',
+        'CheckpointIntegrityError',
+        'CheckpointPersistenceError',
         'ConfigError',
         'PluginRegistrationError',
         'PluginResolutionError',

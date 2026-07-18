@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 
 from langgraph_automation.core.redaction import REDACTED_VALUE
-from langgraph_automation.integrations.checkpoint import MemoryCheckpointStore, summarize_state
+from langgraph_automation.integrations.checkpoint import CheckpointWriteRequest, MemoryCheckpointStore, summarize_state
 
 
 def test_summarize_state_redacts_sensitive_keys_and_bounded_values() -> None:
@@ -32,27 +32,54 @@ def test_summarize_state_redacts_sensitive_keys_and_bounded_values() -> None:
     assert '/tmp/secret/file.txt' not in json.dumps(summary)
 
 
+def test_memory_checkpoint_store_versioned_append_and_history() -> None:
+    store = MemoryCheckpointStore()
+
+    first = store.save(
+        CheckpointWriteRequest(
+            run_id=7,
+            checkpoint_namespace='default',
+            checkpoint_id='checkpoint-a',
+            parent_checkpoint_id=None,
+            body=b'first',
+            serializer_name='langgraph-json',
+            serializer_version=1,
+            content_type='application/vnd.langgraph.checkpoint+json',
+            metadata={'phase': 'first'},
+        )
+    )
+    second = store.save(
+        CheckpointWriteRequest(
+            run_id=7,
+            checkpoint_namespace='default',
+            checkpoint_id='checkpoint-b',
+            parent_checkpoint_id='checkpoint-a',
+            body=b'second',
+            serializer_name='langgraph-json',
+            serializer_version=1,
+            content_type='application/vnd.langgraph.checkpoint+json',
+            metadata={'phase': 'second'},
+        )
+    )
+
+    assert first.revision == 1
+    assert second.revision == 2
+    latest = store.load_latest(7, checkpoint_namespace='default')
+    assert latest is not None
+    assert latest.checkpoint == second
+    assert latest.body == b'second'
+    assert [checkpoint.revision for checkpoint in store.list_for_run(7, checkpoint_namespace='default')] == [1, 2]
+
+
 def test_memory_checkpoint_store_uses_summarized_state() -> None:
     state = {
         'secret_token': 'abc123',
         'current_step': 'planner' * 20,
     }
 
-    store = MemoryCheckpointStore()
-    result = store.save(7, state, thread_id='thread-1', node_name='planner')
+    summary = summarize_state(state)
 
-    assert 'abc123' not in result.state_summary
-    assert 'secret_token' not in result.state_summary
-    assert result.state_summary.endswith('}')
-    assert len(result.state_summary) < 500
-    loaded = json.loads(result.state_summary)
-    assert loaded['preview']['***REDACTED***'] == REDACTED_VALUE
-
-
-def test_memory_checkpoint_store_currently_replaces_latest_state() -> None:
-    store = MemoryCheckpointStore()
-
-    store.save(7, {'phase': 'first'}, thread_id='thread-1', node_name='planner')
-    store.save(7, {'phase': 'second'}, thread_id='thread-1', node_name='planner')
-
-    assert store.load(7) == {'phase': 'second'}
+    assert 'abc123' not in json.dumps(summary)
+    assert 'secret_token' not in json.dumps(summary)
+    assert len(json.dumps(summary)) < 500
+    assert summary['preview']['***REDACTED***'] == REDACTED_VALUE

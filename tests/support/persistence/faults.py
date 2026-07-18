@@ -5,11 +5,11 @@ from __future__ import annotations
 from collections import defaultdict
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import Any, Callable
+from typing import Callable
 
 from langgraph_automation.core.redaction import redact_text
 from langgraph_automation.integrations.artifact.base import ArtifactReadResult, ArtifactStore, ArtifactWriteRequest, StoredArtifact
-from langgraph_automation.integrations.checkpoint.base import CheckpointStore, CheckpointWriteResult
+from langgraph_automation.integrations.checkpoint.base import CheckpointReadResult, CheckpointStore, CheckpointWriteRequest, StoredCheckpoint
 
 
 class FaultTiming(StrEnum):
@@ -119,59 +119,57 @@ class FaultingCheckpointStore(_FaultingBase, CheckpointStore):
         super().__init__(plan=plan)
         self._inner = inner
 
-    def save(
-        self,
-        run_id: int,
-        state: dict[str, Any],
-        *,
-        thread_id: str = '',
-        checkpoint_namespace: str = '',
-        backend: str = '',
-        node_name: str = '',
-    ) -> CheckpointWriteResult:
+    def save(self, request: CheckpointWriteRequest) -> StoredCheckpoint:
         operation = 'save'
         call_count = self._call_counts[operation] + 1
         self._call_counts[operation] = call_count
-        safe_identifier = self._safe_identifier(str(run_id))
+        safe_identifier = self._safe_identifier(f'{request.run_id}:{request.checkpoint_namespace}:{request.checkpoint_id}')
         if self._should_fault(operation, call_count, FaultTiming.BEFORE):
             self._record(operation=operation, call_count=call_count, safe_identifier=safe_identifier, timing=FaultTiming.BEFORE, delegate_ran=False)
             raise self._plan.exception_factory()  # type: ignore[union-attr]
-        result = self._inner.save(
-            run_id,
-            state,
-            thread_id=thread_id,
-            checkpoint_namespace=checkpoint_namespace,
-            backend=backend,
-            node_name=node_name,
-        )
+        result = self._inner.save(request)
         self._record(operation=operation, call_count=call_count, safe_identifier=safe_identifier, timing=FaultTiming.AFTER, delegate_ran=True)
         if self._should_fault(operation, call_count, FaultTiming.AFTER):
             raise self._plan.exception_factory()  # type: ignore[union-attr]
         return result
 
-    def load(self, run_id: int) -> dict[str, Any] | None:
-        operation = 'load'
+    def load_latest(self, run_id: int | str, *, checkpoint_namespace: str = '') -> CheckpointReadResult | None:
+        operation = 'load_latest'
         call_count = self._call_counts[operation] + 1
         self._call_counts[operation] = call_count
-        safe_identifier = self._safe_identifier(str(run_id))
+        safe_identifier = self._safe_identifier(f'{run_id}:{checkpoint_namespace}')
         if self._should_fault(operation, call_count, FaultTiming.BEFORE):
             self._record(operation=operation, call_count=call_count, safe_identifier=safe_identifier, timing=FaultTiming.BEFORE, delegate_ran=False)
             raise self._plan.exception_factory()  # type: ignore[union-attr]
-        result = self._inner.load(run_id)
+        result = self._inner.load_latest(run_id, checkpoint_namespace=checkpoint_namespace)
         self._record(operation=operation, call_count=call_count, safe_identifier=safe_identifier, timing=FaultTiming.AFTER, delegate_ran=True)
         if self._should_fault(operation, call_count, FaultTiming.AFTER):
             raise self._plan.exception_factory()  # type: ignore[union-attr]
         return result
 
-    def delete(self, run_id: int) -> None:
-        operation = 'delete'
+    def load_checkpoint(self, run_id: int | str, checkpoint_id: str, *, checkpoint_namespace: str = '') -> CheckpointReadResult | None:
+        operation = 'load_checkpoint'
         call_count = self._call_counts[operation] + 1
         self._call_counts[operation] = call_count
-        safe_identifier = self._safe_identifier(str(run_id))
+        safe_identifier = self._safe_identifier(f'{run_id}:{checkpoint_namespace}:{checkpoint_id}')
         if self._should_fault(operation, call_count, FaultTiming.BEFORE):
             self._record(operation=operation, call_count=call_count, safe_identifier=safe_identifier, timing=FaultTiming.BEFORE, delegate_ran=False)
             raise self._plan.exception_factory()  # type: ignore[union-attr]
-        result = self._inner.delete(run_id)
+        result = self._inner.load_checkpoint(run_id, checkpoint_id, checkpoint_namespace=checkpoint_namespace)
+        self._record(operation=operation, call_count=call_count, safe_identifier=safe_identifier, timing=FaultTiming.AFTER, delegate_ran=True)
+        if self._should_fault(operation, call_count, FaultTiming.AFTER):
+            raise self._plan.exception_factory()  # type: ignore[union-attr]
+        return result
+
+    def list_for_run(self, run_id: int | str, *, checkpoint_namespace: str = '') -> list[StoredCheckpoint]:
+        operation = 'list_for_run'
+        call_count = self._call_counts[operation] + 1
+        self._call_counts[operation] = call_count
+        safe_identifier = self._safe_identifier(f'{run_id}:{checkpoint_namespace}')
+        if self._should_fault(operation, call_count, FaultTiming.BEFORE):
+            self._record(operation=operation, call_count=call_count, safe_identifier=safe_identifier, timing=FaultTiming.BEFORE, delegate_ran=False)
+            raise self._plan.exception_factory()  # type: ignore[union-attr]
+        result = self._inner.list_for_run(run_id, checkpoint_namespace=checkpoint_namespace)
         self._record(operation=operation, call_count=call_count, safe_identifier=safe_identifier, timing=FaultTiming.AFTER, delegate_ran=True)
         if self._should_fault(operation, call_count, FaultTiming.AFTER):
             raise self._plan.exception_factory()  # type: ignore[union-attr]
