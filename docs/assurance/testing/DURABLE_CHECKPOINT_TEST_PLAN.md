@@ -17,6 +17,7 @@ Status: approved for implementation.
 - current memory checkpoint store is EPHEMERAL
 - current checkpoint protocol exposes versioned history
 - current checkpoint protocol exposes serializer identity / version
+- checkpoint metadata fidelity is lossless and defensively isolated
 
 ## Required Audit Tests
 
@@ -38,6 +39,7 @@ Status: approved for implementation.
 - latest selection
 - history listing
 - parent / lineage preservation
+- metadata fidelity
 - serializer compatibility / version compatibility
 - restart durability
 - safe deletion scope through omission

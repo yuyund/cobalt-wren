@@ -25,6 +25,7 @@ This document ranks the remaining persistence gaps after the current code-first 
 
 - artifact bodies are bytes in process-local memory only
 - checkpoint bodies are serialized bytes in process-local memory only
+- checkpoint metadata fidelity is lossless and defensively isolated in the current in-memory checkpoint boundary
 - restart destroys body state
 - no shared-instance durability exists
 - no checkpoint restart durability exists
@@ -41,6 +42,7 @@ This document ranks the remaining persistence gaps after the current code-first 
 
 - durable checkpoint backend is deferred
 - checkpoint protocol evolution is complete
+- checkpoint metadata fidelity is preserved and no longer a gap
 - reconciliation worker is deferred
 - cleanup command is deferred
 - true resume is deferred

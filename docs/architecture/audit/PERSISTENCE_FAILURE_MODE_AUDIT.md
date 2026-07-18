@@ -40,6 +40,7 @@ Evidence:
 - current read: `MemoryCheckpointStore.load()` only in tests / direct use
 - metadata write: `DjangoEventSink.checkpoint_saved()` writes `CheckpointMetadata` rows only
 - metadata-body separation: body is not stored in Django
+- checkpoint metadata fidelity in the in-memory checkpoint boundary is lossless and defensively isolated
 - target baseline remains body-first / metadata-second
 
 ## Failure-Mode Matrix

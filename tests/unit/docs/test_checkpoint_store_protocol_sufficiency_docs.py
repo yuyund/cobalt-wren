@@ -35,6 +35,8 @@ def test_checkpoint_store_protocol_sufficiency_docs_exist_and_cover_core_terms()
         'specific-version read',
         'history listing',
         'deterministic latest selection',
+        'lossless logical json value',
+        'defensively isolated',
         'request / descriptor / read-result separation',
     ):
         assert token in audit_text
@@ -49,6 +51,7 @@ def test_checkpoint_store_protocol_sufficiency_docs_exist_and_cover_core_terms()
         'lineage',
         'specific-version read',
         'history listing',
+        'lossless logical json value',
         'durable checkpoint storage is necessary but not sufficient for true resume',
     ):
         assert token in design_text
@@ -62,6 +65,7 @@ def test_checkpoint_store_protocol_sufficiency_docs_exist_and_cover_core_terms()
         'specific-version read',
         'history listing',
         'lost-update detection',
+        'metadata fidelity',
     ):
         assert token in test_plan_text
 
@@ -72,6 +76,7 @@ def test_checkpoint_store_protocol_sufficiency_docs_exist_and_cover_core_terms()
         'specific-version reads',
         'history listing',
         'durable checkpoint implementation is now unblocked',
+        'lossless logical json value',
     ):
         assert token in contract_text
 

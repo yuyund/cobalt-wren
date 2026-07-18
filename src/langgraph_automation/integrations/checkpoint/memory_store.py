@@ -14,6 +14,7 @@ from .base import (
     CheckpointStore,
     CheckpointWriteRequest,
     StoredCheckpoint,
+    canonicalize_checkpoint_metadata,
     normalize_checkpoint_namespace,
     normalize_checkpoint_run_id,
 )
@@ -89,7 +90,7 @@ class MemoryCheckpointStore(CheckpointStore):
             and descriptor.serializer_name == request.serializer_name
             and descriptor.serializer_version == request.serializer_version
             and descriptor.content_type == request.content_type
-            and descriptor.metadata == request.metadata
+            and canonicalize_checkpoint_metadata(descriptor.metadata) == canonicalize_checkpoint_metadata(request.metadata)
         )
 
     @staticmethod

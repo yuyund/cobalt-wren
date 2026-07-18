@@ -43,6 +43,10 @@ The storage contract is split into three values:
 
 The caller owns serialization.
 `CheckpointStore` persists bytes and safe metadata only.
+Accepted checkpoint metadata is preserved as a lossless logical JSON value.
+Persistence does not redact, mask, or drop accepted metadata values.
+Mapping key order is not semantically significant, list order is semantically significant, and JSON scalar types are preserved for canonical comparison.
+Returned metadata is defensively isolated from stored state.
 
 ## Write Contract
 

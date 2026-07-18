@@ -202,6 +202,7 @@ These contracts describe the current internal foundation surface. If parts of th
 
 ## CheckpointStore Contract
 
+- checkpoint store contract is versioned and append-only
 - checkpoint storage is a versioned execution-state repository
 - `CheckpointWriteRequest`, `StoredCheckpoint`, and `CheckpointReadResult` separate request / descriptor / read-result responsibilities
 - execution stream identity is `run_id + checkpoint_namespace`
@@ -214,6 +215,8 @@ These contracts describe the current internal foundation surface. If parts of th
 - `list_for_run()` returns descriptors only and is ordered by revision
 - `delete(run_id)` is not part of the versioned checkpoint contract
 - serializer identity, serializer version, content type, size, digest, and safe JSON-compatible metadata are part of the durable descriptor
+- accepted checkpoint metadata is preserved as a lossless logical JSON value and is not redacted during persistence
+- returned checkpoint metadata is defensively isolated from stored state
 - `MemoryCheckpointStore` is the EPHEMERAL semantic reference implementation
 - `CheckpointStore` audit result is `APPROVED_FOR_IMPLEMENTATION`
 - `FilesystemCheckpointStore` remains unimplemented until the durable backend work lands

@@ -127,6 +127,17 @@ def test_checkpoint_store_protocol_is_versioned_and_approved_for_implementation(
     assert not Path('src/langgraph_automation/integrations/checkpoint/filesystem_store.py').exists()
 
 
+def test_checkpoint_persistence_modules_do_not_import_diagnostic_redaction_helpers() -> None:
+    for relative in (
+        Path('src/langgraph_automation/integrations/checkpoint/base.py'),
+        Path('src/langgraph_automation/integrations/checkpoint/memory_store.py'),
+    ):
+        source = relative.read_text()
+        assert 'langgraph_automation.core.redaction' not in source
+        assert 'redact_text(' not in source
+        assert 'REDACTED_VALUE' not in source
+
+
 def test_checkpoint_store_errors_are_public_and_category_specific() -> None:
     assert CheckpointStoreError('x', code='CHECKPOINT_STORE_ERROR').category == 'checkpoint_store'
     assert CheckpointValidationError('x', code='CHECKPOINT_VALIDATION').category == 'checkpoint_store'

@@ -77,6 +77,26 @@ def test_store_api_all() -> None:
     }
 
 
+def test_checkpoint_public_api_is_bounded_to_facades() -> None:
+    import langgraph_automation as package_root
+    import langgraph_automation.api as api_package
+    import langgraph_automation.integrations.checkpoint as checkpoint_integration
+
+    assert not hasattr(package_root, 'CheckpointStore')
+    assert not hasattr(package_root, 'CheckpointWriteRequest')
+    assert not hasattr(package_root, 'StoredCheckpoint')
+    assert not hasattr(package_root, 'CheckpointReadResult')
+    assert not hasattr(api_package, 'CheckpointStore')
+    assert not hasattr(api_package, 'CheckpointWriteRequest')
+    assert not hasattr(api_package, 'StoredCheckpoint')
+    assert not hasattr(api_package, 'CheckpointReadResult')
+    assert checkpoint_integration.MemoryCheckpointStore is not None
+    assert checkpoint_integration.CheckpointStore is not None
+    assert checkpoint_integration.CheckpointWriteRequest is not None
+    assert checkpoint_integration.StoredCheckpoint is not None
+    assert checkpoint_integration.CheckpointReadResult is not None
+
+
 def test_event_api_exports() -> None:
     from langgraph_automation.api.events import EventSink
 

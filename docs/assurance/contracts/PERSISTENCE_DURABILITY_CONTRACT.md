@@ -106,6 +106,12 @@ Evidence:
 - checkpoint_id is caller-issued and identifies an immutable checkpoint version
 - `revision` is store-assigned and orders versions within a stream
 - `parent_checkpoint_id` is the expected current head and records lineage
+- accepted checkpoint metadata is preserved as a lossless logical JSON value
+- mapping key order is not semantically significant
+- list order is semantically significant
+- JSON scalar types are preserved for canonical equivalence
+- returned checkpoint metadata is defensively isolated from stored state
+- diagnostic redaction does not modify persisted checkpoint metadata
 - `save(request)` is idempotent for the same canonical request and conflict-aware for stale parents or changed content
 - `load_latest()`, `load_checkpoint()`, and `list_for_run()` are the supported read operations
 - `list_for_run()` returns descriptors only and does not read full body bytes
@@ -243,16 +249,14 @@ Evidence:
 
 ### Checkpoint
 
-Target:
+Target and current:
 
-- append-only or versioned
+- append-only and versioned
 - no destructive overwrite of existing checkpoint body
 - namespace / ordering / lineage preserved
-
-Current:
-
-- `MemoryCheckpointStore.save()` overwrites by `run_id`
-- no versioning or lineage fields exist in the store protocol
+- `MemoryCheckpointStore.save()` implements linear append-only versioning
+- `CheckpointStore` exposes request / descriptor / read-result separation
+- `checkpoint_id` is caller-issued and `revision` is store-assigned
 
 Evidence:
 
@@ -270,8 +274,8 @@ Target contract:
 Current behavior:
 
 - artifact store: idempotent success for canonical repeats and conflict for canonical differences
-- checkpoint store: last write wins by run id
-- no checksum-based idempotency check exists
+- checkpoint store: idempotent success for canonical repeats and conflict for canonical differences
+- checkpoint store: no checksum-based idempotency check exists beyond the stored descriptor and body digest
 
 ## Integrity
 
@@ -298,7 +302,8 @@ Forbidden:
 Current gap:
 
 - `StoredArtifact` exposes `content_type`, `size`, `digest`, and `metadata`
-- `CheckpointWriteResult` exposes `thread_id`, `checkpoint_namespace`, `backend`, `node_name`, `state_summary`, but no checksum, serializer, or backend reference
+- the checkpoint protocol now uses `CheckpointWriteRequest`, `StoredCheckpoint`, and `CheckpointReadResult` instead of the older `CheckpointWriteResult`
+- `StoredCheckpoint` exposes `content_type`, `size`, `digest`, `serializer_name`, `serializer_version`, and lossless metadata, but not backend references
 
 ## Failure-Mode Matrix
 

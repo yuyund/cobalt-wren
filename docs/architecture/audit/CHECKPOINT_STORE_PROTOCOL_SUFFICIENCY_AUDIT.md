@@ -104,7 +104,7 @@ History listing | SUPPORTED | `list_for_run()` returns revision-ordered descript
 Serializer identity | SUPPORTED | `serializer_name` is persisted | none | supported
 Serializer version | SUPPORTED | `serializer_version` is persisted | none | supported
 Size / digest | SUPPORTED | `size` and `digest` are stored | none | supported
-Safe metadata | SUPPORTED | metadata is normalized, redacted, and defensively copied | none | supported
+Safe metadata | SUPPORTED | metadata is preserved as a lossless logical JSON value and defensively isolated | none | supported
 Immutable version write | SUPPORTED | same identity does not overwrite prior versions | none | supported
 Idempotent retry | SUPPORTED | same canonical request returns the existing descriptor | none | supported
 Conflict detection | SUPPORTED | changed immutable identity or stale parent conflicts | none | supported

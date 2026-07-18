@@ -12,7 +12,6 @@ from langgraph_automation.api.errors import (
     CheckpointIntegrityError,
     CheckpointValidationError,
 )
-from langgraph_automation.core.redaction import REDACTED_VALUE, is_sensitive_key
 
 __all__ = [
     'CheckpointStore',
@@ -148,16 +147,13 @@ def _normalize_metadata_value(value: Any, *, depth: int, seen: set[int]) -> Any:
         seen.add(value_id)
         try:
             normalized: dict[str, Any] = {}
-            for key in sorted(value.keys()):
+            for key in value.keys():
                 if not isinstance(key, str):
                     raise _raise_validation('Checkpoint store rejected invalid metadata.', code='CHECKPOINT_STORE_INVALID_METADATA')
                 if len(key) > _MAX_IDENTIFIER_LENGTH:
                     raise _raise_validation('Checkpoint store rejected invalid metadata.', code='CHECKPOINT_STORE_INVALID_METADATA')
                 nested_value = value[key]
-                if is_sensitive_key(key):
-                    normalized[key] = REDACTED_VALUE
-                else:
-                    normalized[key] = _normalize_metadata_value(nested_value, depth=depth + 1, seen=seen)
+                normalized[key] = _normalize_metadata_value(nested_value, depth=depth + 1, seen=seen)
             return normalized
         finally:
             seen.remove(value_id)
@@ -176,7 +172,7 @@ def _normalize_metadata_value(value: Any, *, depth: int, seen: set[int]) -> Any:
 
 
 def normalize_checkpoint_metadata(metadata: Mapping[str, Any] | None) -> dict[str, Any]:
-    """Return redacted, JSON-compatible checkpoint metadata."""
+    """Return lossless, JSON-compatible checkpoint metadata."""
 
     if metadata is None:
         return {}
@@ -187,6 +183,36 @@ def normalize_checkpoint_metadata(metadata: Mapping[str, Any] | None) -> dict[st
 
 def _freeze_metadata(metadata: Mapping[str, Any] | None) -> Mapping[str, Any]:
     return MappingProxyType(normalize_checkpoint_metadata(metadata))
+
+
+def _canonicalize_metadata_value(value: Any) -> tuple[Any, ...]:
+    if value is None:
+        return ('null',)
+    if isinstance(value, bool):
+        return ('bool', value)
+    if isinstance(value, int):
+        return ('int', value)
+    if isinstance(value, float):
+        return ('float', value)
+    if isinstance(value, str):
+        return ('str', value)
+    if isinstance(value, list):
+        return ('list', tuple(_canonicalize_metadata_value(item) for item in value))
+    if isinstance(value, Mapping):
+        return (
+            'object',
+            tuple(
+                (key, _canonicalize_metadata_value(value[key]))
+                for key in sorted(value.keys())
+            ),
+        )
+    raise _raise_validation('Checkpoint store rejected invalid metadata.', code='CHECKPOINT_STORE_INVALID_METADATA')
+
+
+def canonicalize_checkpoint_metadata(metadata: Mapping[str, Any] | None) -> tuple[Any, ...]:
+    """Return a deterministic comparison form for checkpoint metadata."""
+
+    return _canonicalize_metadata_value(normalize_checkpoint_metadata(metadata))
 
 
 @dataclass(frozen=True, slots=True)

@@ -35,6 +35,10 @@ def test_checkpoint_store_contract_docs_exist_and_cover_core_terms() -> None:
         'no delete',
         'memorycheckpointstore',
         'ephemeral',
+        'lossless logical json value',
+        'mapping key order is not semantically significant',
+        'list order is semantically significant',
+        'returned metadata is defensively isolated',
     ):
         assert token in contract_text
 
@@ -44,6 +48,7 @@ def test_checkpoint_store_contract_docs_exist_and_cover_core_terms() -> None:
         'checkpointreadresult',
         'checkpointstore',
         'approved for durable backend implementation',
+        'checkpoint metadata is preserved as a lossless logical json value',
     ):
         assert token in api_surface_text
 
@@ -53,5 +58,6 @@ def test_checkpoint_store_contract_docs_exist_and_cover_core_terms() -> None:
         'storedcheckpoint',
         'checkpointreadresult',
         'approved_for_implementation',
+        'checkpoint store contract',
     ):
         assert token in core_contract_text

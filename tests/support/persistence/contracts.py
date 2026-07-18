@@ -288,6 +288,9 @@ def assert_checkpoint_validation_contract() -> None:
         ({'run_id': 1, 'checkpoint_namespace': '', 'checkpoint_id': 'checkpoint-a', 'parent_checkpoint_id': None, 'body': b'body', 'serializer_name': 'langgraph-json', 'serializer_version': 0, 'content_type': 'application/vnd.langgraph.checkpoint+json'}, 'serializer version'),
         ({'run_id': 1, 'checkpoint_namespace': '', 'checkpoint_id': 'checkpoint-a', 'parent_checkpoint_id': None, 'body': b'body', 'serializer_name': 'langgraph-json', 'serializer_version': 1, 'content_type': ' text/plain '}, 'content type'),
         ({'run_id': 1, 'checkpoint_namespace': '', 'checkpoint_id': 'checkpoint-a', 'parent_checkpoint_id': 'checkpoint-a', 'body': b'body', 'serializer_name': 'langgraph-json', 'serializer_version': 1, 'content_type': 'application/vnd.langgraph.checkpoint+json'}, 'self-parent'),
+        ({'run_id': 1, 'checkpoint_namespace': '', 'checkpoint_id': 'checkpoint-a', 'parent_checkpoint_id': None, 'body': b'body', 'serializer_name': 'langgraph-json', 'serializer_version': 1, 'content_type': 'application/vnd.langgraph.checkpoint+json', 'metadata': {'credential': b'secret'}}, 'metadata'),
+        ({'run_id': 1, 'checkpoint_namespace': '', 'checkpoint_id': 'checkpoint-a', 'parent_checkpoint_id': None, 'body': b'body', 'serializer_name': 'langgraph-json', 'serializer_version': 1, 'content_type': 'application/vnd.langgraph.checkpoint+json', 'metadata': {'value': float('nan')}}, 'metadata'),
+        ({'run_id': 1, 'checkpoint_namespace': '', 'checkpoint_id': 'checkpoint-a', 'parent_checkpoint_id': None, 'body': b'body', 'serializer_name': 'langgraph-json', 'serializer_version': 1, 'content_type': 'application/vnd.langgraph.checkpoint+json', 'metadata': {1: 'value'}}, 'metadata'),
     )
 
     for kwargs, marker in invalid_cases:
@@ -334,7 +337,7 @@ def assert_checkpoint_defensive_copy(store: CheckpointStore) -> None:
 
     loaded = store.load_latest(7)
     assert loaded is not None
-    assert loaded.checkpoint.metadata['nested']['token'] == REDACTED_VALUE
+    assert loaded.checkpoint.metadata['nested']['token'] == 'abc123'
     assert loaded.checkpoint.metadata['items'] == [1, 2, 3]
 
     loaded.checkpoint.metadata['nested']['token'] = 'mutated'
@@ -342,8 +345,114 @@ def assert_checkpoint_defensive_copy(store: CheckpointStore) -> None:
 
     round_trip = store.load_checkpoint(7, 'checkpoint-copy')
     assert round_trip is not None
-    assert round_trip.checkpoint.metadata['nested']['token'] == REDACTED_VALUE
+    assert round_trip.checkpoint.metadata['nested']['token'] == 'abc123'
     assert round_trip.checkpoint.metadata['items'] == [1, 2, 3]
+
+
+def assert_checkpoint_metadata_fidelity(store: CheckpointStore) -> None:
+    metadata = {
+        'credential': 'secret-A',
+        'password': 'example-password',
+        'nested': {
+            'api_key': 'key-A',
+            'token': 'token-A',
+            'items': [1, True, 1.0, None],
+        },
+        'value': ' secret ',
+        'empty_string': '',
+        'empty_list': [],
+        'empty_object': {},
+        'true_value': True,
+        'int_value': 1,
+        'float_value': 1.0,
+    }
+    request = _checkpoint_request(
+        run_id=6,
+        checkpoint_id='checkpoint-fidelity',
+        parent_checkpoint_id=None,
+        body=b'fidelity',
+        metadata=metadata,
+    )
+
+    written = store.save(request)
+    latest = store.load_latest(6)
+    specific = store.load_checkpoint(6, 'checkpoint-fidelity')
+    listed = store.list_for_run(6)
+
+    assert written.metadata['credential'] == 'secret-A'
+    assert written.metadata['password'] == 'example-password'
+    assert written.metadata['nested']['api_key'] == 'key-A'
+    assert written.metadata['nested']['token'] == 'token-A'
+    assert written.metadata['nested']['items'] == [1, True, 1.0, None]
+    assert written.metadata['value'] == ' secret '
+    assert written.metadata['empty_string'] == ''
+    assert written.metadata['empty_list'] == []
+    assert written.metadata['empty_object'] == {}
+    assert written.metadata['true_value'] is True
+    assert written.metadata['int_value'] == 1
+    assert written.metadata['float_value'] == 1.0
+
+    for result in (latest, specific):
+        assert result is not None
+        assert result.checkpoint.metadata == written.metadata
+        assert result.checkpoint.metadata['credential'] == 'secret-A'
+        assert result.checkpoint.metadata['password'] == 'example-password'
+        assert result.checkpoint.metadata['nested']['api_key'] == 'key-A'
+        assert result.checkpoint.metadata['nested']['token'] == 'token-A'
+        assert result.checkpoint.metadata['nested']['items'] == [1, True, 1.0, None]
+        assert result.checkpoint.metadata['value'] == ' secret '
+        assert result.checkpoint.metadata['empty_string'] == ''
+        assert result.checkpoint.metadata['empty_list'] == []
+        assert result.checkpoint.metadata['empty_object'] == {}
+        assert result.checkpoint.metadata['true_value'] is True
+        assert result.checkpoint.metadata['int_value'] == 1
+        assert result.checkpoint.metadata['float_value'] == 1.0
+
+    assert listed[0].metadata == written.metadata
+
+
+def assert_checkpoint_metadata_canonical_equivalence(store: CheckpointStore) -> None:
+    base = _checkpoint_request(
+        run_id=8,
+        checkpoint_id='checkpoint-meta-order',
+        parent_checkpoint_id=None,
+        body=b'metadata-order',
+        metadata={'a': 1, 'b': 2},
+    )
+    written = store.save(base)
+    same_request = _checkpoint_request(
+        run_id=8,
+        checkpoint_id='checkpoint-meta-order',
+        parent_checkpoint_id=None,
+        body=b'metadata-order',
+        metadata={'b': 2, 'a': 1},
+    )
+    same_written = store.save(same_request)
+    assert same_written == written
+    assert store.load_checkpoint(8, 'checkpoint-meta-order').checkpoint.metadata == {'a': 1, 'b': 2}
+
+    conflict_pairs = (
+        (
+            _checkpoint_request(run_id=9, checkpoint_id='checkpoint-meta-list', parent_checkpoint_id=None, body=b'metadata-list', metadata={'items': [1, 2]}),
+            _checkpoint_request(run_id=9, checkpoint_id='checkpoint-meta-list', parent_checkpoint_id=None, body=b'metadata-list', metadata={'items': [2, 1]}),
+        ),
+        (
+            _checkpoint_request(run_id=10, checkpoint_id='checkpoint-meta-bool', parent_checkpoint_id=None, body=b'metadata-bool', metadata={'value': True}),
+            _checkpoint_request(run_id=10, checkpoint_id='checkpoint-meta-bool', parent_checkpoint_id=None, body=b'metadata-bool', metadata={'value': 1}),
+        ),
+        (
+            _checkpoint_request(run_id=11, checkpoint_id='checkpoint-meta-number', parent_checkpoint_id=None, body=b'metadata-number', metadata={'value': 1}),
+            _checkpoint_request(run_id=11, checkpoint_id='checkpoint-meta-number', parent_checkpoint_id=None, body=b'metadata-number', metadata={'value': 1.0}),
+        ),
+        (
+            _checkpoint_request(run_id=12, checkpoint_id='checkpoint-meta-string', parent_checkpoint_id=None, body=b'metadata-string', metadata={'value': ' secret '}),
+            _checkpoint_request(run_id=12, checkpoint_id='checkpoint-meta-string', parent_checkpoint_id=None, body=b'metadata-string', metadata={'value': 'secret'}),
+        ),
+    )
+    for success_request, conflict_request in conflict_pairs:
+        assert store.save(success_request).checkpoint_id == success_request.checkpoint_id
+        with pytest.raises(CheckpointConflictError):
+            store.save(conflict_request)
 
 
 def assert_checkpoint_idempotency_and_conflict(store: CheckpointStore) -> None:

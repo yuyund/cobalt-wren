@@ -43,6 +43,8 @@ def test_persistence_durability_audit_docs_exist_and_cover_core_terms() -> None:
         'checkpoint semantics',
         'true resume',
         '`checkpointstore` is a versioned append-only checkpoint repository keyed by `run_id` and `checkpoint_namespace`',
+        'lossless logical json value',
+        'defensively isolated',
     ):
         assert token in contract_text
 
@@ -52,6 +54,7 @@ def test_persistence_durability_audit_docs_exist_and_cover_core_terms() -> None:
         'buckets: w write failures, r read failures, c retry / concurrency failures, s safety failures, d restart / durability failures.',
         'body-first',
         'metadata-second',
+        'checkpoint metadata fidelity',
     ):
         assert token in audit_text
 
@@ -70,6 +73,7 @@ def test_persistence_durability_audit_docs_exist_and_cover_core_terms() -> None:
         'body-aware',
         'approved_for_implementation',
         'blocked_by_protocol',
+        'checkpoint metadata fidelity',
     ):
         assert token in traceability_text
 
@@ -82,6 +86,7 @@ def test_persistence_durability_audit_docs_exist_and_cover_core_terms() -> None:
         'durable checkpoint backend is deferred',
         'checkpoint protocol evolution is complete',
         'artifactstore protocol evolution is complete',
+        'checkpoint metadata fidelity',
     ):
         assert token in gaps_text
 

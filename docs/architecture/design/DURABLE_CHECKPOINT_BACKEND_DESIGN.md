@@ -102,6 +102,8 @@ Recommended boundary:
 
 - execution / checkpointer adapter serializes state to bytes
 - checkpoint store persists bytes and safe metadata only
+- accepted metadata is stored as a lossless logical JSON value
+- persistence does not redact, mask, or drop accepted metadata values
 - serializer identity and serializer version are persisted alongside the bytes
 
 The store must not infer Python object structure or import serializer classes from arbitrary module paths.

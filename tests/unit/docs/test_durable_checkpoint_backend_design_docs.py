@@ -43,6 +43,7 @@ def test_durable_checkpoint_backend_design_docs_exist_and_cover_core_terms() -> 
         'process_durable',
         'orphan body is allowed',
         'durable checkpoint storage is necessary but not sufficient for true resume',
+        'lossless logical json value',
     ):
         assert token in design_text
 
@@ -54,6 +55,7 @@ def test_durable_checkpoint_backend_design_docs_exist_and_cover_core_terms() -> 
         'specific-version read',
         'history listing',
         'lost-update detection',
+        'metadata fidelity',
     ):
         assert token in test_plan_text
 

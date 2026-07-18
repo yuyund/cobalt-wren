@@ -9,6 +9,8 @@ from tests.support.persistence import (
     assert_checkpoint_defensive_copy,
     assert_checkpoint_descriptor_derivation,
     assert_checkpoint_diagnostic_non_exposure,
+    assert_checkpoint_metadata_canonical_equivalence,
+    assert_checkpoint_metadata_fidelity,
     assert_checkpoint_integrity_error_is_representable,
     assert_checkpoint_idempotency_and_conflict,
     assert_checkpoint_missing_behavior,
@@ -32,6 +34,8 @@ def test_checkpoint_store_baseline_contract_suite(backend_spec) -> None:
     assert_checkpoint_idempotency_and_conflict(store)
     assert_checkpoint_descriptor_derivation(store)
     assert_checkpoint_diagnostic_non_exposure(store)
+    assert_checkpoint_metadata_fidelity(store)
+    assert_checkpoint_metadata_canonical_equivalence(store)
     assert_checkpoint_validation_contract()
     assert_checkpoint_integrity_error_is_representable()
     assert_checkpoint_concurrent_append(backend_spec.factory)
