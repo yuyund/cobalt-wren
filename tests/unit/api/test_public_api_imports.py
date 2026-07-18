@@ -59,7 +59,9 @@ def test_store_api_does_not_export_concrete_backends() -> None:
     import langgraph_automation.api.stores as stores_api
 
     assert 'FilesystemArtifactStore' not in stores_api.__all__
+    assert 'FilesystemCheckpointStore' not in stores_api.__all__
     assert not hasattr(stores_api, 'FilesystemArtifactStore')
+    assert not hasattr(stores_api, 'FilesystemCheckpointStore')
 
 
 def test_store_api_all() -> None:
@@ -86,10 +88,13 @@ def test_checkpoint_public_api_is_bounded_to_facades() -> None:
     assert not hasattr(package_root, 'CheckpointWriteRequest')
     assert not hasattr(package_root, 'StoredCheckpoint')
     assert not hasattr(package_root, 'CheckpointReadResult')
+    assert not hasattr(package_root, 'FilesystemCheckpointStore')
     assert not hasattr(api_package, 'CheckpointStore')
     assert not hasattr(api_package, 'CheckpointWriteRequest')
     assert not hasattr(api_package, 'StoredCheckpoint')
     assert not hasattr(api_package, 'CheckpointReadResult')
+    assert not hasattr(api_package, 'FilesystemCheckpointStore')
+    assert checkpoint_integration.FilesystemCheckpointStore is not None
     assert checkpoint_integration.MemoryCheckpointStore is not None
     assert checkpoint_integration.CheckpointStore is not None
     assert checkpoint_integration.CheckpointWriteRequest is not None

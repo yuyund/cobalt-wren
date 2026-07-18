@@ -1,10 +1,10 @@
 # Durable Checkpoint Backend Design
 
-This document describes the target design for a future durable checkpoint backend.
+This document describes the implemented durable checkpoint backend design.
 
-Status: approved for implementation.
+Status: implemented and approved for implementation.
 
-The checkpoint protocol now expresses immutable checkpoint versions, lineage, serializer compatibility, specific-version reads, and history listing. The durable backend implementation remains a later step.
+The checkpoint protocol expresses immutable checkpoint versions, lineage, serializer compatibility, specific-version reads, and history listing. The durable filesystem backend now realizes that contract locally.
 
 ## Purpose
 
@@ -33,55 +33,11 @@ Target checkpoint capabilities:
 
 ## Target Value Model
 
-The current protocol already uses the request / descriptor / read-result split.
-That is the request / descriptor / read result separation the backend will preserve:
+The protocol uses the request / descriptor / read-result split:
 
 - `CheckpointWriteRequest`
 - `StoredCheckpoint`
 - `CheckpointReadResult`
-
-Conceptual request:
-
-```python
-@dataclass(frozen=True, slots=True)
-class CheckpointWriteRequest:
-    run_id: int | str
-    checkpoint_namespace: str = ''
-    checkpoint_id: str
-    parent_checkpoint_id: str | None
-    body: bytes = field(repr=False)
-    serializer_name: str
-    serializer_version: int
-    content_type: str
-    metadata: Mapping[str, JsonValue] = field(default_factory=dict, repr=False)
-```
-
-Conceptual stored descriptor:
-
-```python
-@dataclass(frozen=True, slots=True)
-class StoredCheckpoint:
-    run_id: int | str
-    checkpoint_namespace: str
-    checkpoint_id: str
-    parent_checkpoint_id: str | None
-    revision: int
-    serializer_name: str
-    serializer_version: int
-    content_type: str
-    size: int
-    digest: str
-    metadata: Mapping[str, JsonValue] = field(repr=False)
-```
-
-Conceptual read result:
-
-```python
-@dataclass(frozen=True, slots=True)
-class CheckpointReadResult:
-    checkpoint: StoredCheckpoint
-    body: bytes = field(repr=False)
-```
 
 ## Identity Model
 
@@ -108,44 +64,73 @@ Recommended boundary:
 
 The store must not infer Python object structure or import serializer classes from arbitrary module paths.
 
-## Target Filesystem Layout
+## Filesystem Layout
 
-The first durable backend target should use content-addressed immutable files and explicit head records.
+The filesystem backend uses content-addressed bodies, stream-scoped records, and a mutable head record.
 
-Suggested layout:
+filesystem checkpoint backend is now implemented.
+The record indexes are records/by-id and records/by-revision.
+checkpoint runtime selection remains deferred to w4.
 
 ```text
 <root>/
-  checkpoint-bodies/
+  bodies/
     sha256/
-      <shard>/
-        <digest>.blob
+      <2>/
+        <2>/
+          <body-digest>.blob
 
-  checkpoints/
-    <run-digest>/
-      <namespace-digest>/
-        <checkpoint-id-digest>.json
-
-  heads/
-    <run-digest>/
-      <namespace-digest>.json
+  streams/
+    sha256/
+      <2>/
+        <2>/
+          <stream-digest>/
+            lock
+            head.json
+            pending.json
+            records/
+              by-id/
+                <2>/
+                  <2>/
+                    <checkpoint-id-digest>.json
+              by-revision/
+                00000000000000000001.json
+                00000000000000000002.json
 ```
 
-This layout remains provisional until the W3 implementation lands.
+Raw `run_id`, `checkpoint_namespace`, `checkpoint_id`, and `parent_checkpoint_id` never appear as path components.
 
 ## Publication Order
 
 Target publication order:
 
 1. immutable state body
-2. immutable checkpoint record
-3. atomic head update
+2. pending append intent
+3. immutable checkpoint record by id
+4. the same immutable record by revision
+5. atomic head update
+6. pending cleanup
+7. directory fsync
 
 Failure bias:
 
 - orphan body is allowed
 - orphan checkpoint record is allowed
-- missing or corrupt head references are not allowed
+- missing or corrupt head references are not allowed once recovery runs
+
+## Crash-Window Recovery
+
+The backend uses a stream-local pending record to recover between immutable record publication and mutable head advancement.
+
+Recovery handles:
+
+- pending only
+- by-id only
+- by-revision only
+- both indexes with an old head
+- head already at the pending target
+
+Impossible combinations raise `CheckpointIntegrityError`.
 
 ## Durability Scope
 
@@ -170,7 +155,7 @@ Not guaranteed:
 
 ## Failure Modeling
 
-The future backend should distinguish:
+The filesystem backend distinguishes:
 
 - missing checkpoint
 - corrupt record
@@ -180,7 +165,7 @@ The future backend should distinguish:
 - lost update
 - conflicting concurrent append
 
-Those failures should not collapse into a single generic missing-value result.
+Those failures do not collapse into a single generic missing-value result.
 
 ## Relationship To True Resume
 
@@ -196,7 +181,6 @@ True resume additionally needs:
 
 ## Deferred Work
 
-- filesystem checkpoint backend implementation
 - checkpoint runtime selection
 - true resume
 - metadata orchestration

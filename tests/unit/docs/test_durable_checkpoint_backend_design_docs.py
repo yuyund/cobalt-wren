@@ -35,27 +35,35 @@ def test_durable_checkpoint_backend_design_docs_exist_and_cover_core_terms() -> 
 
     for token in (
         'durable checkpoint backend design',
-        'status: approved for implementation',
+        'status: implemented and approved for implementation',
         'immutable checkpoint versions',
-        'request / descriptor / read result separation',
-        'checkpoint-bodies',
-        'heads/',
+        'request / descriptor / read-result split',
+        'bodies/',
+        'streams/',
+        'head.json',
+        'pending.json',
+        'lock',
         'process_durable',
         'orphan body is allowed',
+        'same host',
         'durable checkpoint storage is necessary but not sufficient for true resume',
         'lossless logical json value',
+        'filesystem checkpoint backend is now implemented',
+        'checkpoint runtime selection remains deferred to w4',
     ):
         assert token in design_text
 
     for token in (
         'durable checkpoint test plan',
-        'status: approved for implementation',
+        'status: implemented and approved for implementation',
         'current memory checkpoint store uses linear append-only versioned history',
-        'durable checkpoint backend implementation remains a later step',
+        'current filesystem checkpoint store is process_durable',
+        'filesystem backend is implemented',
         'specific-version read',
         'history listing',
         'lost-update detection',
         'metadata fidelity',
+        'runtime selection remains deferred to w4',
     ):
         assert token in test_plan_text
 
@@ -63,6 +71,7 @@ def test_durable_checkpoint_backend_design_docs_exist_and_cover_core_terms() -> 
         'checkpoint durability contract and protocol sufficiency audit block w1',
         'approved_for_implementation',
         'checkpoint store protocol evolution block w2',
-        'next block: filesystem checkpoint backend implementation block w3',
+        'filesystem checkpoint backend implementation block w3',
+        'next block: checkpoint backend runtime selection and configuration block w4',
     ):
         assert token in roadmap_text

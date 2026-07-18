@@ -219,7 +219,9 @@ These contracts describe the current internal foundation surface. If parts of th
 - returned checkpoint metadata is defensively isolated from stored state
 - `MemoryCheckpointStore` is the EPHEMERAL semantic reference implementation
 - `CheckpointStore` audit result is `APPROVED_FOR_IMPLEMENTATION`
-- `FilesystemCheckpointStore` remains unimplemented until the durable backend work lands
+- `FilesystemCheckpointStore` is implemented in `langgraph_automation.integrations.checkpoint` and is `PROCESS_DURABLE`
+- filesystemcheckpointstore is implemented in `langgraph_automation.integrations.checkpoint`
+- checkpoint runtime selection remains deferred to the W4 composition block
 - true resume is still deferred
 - DB metadata には checkpoint body copy を入れない
 

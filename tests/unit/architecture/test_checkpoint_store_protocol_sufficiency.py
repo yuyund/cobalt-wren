@@ -124,9 +124,6 @@ def test_checkpoint_store_protocol_is_versioned_and_approved_for_implementation(
     assert matrix['Restart durability'] == 'NOT_SUPPORTED'
     assert matrix['Safe deletion scope'] == 'NOT_SUPPORTED'
 
-    assert not Path('src/langgraph_automation/integrations/checkpoint/filesystem_store.py').exists()
-
-
 def test_checkpoint_persistence_modules_do_not_import_diagnostic_redaction_helpers() -> None:
     for relative in (
         Path('src/langgraph_automation/integrations/checkpoint/base.py'),

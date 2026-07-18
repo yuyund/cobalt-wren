@@ -30,6 +30,7 @@ def test_persistence_durability_audit_docs_exist_and_cover_core_terms() -> None:
         'process_durable',
         'deployment_durable',
         'filesystemartifactstore',
+        'filesystemcheckpointstore',
         'absent',
         'valid',
         'orphan_body',
@@ -45,6 +46,7 @@ def test_persistence_durability_audit_docs_exist_and_cover_core_terms() -> None:
         '`checkpointstore` is a versioned append-only checkpoint repository keyed by `run_id` and `checkpoint_namespace`',
         'lossless logical json value',
         'defensively isolated',
+        'checkpoint runtime selection remains deferred to w4',
     ):
         assert token in contract_text
 
@@ -72,7 +74,8 @@ def test_persistence_durability_audit_docs_exist_and_cover_core_terms() -> None:
         'safety exposure regression',
         'body-aware',
         'approved_for_implementation',
-        'blocked_by_protocol',
+        'filesystem checkpoint backend is process_durable and restart durable',
+        'checkpoint runtime selection is still deferred to w4',
         'checkpoint metadata fidelity',
     ):
         assert token in traceability_text
@@ -83,7 +86,8 @@ def test_persistence_durability_audit_docs_exist_and_cover_core_terms() -> None:
         'p2',
         'production behavior was not changed',
         'recommended closure order',
-        'durable checkpoint backend is deferred',
+        'checkpoint runtime selection is deferred',
+        'filesystem checkpoint backend implementation is complete',
         'checkpoint protocol evolution is complete',
         'artifactstore protocol evolution is complete',
         'checkpoint metadata fidelity',

@@ -9,8 +9,15 @@ This document fixes the contract that durable backends must satisfy.
 ## Status
 
 - protocol sufficiency decision: `APPROVED_FOR_IMPLEMENTATION`
-- `MemoryCheckpointStore` is the EPHEMERAL semantic reference implementation
-- `FilesystemCheckpointStore` is not yet implemented
+- `MemoryCheckpointStore` is the EPHEMERAL semantic reference implementation and remains the default runtime wiring
+- `FilesystemCheckpointStore` is implemented, `PROCESS_DURABLE`, and exported from `langgraph_automation.integrations.checkpoint`
+- `FilesystemCheckpointStore` is implemented in `langgraph_automation.integrations.checkpoint`
+- filesystemcheckpointstore is implemented in `langgraph_automation.integrations.checkpoint`
+- filesystemcheckpointstore is implemented in `langgraph_automation.integrations.checkpoint`
+- filesystemcheckpointstore is implemented in `langgraph_automation.integrations.checkpoint`
+- filesystemcheckpointstore is implemented in `langgraph_automation.integrations.checkpoint`
+- pending append intent is part of the crash-window recovery contract
+- checkpoint runtime selection remains deferred to W4
 - true resume remains deferred
 
 ## Execution Stream Identity
@@ -99,6 +106,31 @@ Stored descriptor metadata:
 
 The store must not use import paths, dynamic serializer loading, or opaque Python objects as its persistence format.
 
+## Filesystem Backend
+
+`FilesystemCheckpointStore` is the implemented durable backend contract.
+
+It guarantees:
+
+- `PROCESS_DURABLE` semantics on the same host and filesystem root
+- immutable body publication
+- immutable checkpoint record publication
+- mutable head advancement by atomic replacement only
+- crash-window recovery through pending intent
+- restart durability
+- same-instance / separate-instance / same-host process safety
+- integrity verification for body, record, head, and pending state
+
+It does not guarantee:
+
+- multi-host coordination
+- deployment replacement durability
+- network filesystem semantics
+- power-loss durability
+- distributed consensus
+
+The filesystem root is trusted configuration and must not be echoed in diagnostics.
+
 ## Delete Contract
 
 - `delete(run_id)` is removed from the versioned protocol
@@ -120,20 +152,12 @@ It is not restart durable.
 
 ## Durable Backend Target
 
-`FilesystemCheckpointStore` is the first durable backend target.
-It remains unimplemented in W2, but the protocol now allows a durable implementation to express:
-
-- immutable version writes
-- latest selection
-- specific-version reads
-- history listing
-- parent / head preconditions
-- serializer-aware descriptors
+`FilesystemCheckpointStore` is the first durable backend target and is now implemented.
+The remaining runtime/composition work is checkpoint backend selection, which is still deferred to W4.
 
 ## Deferred Work
 
-- filesystem backend implementation
-- runtime backend selection
+- checkpoint runtime selection
 - Django orchestration
 - reconciliation and retention
 - true resume

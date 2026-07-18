@@ -4,6 +4,7 @@ This audit determines whether the current `CheckpointStore` protocol can express
 
 The checkpoint store contract is now versioned, linear, serializer-aware, idempotent, and conflict-aware.
 It is a request / descriptor / read-result separation rather than a destructive latest snapshot contract.
+The filesystem checkpoint backend is now implemented, but checkpoint runtime selection remains deferred to W4.
 
 Code is the source of truth.
 Tests are the source of truth.
@@ -49,6 +50,7 @@ Current code-first evidence shows:
 - `src/langgraph_automation/apps/automation/services/runtime.py` constructs `MemoryCheckpointStore`
 - `src/langgraph_automation/runtime/assembly.py` threads the checkpoint store through `RuntimeDependencies`
 - `src/langgraph_automation/graphs/runtime.py` carries the checkpoint store on `GraphRuntime`
+- `src/langgraph_automation/integrations/checkpoint/filesystem_store.py` implements the durable filesystem backend
 - `src/langgraph_automation/integrations/observability/django_event_sink.py` persists `CheckpointMetadata` rows only
 - `src/langgraph_automation/apps/automation/services/execution.py` does not write checkpoint bodies
 - `src/langgraph_automation/apps/automation/services/runs.py` does not write checkpoint bodies
@@ -148,8 +150,7 @@ Option D, an internal repository plus LangGraph adapter, remains a good later in
 
 ## Deferred Work
 
-- FilesystemCheckpointStore implementation is deferred
-- checkpoint runtime selection is deferred
+- checkpoint runtime selection remains deferred to W4
 - true resume is deferred
 - pending writes / interrupts / task replay are deferred
 - body / metadata orchestration is deferred

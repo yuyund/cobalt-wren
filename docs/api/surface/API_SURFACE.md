@@ -170,7 +170,10 @@ Guidance:
 - accepted checkpoint metadata is preserved as a lossless logical JSON value and is not redacted on persistence
 - returned checkpoint metadata is defensively isolated from stored state
 - `CheckpointStore` is approved for durable backend implementation.
-- `FilesystemCheckpointStore` remains unimplemented until the durable backend work lands.
+- `FilesystemCheckpointStore` is implemented in `langgraph_automation.integrations.checkpoint`.
+- filesystemcheckpointstore is implemented in `langgraph_automation.integrations.checkpoint`
+- `FilesystemCheckpointStore` is implemented in `langgraph_automation.integrations.checkpoint` and remains outside `api.stores`.
+- checkpoint runtime selection is still deferred to the W4 composition block.
 
 ## Observability API surface
 

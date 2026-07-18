@@ -4,7 +4,7 @@ This folder captures concrete integration contracts that sit below the public fa
 
 ## Entry Points
 - `FILESYSTEM_ARTIFACT_STORE.md`: process-durable filesystem artifact backend contract.
-- `CHECKPOINT_STORE.md`: versioned checkpoint repository contract.
+- `CHECKPOINT_STORE.md`: versioned checkpoint repository contract and filesystem checkpoint backend.
 
 ## Read Next
 - Read the filesystem artifact store contract when changing durable artifact storage.

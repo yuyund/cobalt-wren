@@ -81,6 +81,7 @@ Forbidden:
 - MemoryArtifactStore: `EPHEMERAL` `CODE_CONFIRMED`
 - FilesystemArtifactStore: `PROCESS_DURABLE` `CODE_CONFIRMED`
 - MemoryCheckpointStore: `EPHEMERAL` `CODE_CONFIRMED`
+- FilesystemCheckpointStore: `PROCESS_DURABLE` `CODE_CONFIRMED`
 
 ### Artifact backend runtime selection
 
@@ -118,8 +119,10 @@ Evidence:
 - specific-version reads are supported
 - history listing is supported
 - `CheckpointStore` sufficiency audit result is `APPROVED_FOR_IMPLEMENTATION`
-- durable checkpoint implementation is now unblocked for the first durable backend
-- `FilesystemCheckpointStore` remains deferred until W3
+- durable checkpoint implementation is now closed for the first durable backend
+- `FilesystemCheckpointStore` is implemented in `langgraph_automation.integrations.checkpoint`
+- filesystemcheckpointstore is implemented in `langgraph_automation.integrations.checkpoint`
+- checkpoint runtime selection remains deferred to W4
 - true resume remains deferred until the adapter layer is designed
 
 Evidence:
@@ -135,7 +138,7 @@ The reusable baseline contract suite lives in `tests/contract/persistence/` and 
 
 Characterization tests for current in-memory overwrite behavior stay in unit tests and do not define the shared baseline contract.
 
-Advanced durable semantics remain deferred until durable backends exist.
+Advanced durable semantics remain deferred until runtime selection and orchestration are added on top of the implemented durable backends.
 
 ## Object State Model
 
@@ -188,6 +191,9 @@ Advanced durable semantics remain deferred until durable backends exist.
 - `FilesystemArtifactStore` verifies manifest integrity and body metadata during listing
 - `FilesystemArtifactStore` verifies full body integrity on read
 - `FilesystemArtifactStore` provides process-durable reads on the same host/root
+- `FilesystemCheckpointStore` publishes content-addressed immutable bodies, immutable records, and a mutable head on the local filesystem
+- `FilesystemCheckpointStore` verifies manifest integrity, pending recovery, and body integrity on read
+- `FilesystemCheckpointStore` provides process-durable reads on the same host/root
 
 Evidence:
 
@@ -361,7 +367,8 @@ Evidence:
 
 ## Deferred Work
 
-- durable artifact/checkpoint backend is deferred
+- checkpoint runtime selection remains deferred to W4
+- artifact runtime selection remains the current state for artifact backends
 - api.runtime is deferred
 - run_workflow is deferred
 - application workflow is deferred

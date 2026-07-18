@@ -1,8 +1,8 @@
 # Durable Checkpoint Test Plan
 
-This document defines the acceptance plan for the versioned checkpoint protocol and the future durable backend.
+This document defines the acceptance plan for the versioned checkpoint protocol and the filesystem durable backend.
 
-Status: approved for implementation.
+Status: implemented and approved for implementation.
 
 ## Baseline Contract Activation
 
@@ -10,11 +10,13 @@ Status: approved for implementation.
 - keep the baseline suite black-box
 - keep characterization tests separate
 - keep the current checkpoint contract executable against `MemoryCheckpointStore`
+- keep the durable filesystem backend executable against the same reusable contract suite
 
 ## Current Characterization
 
 - current memory checkpoint store uses linear append-only versioned history
 - current memory checkpoint store is EPHEMERAL
+- current filesystem checkpoint store is PROCESS_DURABLE
 - current checkpoint protocol exposes versioned history
 - current checkpoint protocol exposes serializer identity / version
 - checkpoint metadata fidelity is lossless and defensively isolated
@@ -45,6 +47,15 @@ Status: approved for implementation.
 - safe deletion scope through omission
 - safe diagnostics
 - concurrency and lost-update detection
+- crash-window recovery
+
+## Filesystem Backend Coverage
+
+- filesystem backend is implemented
+- baseline suite passes for memory and filesystem
+- advanced durable contract suite passes for filesystem
+- default backend remains memory
+- filesystem runtime selection remains deferred to W4
 
 ## Failure-Mode Focus
 
@@ -65,11 +76,11 @@ Status: approved for implementation.
 - protocol sufficiency audit is explicitly `APPROVED_FOR_IMPLEMENTATION`
 - current checkpoint store remains linear and versioned
 - current memory backend keeps its current semantics
-- durable checkpoint backend implementation remains a later step
+- filesystem backend is implemented and process durable
+- durable checkpoint backend implementation is now complete
 - checkpoint protocol evolution is complete
-- `FilesystemCheckpointStore` remains deferred until W3
+- runtime selection remains deferred to W4
 - true resume remains separate from storage durability
-- runtime selection remains deferred
 - metadata orchestration remains deferred
 
 ## Xfail Policy

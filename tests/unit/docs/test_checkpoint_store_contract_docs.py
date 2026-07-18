@@ -34,11 +34,14 @@ def test_checkpoint_store_contract_docs_exist_and_cover_core_terms() -> None:
         'list_for_run',
         'no delete',
         'memorycheckpointstore',
+        'filesystemcheckpointstore',
         'ephemeral',
+        'process_durable',
         'lossless logical json value',
         'mapping key order is not semantically significant',
         'list order is semantically significant',
         'returned metadata is defensively isolated',
+        'checkpoint runtime selection remains deferred to w4',
     ):
         assert token in contract_text
 
@@ -49,6 +52,7 @@ def test_checkpoint_store_contract_docs_exist_and_cover_core_terms() -> None:
         'checkpointstore',
         'approved for durable backend implementation',
         'checkpoint metadata is preserved as a lossless logical json value',
+        'filesystemcheckpointstore is implemented in `langgraph_automation.integrations.checkpoint`',
     ):
         assert token in api_surface_text
 
@@ -59,5 +63,7 @@ def test_checkpoint_store_contract_docs_exist_and_cover_core_terms() -> None:
         'checkpointreadresult',
         'approved_for_implementation',
         'checkpoint store contract',
+        'process_durable',
+        'filesystemcheckpointstore is implemented in `langgraph_automation.integrations.checkpoint`',
     ):
         assert token in core_contract_text

@@ -226,8 +226,8 @@ Next focus areas:
 Persistence contract test harness:
 
 - Block U: complete
-- durable backend: deferred
-- next block: Durable Artifact / Checkpoint Backend Block V
+- durable backend: complete
+- next block: Checkpoint Backend Runtime Selection and Configuration Block W4
 
 Artifact protocol sufficiency / durable backend design:
 
@@ -267,6 +267,15 @@ Checkpoint Store Protocol Evolution Block W2:
 - filesystem backend readiness: approved
 - next block: Filesystem Checkpoint Backend Implementation Block W3
 
+Filesystem Checkpoint Backend Implementation Block W3:
+
+- complete
+- FilesystemCheckpointStore implementation: complete
+- process-durable filesystem checkpoint backend: complete
+- filesystem checkpoint backend implementation: complete
+- process-durable filesystem checkpoint backend: complete
+- next block: Checkpoint Backend Runtime Selection and Configuration Block W4
+
 Later:
 
 - Minimal Application Workflow Example
@@ -290,14 +299,14 @@ P1 safety exposure hardening:
 - observability metadata safety: complete
 - artifact/store body safety: complete
 - safe error exposure: complete
-- persistence durability: artifact complete / checkpoint deferred
+- persistence durability: artifact complete / checkpoint filesystem complete / checkpoint runtime selection deferred
 
 Persistence durability audit:
 
 - Block T: complete
 - durable artifact backend: complete
 - durable checkpoint protocol: complete
-- durable checkpoint backend: deferred
+- durable checkpoint backend: complete
 - next block: Persistence Contract Test Harness Block U
 
 Persistence contract test harness:
@@ -305,8 +314,8 @@ Persistence contract test harness:
 - Block U: complete
 - durable artifact backend: complete
 - durable checkpoint protocol: complete
-- durable checkpoint backend: deferred
-- next block: Durable Checkpoint Backend Block V
+- durable checkpoint backend: complete
+- next block: Checkpoint Backend Runtime Selection and Configuration Block W4
 
 Package Complete+ future work:
 

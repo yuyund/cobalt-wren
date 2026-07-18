@@ -38,12 +38,14 @@ def test_checkpoint_store_protocol_sufficiency_docs_exist_and_cover_core_terms()
         'lossless logical json value',
         'defensively isolated',
         'request / descriptor / read-result separation',
+        'filesystem checkpoint backend is now implemented',
+        'checkpoint runtime selection remains deferred to w4',
     ):
         assert token in audit_text
 
     for token in (
         'durable checkpoint backend design',
-        'approved for implementation',
+        'implemented and approved for implementation',
         'request / descriptor / read-result split',
         'immutable checkpoint versions',
         'stable execution identity',
@@ -52,20 +54,26 @@ def test_checkpoint_store_protocol_sufficiency_docs_exist_and_cover_core_terms()
         'specific-version read',
         'history listing',
         'lossless logical json value',
+        'pending.json',
+        'head.json',
+        'lock',
         'durable checkpoint storage is necessary but not sufficient for true resume',
     ):
         assert token in design_text
 
     for token in (
         'durable checkpoint test plan',
-        'approved for implementation',
+        'implemented and approved for implementation',
         'current memory checkpoint store uses linear append-only versioned history',
-        'checkpoint protocol evolution is complete',
+        'current filesystem checkpoint store is process_durable',
+        'filesystem backend is implemented',
+        'baseline suite passes for memory and filesystem',
         'immutable checkpoint version write',
         'specific-version read',
         'history listing',
         'lost-update detection',
         'metadata fidelity',
+        'runtime selection remains deferred to w4',
     ):
         assert token in test_plan_text
 
@@ -75,7 +83,8 @@ def test_checkpoint_store_protocol_sufficiency_docs_exist_and_cover_core_terms()
         'checkpoint_id is caller-issued and identifies an immutable checkpoint version',
         'specific-version reads',
         'history listing',
-        'durable checkpoint implementation is now unblocked',
+        'durable checkpoint implementation is now closed for the first durable backend',
+        'filesystemcheckpointstore is implemented in `langgraph_automation.integrations.checkpoint`',
         'lossless logical json value',
     ):
         assert token in contract_text
@@ -83,12 +92,14 @@ def test_checkpoint_store_protocol_sufficiency_docs_exist_and_cover_core_terms()
     for token in (
         'checkpointstore protocol is versioned and approved for implementation',
         'checkpoint protocol is versioned and approved for implementation',
-        'durable backend implementation still deferred',
+        'filesystem checkpoint backend is process_durable and restart durable',
+        'checkpoint runtime selection remains deferred',
     ):
         assert token in traceability_text
 
     for token in (
-        'durable checkpoint backend is deferred',
+        'checkpoint runtime selection is deferred',
+        'filesystem checkpoint backend implementation is complete',
         'checkpoint protocol evolution is complete',
         'recommended closure order',
     ):

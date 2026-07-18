@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Callable
 
 from langgraph_automation.integrations.artifact import ArtifactStore, FilesystemArtifactStore, MemoryArtifactStore
-from langgraph_automation.integrations.checkpoint import CheckpointStore, MemoryCheckpointStore
+from langgraph_automation.integrations.checkpoint import CheckpointStore, FilesystemCheckpointStore, MemoryCheckpointStore
 
 from .capabilities import ContractCapability, DurabilityLevel
 
@@ -98,7 +98,37 @@ def checkpoint_backend_specs() -> tuple[CheckpointBackendSpec, ...]:
                     ContractCapability.HISTORY_LISTING,
                     ContractCapability.LINEAGE,
                     ContractCapability.SERIALIZER_DESCRIPTOR,
+                    ContractCapability.VERSIONED_HISTORY,
                     ContractCapability.THREAD_CONCURRENT_APPEND,
+                    ContractCapability.SHARED_INSTANCE,
+                }
+            ),
+        ),
+        CheckpointBackendSpec(
+            name='filesystem',
+            implementation=FilesystemCheckpointStore,
+            factory=lambda: FilesystemCheckpointStore(Path(tempfile.mkdtemp(prefix='langgraph-automation-checkpoint-'))),
+            durability=DurabilityLevel.PROCESS_DURABLE,
+            capabilities=frozenset(
+                {
+                    ContractCapability.BASELINE,
+                    ContractCapability.DEFENSIVE_COPY,
+                    ContractCapability.SAFE_REFERENCE,
+                    ContractCapability.RUN_ISOLATION,
+                    ContractCapability.IMMUTABLE_VERSION,
+                    ContractCapability.IDEMPOTENT_WRITE,
+                    ContractCapability.CONFLICT_DETECTION,
+                    ContractCapability.INTEGRITY_VERIFICATION,
+                    ContractCapability.RESTART_DURABILITY,
+                    ContractCapability.SPECIFIC_VERSION_READ,
+                    ContractCapability.LATEST_SELECTION,
+                    ContractCapability.HISTORY_LISTING,
+                    ContractCapability.LINEAGE,
+                    ContractCapability.SERIALIZER_DESCRIPTOR,
+                    ContractCapability.VERSIONED_HISTORY,
+                    ContractCapability.SHARED_INSTANCE,
+                    ContractCapability.THREAD_CONCURRENT_APPEND,
+                    ContractCapability.PROCESS_CONCURRENT_APPEND,
                 }
             ),
         ),

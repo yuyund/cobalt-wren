@@ -19,7 +19,7 @@ This document defines the reusable black-box contract test harness for ArtifactS
 ## Baseline Contract
 
 - ArtifactStore: body round-trip, missing behavior, run isolation, defensive copy, deterministic list ordering, idempotent write, conflict detection, safe reference rejection, diagnostic non-exposure.
-- CheckpointStore: genesis append, versioned round-trip, missing behavior, run isolation, namespace isolation, defensive copy, idempotent retry, conflict detection, ordered history listing, diagnostic non-exposure.
+- CheckpointStore: genesis append, versioned round-trip, missing behavior, run isolation, namespace isolation, defensive copy, idempotent retry, conflict detection, specific-version read, ordered history listing, diagnostic non-exposure.
 - The checkpoint baseline is a characterization of versioned append-only history, not destructive latest-state replacement.
 - Baseline tests live under `tests/contract/persistence/`.
 
@@ -33,13 +33,14 @@ This document defines the reusable black-box contract test harness for ArtifactS
 
 - `tests/support/persistence/backends.py` registers the current concrete backends.
 - The registry is compared against concrete implementation discovery to catch onboarding drift.
-- The current registry contains `MemoryArtifactStore` and `MemoryCheckpointStore`.
+- The current registry contains `MemoryArtifactStore`, `FilesystemArtifactStore`, `MemoryCheckpointStore`, and `FilesystemCheckpointStore`.
 
 ## Test-Only Capability Model
 
 - `tests/support/persistence/capabilities.py` defines test-only durability and contract capability enums.
 - The capability model stays in tests and does not become production API.
 - The current memory backends are classified as `EPHEMERAL`.
+- The current filesystem backends are classified as `PROCESS_DURABLE`.
 
 ## Durability Levels
 
@@ -64,12 +65,17 @@ This document defines the reusable black-box contract test harness for ArtifactS
 
 ## Checkpoint Baseline Cases
 
+- genesis append
 - round-trip
 - missing behavior
 - run isolation
 - defensive copy
-- delete contract
-- latest-state compatibility
+- namespace isolation
+- idempotent retry
+- conflict detection
+- specific-version read
+- latest selection
+- history listing
 - diagnostic non-exposure
 
 ## Fault Injection Model
@@ -103,9 +109,8 @@ This document defines the reusable black-box contract test harness for ArtifactS
 - concurrency
 - versioned history
 
-Checkpoint durable contract requirements are still blocked by the protocol audit and remain a future target only.
-
-These capabilities are documented for later backends and remain deferred until the corresponding implementations exist.
+Checkpoint durable contract requirements are now implemented for the filesystem backend and remain part of the shared harness.
+Runtime selection and orchestration remain future work.
 
 ## Xfail Policy
 
@@ -157,8 +162,8 @@ Any capability that the current protocol cannot express remains a gap until the 
 
 ## Deferred Work
 
-- durable ArtifactStore implementation is deferred
-- durable CheckpointStore implementation is deferred
+- durable ArtifactStore implementation is deferred for deployment-level durability
+- checkpoint runtime selection is deferred
 - production capability model is not added
 - body/metadata orchestration is deferred
 - true resume is deferred
