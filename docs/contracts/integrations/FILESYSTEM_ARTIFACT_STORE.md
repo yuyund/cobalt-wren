@@ -57,6 +57,7 @@ It is process-durable, immutable, idempotent, conflict-aware, and integrity-veri
 
 ## Deferred Work
 
+- explicit artifact emission and orchestration
 - runtime backend selection is deferred
 - Django orchestration is deferred
 - body/metadata orchestration is deferred

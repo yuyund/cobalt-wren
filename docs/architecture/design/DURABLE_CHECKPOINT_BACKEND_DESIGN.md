@@ -194,3 +194,5 @@ True resume additionally needs:
 
 - true resume
 - metadata orchestration
+- execution persistence orchestration
+- LangGraph adapter integration

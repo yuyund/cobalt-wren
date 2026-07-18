@@ -18,6 +18,8 @@ This document fixes the contract that durable backends must satisfy.
 - checkpoint runtime selection is implemented through typed config and the canonical runtime builder
 - checkpoint runtime selection is implemented through typed config and the canonical builder
 - runtime / composition work is execution persistence orchestration
+- current production execution path still does not call `CheckpointStore.save()`
+- LangGraph adapter integration remains deferred
 - true resume remains deferred
 
 ## Execution Stream Identity
@@ -171,4 +173,6 @@ The remaining runtime/composition work is execution persistence orchestration, n
 - execution persistence orchestration
 - Django orchestration
 - reconciliation and retention
+- LangGraph adapter
+- pending writes
 - true resume

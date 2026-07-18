@@ -170,6 +170,7 @@ Guidance:
 - accepted checkpoint metadata is preserved as a lossless logical JSON value and is not redacted on persistence
 - returned checkpoint metadata is defensively isolated from stored state
 - `CheckpointStore` is approved for durable backend implementation.
+- `CheckpointStore` is storage-only; execution persistence orchestration remains a future internal layer.
 - `FilesystemCheckpointStore` is implemented in `langgraph_automation.integrations.checkpoint`.
 - `FilesystemCheckpointStore` is implemented in `langgraph_automation.integrations.checkpoint` and remains outside `api.stores`.
 - `FilesystemCheckpointStore` is implemented in `langgraph_automation.integrations.checkpoint` and is not re-exported from `api.stores`.
@@ -180,6 +181,8 @@ Guidance:
 - `MemoryCheckpointStore` remains the default checkpoint backend when the section is absent.
 - `FilesystemCheckpointStore` is explicit opt-in and must fail startup on initialization errors.
 - `build_checkpoint_store()` is the canonical construction point, and `api.stores` remains the minimal public facade.
+- `api.runtime` remains deferred.
+- no public execution persistence facade is exposed yet.
 
 ## Observability API surface
 

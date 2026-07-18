@@ -201,6 +201,7 @@ Advanced durable semantics remain deferred until runtime selection and orchestra
 - artifact backend selection is canonicalized through typed config and a single runtime builder
 - `GraphRuntime` carries the stores
 - no execution path currently writes artifact or checkpoint bodies through these store protocols
+- execution persistence orchestration is still a separate block
 - Django observability emits metadata rows through `DjangoEventSink`
 - `FilesystemArtifactStore` publishes content-addressed bodies and deterministic manifests on the local filesystem
 - `FilesystemArtifactStore` verifies manifest integrity and body metadata during listing
@@ -242,6 +243,7 @@ Reason:
 
 - current code wires in-memory stores only
 - current code does not yet implement durable body writes or transactional body/metadata orchestration
+- current code does not yet define an execution-owned artifact or checkpoint emission policy
 - restart durability is therefore not guaranteed
 
 ## Immutability

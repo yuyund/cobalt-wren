@@ -20,6 +20,7 @@ Status: implemented and approved for implementation.
 - current checkpoint protocol exposes versioned history
 - current checkpoint protocol exposes serializer identity / version
 - checkpoint metadata fidelity is lossless and defensively isolated
+- execution persistence orchestration remains out of scope for this backend plan
 
 ## Required Audit Tests
 
@@ -84,6 +85,7 @@ Status: implemented and approved for implementation.
 - checkpoint runtime selection is complete
 - true resume remains separate from storage durability
 - metadata orchestration remains deferred
+- execution lifecycle orchestration remains a separate block
 
 ## Xfail Policy
 
