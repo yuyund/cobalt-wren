@@ -2,7 +2,11 @@
 
 from __future__ import annotations
 
+import inspect
 from pathlib import Path
+
+from langgraph_automation.apps.automation.services import execution as execution_service
+from langgraph_automation.apps.automation.services import runs as run_services
 
 
 def test_execution_path_does_not_call_artifact_or_checkpoint_store_persistence_methods() -> None:
@@ -54,3 +58,12 @@ def test_application_runtime_does_not_source_physical_store_selection_from_workf
 
     offenders = [token for token in forbidden_tokens if token in text]
     assert offenders == [], f'{path} still sources persistence selection from workflow payload: {offenders}'
+
+
+def test_run_service_signatures_do_not_accept_physical_persistence_configuration() -> None:
+    for func in (run_services.start_run, run_services.retry_run, run_services.cancel_run, execution_service.dispatch_run_execution):
+        signature = inspect.signature(func)
+        assert 'package_settings' not in signature.parameters, f'{func.__module__}.{func.__name__} still accepts package_settings'
+
+    dispatch_signature = inspect.signature(execution_service.dispatch_run_execution)
+    assert dispatch_signature.parameters['runtime'].default is inspect._empty

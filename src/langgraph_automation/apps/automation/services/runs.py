@@ -13,7 +13,6 @@ from langgraph_automation.apps.automation.services import runtime as runtime_mod
 from langgraph_automation.apps.automation.services.errors import WorkflowConfigurationError
 from langgraph_automation.apps.automation.services.execution import dispatch_run_execution
 from langgraph_automation.core.result_safety import safe_run_error_message, safe_run_output_payload
-from langgraph_automation.config.models import NormalizedPackageConfig
 from langgraph_automation.graphs.runner import ExecutionResult
 from langgraph_automation.graphs.runtime import GraphRuntime
 from langgraph_automation.integrations.observability.failure_policy import suppress_observability_failure
@@ -83,9 +82,13 @@ def _make_runtime(
     run: Run,
     runtime: GraphRuntime | None,
     *,
-    package_settings: NormalizedPackageConfig | None = None,
+    services: runtime_module.RunExecutionServices | None = None,
 ) -> GraphRuntime:
-    return runtime if runtime is not None else runtime_module.build_graph_runtime(run, package_settings=package_settings)
+    if runtime is not None:
+        return runtime
+    if services is None:
+        services = runtime_module.get_run_execution_services()
+    return services.build_graph_runtime(run)
 
 
 def _emit_run_failed(*, event_sink, run: Run, error_message: str) -> None:
@@ -130,7 +133,7 @@ def start_run(
     *,
     run: Run,
     runtime: GraphRuntime | None = None,
-    package_settings: NormalizedPackageConfig | None = None,
+    services: runtime_module.RunExecutionServices | None = None,
     actor: object | None = None,
 ) -> RunActionResult:
     '''Start a run.'''
@@ -142,12 +145,12 @@ def start_run(
         _transition_run(locked_run, status=RunStatus.RUNNING, thread_id=thread_id)
 
     try:
-        runtime = _make_runtime(locked_run, runtime, package_settings=package_settings)
+        runtime = _make_runtime(locked_run, runtime, services=services)
     except WorkflowConfigurationError as exc:
         return _handle_runtime_build_failure(locked_run, exc)
 
     try:
-        execution_result = dispatch_run_execution(locked_run, runtime=runtime, package_settings=package_settings)
+        execution_result = dispatch_run_execution(locked_run, runtime=runtime)
     except Exception as exc:  # pragma: no cover
         with transaction.atomic():
             locked_run = _locked_run(locked_run)
@@ -161,7 +164,13 @@ def start_run(
     return RunActionResult(run=locked_run, message=execution_result.message, output_payload=safe_run_output_payload(execution_result.output_payload), execution_result=execution_result)
 
 
-def cancel_run(*, run: Run, runtime: GraphRuntime | None = None, actor: object | None = None) -> RunActionResult:
+def cancel_run(
+    *,
+    run: Run,
+    runtime: GraphRuntime | None = None,
+    services: runtime_module.RunExecutionServices | None = None,
+    actor: object | None = None,
+) -> RunActionResult:
     '''Cancel a run.'''
 
     with transaction.atomic():
@@ -169,7 +178,7 @@ def cancel_run(*, run: Run, runtime: GraphRuntime | None = None, actor: object |
         _policy_or_raise(can_cancel_run(actor, locked_run))
         _transition_run(locked_run, status=RunStatus.CANCELLED)
 
-    runtime = _make_runtime(locked_run, runtime)
+    runtime = _make_runtime(locked_run, runtime, services=services)
     if runtime.event_sink is not None:
         runtime.event_sink.run_cancelled(locked_run.pk, message='run cancelled', payload={'run_id': locked_run.pk, 'workflow_id': locked_run.workflow_id})
     return RunActionResult(run=locked_run, message='run cancelled')
@@ -185,7 +194,7 @@ def retry_run(
     *,
     run: Run,
     runtime: GraphRuntime | None = None,
-    package_settings: NormalizedPackageConfig | None = None,
+    services: runtime_module.RunExecutionServices | None = None,
     actor: object | None = None,
 ) -> RunActionResult:
     '''Retry a failed or cancelled run.'''
@@ -196,12 +205,12 @@ def retry_run(
         _transition_run(locked_run, status=RunStatus.RUNNING)
 
     try:
-        runtime = _make_runtime(locked_run, runtime, package_settings=package_settings)
+        runtime = _make_runtime(locked_run, runtime, services=services)
     except WorkflowConfigurationError as exc:
         return _handle_runtime_build_failure(locked_run, exc)
 
     try:
-        execution_result = dispatch_run_execution(locked_run, runtime=runtime, package_settings=package_settings)
+        execution_result = dispatch_run_execution(locked_run, runtime=runtime)
     except Exception as exc:  # pragma: no cover
         with transaction.atomic():
             locked_run = _locked_run(locked_run)

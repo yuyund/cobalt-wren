@@ -49,6 +49,7 @@ def test_start_run_executes_minimal_llm_workflow_and_saves_safe_output(monkeypat
     sink = RecordingEventSink()
     monkeypatch.setattr(runtime_module, 'build_event_sink', lambda _run: sink)
     monkeypatch.setattr('langgraph_automation.integrations.llm.litellm_client.litellm.completion', _fake_litellm_completion)
+    services = runtime_module.build_run_execution_services_from_mapping({'version': 1})
 
     workflow = Workflow.objects.create(
         name='wf-minimal-llm',
@@ -71,7 +72,7 @@ def test_start_run_executes_minimal_llm_workflow_and_saves_safe_output(monkeypat
         input_payload={'text': 'summarize this /tmp/secret.txt Authorization: Bearer secret-token'},
     )
 
-    result = run_services.start_run(run=run)
+    result = run_services.start_run(run=run, services=services)
     result.run.refresh_from_db()
 
     assert result.run.status == RunStatus.SUCCEEDED
@@ -146,6 +147,7 @@ def test_start_run_continues_when_echo_is_policy_denied() -> None:
 def test_start_run_fails_when_llm_is_disabled(monkeypatch: pytest.MonkeyPatch) -> None:
     sink = RecordingEventSink()
     monkeypatch.setattr(runtime_module, 'build_event_sink', lambda _run: sink)
+    services = runtime_module.build_run_execution_services_from_mapping({'version': 1})
 
     workflow = Workflow.objects.create(
         name='wf-minimal-llm-disabled',
@@ -165,7 +167,7 @@ def test_start_run_fails_when_llm_is_disabled(monkeypatch: pytest.MonkeyPatch) -
         input_payload={'text': 'summarize this'},
     )
 
-    result = run_services.start_run(run=run)
+    result = run_services.start_run(run=run, services=services)
     result.run.refresh_from_db()
 
     assert result.run.status == RunStatus.FAILED

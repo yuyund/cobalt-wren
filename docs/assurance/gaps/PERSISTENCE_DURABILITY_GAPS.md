@@ -12,7 +12,7 @@ This document ranks the remaining persistence gaps after the current code-first 
 | --- | --- | --- | --- |
 | No body/metadata orchestration path | `src/langgraph_automation/apps/automation/services/execution.py`, `src/langgraph_automation/apps/automation/services/runs.py`, `src/langgraph_automation/graphs/runner.py` | The execution path does not write or verify artifact/checkpoint bodies today. | High |
 | No reconciliation path for orphan body / dangling metadata | current code has metadata-only models and explicit pending recovery only | Crash windows and repair semantics are still bounded to the store layer. | High |
-| No execution-owned persistence orchestration contract | `src/langgraph_automation/apps/automation/services/runtime.py`, `src/langgraph_automation/apps/automation/services/execution.py`, `src/langgraph_automation/apps/automation/services/runs.py` | `GraphRuntime` now receives selected stores, but execution ownership for artifact or checkpoint emission is still undefined. | High |
+| No execution-owned persistence orchestration contract | `src/langgraph_automation/apps/automation/services/runtime.py`, `src/langgraph_automation/apps/automation/services/execution.py`, `src/langgraph_automation/apps/automation/services/runs.py` | `GraphRuntime` now receives selected stores through composition-bound run services, but execution ownership for artifact or checkpoint emission is still undefined. | High |
 
 ## P2
 
@@ -27,9 +27,10 @@ This document ranks the remaining persistence gaps after the current code-first 
 
 - artifact bodies are process-local only in the default runtime wiring
 - checkpoint bodies are process-local in the default runtime wiring, but the filesystem backend is now available for direct use
-- physical persistence backend/root selection is owned by trusted package settings, not workflow payload or run input
+- physical persistence backend/root selection is owned by trusted package settings bound once at application composition, not workflow payload or run input
 - checkpoint metadata fidelity is lossless and defensively isolated in both current checkpoint backends
 - execution persistence orchestration is still absent from the canonical production run path, even though selected stores now propagate into `GraphRuntime`
+- normalized package config is not recomputed per run; bound run services reuse the same physical persistence policy across start / retry execution
 - restart destroys the default in-memory checkpoint state
 - no deployment-wide default checkpoint durability exists yet
 

@@ -71,12 +71,18 @@ Current candidates:
 - `GraphExecutionInput`
 - `GraphRuntimeConfig`
 
+Internal composition helpers:
+
+- `ApplicationRuntimeFactory`
+- `RunExecutionServices`
+
 Guidance:
 
 - `GraphRuntime` is not yet exposed through the public facade and remains provisional.
 - A future `WorkflowRuntime` protocol or facade may replace direct reliance on the concrete class.
 - `GraphExecutionInput` is the transient raw input boundary and may later be renamed toward `WorkflowExecutionInput`.
 - `GraphRuntimeConfig` is graph-local runtime configuration and must never carry secrets or raw input.
+- `ApplicationRuntimeFactory` and `RunExecutionServices` remain internal composition helpers and are not exported through the public facade.
 - Do not over-freeze the concrete `GraphRuntime` class before the package surface is designed.
 
 ## Tool API surface

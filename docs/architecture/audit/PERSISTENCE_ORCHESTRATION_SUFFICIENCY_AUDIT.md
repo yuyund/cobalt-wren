@@ -27,6 +27,13 @@ Recommended target model:
 - application-adapter-owned control-plane projection
 - separate LangGraph checkpoint adapter before true resume
 
+Configuration ownership note:
+
+- physical persistence configuration is bound once at application composition
+- `NormalizedPackageConfig` is not accepted as a per-run override on `start_run()` / `retry_run()`
+- `RunExecutionServices` owns the bound runtime factory for the production run path
+- workflow / run payloads remain validation-only inputs and cannot rebuild store selection
+
 ## Scope
 
 In scope:
@@ -93,8 +100,14 @@ Out of scope:
 
 ### Primary production path
 
-`src/langgraph_automation/apps/automation/services/runs.py:start_run`
+`application composition`
+  -> `src/langgraph_automation/apps/automation/services/runtime.py:build_run_execution_services`
+  -> `src/langgraph_automation/apps/automation/services/runtime.py:ApplicationRuntimeFactory`
+  -> `src/langgraph_automation/apps/automation/services/runtime.py:RunExecutionServices`
+  -> `src/langgraph_automation/apps/automation/services/runs.py:start_run`
   -> `src/langgraph_automation/apps/automation/services/runs.py:_make_runtime`
+  -> `src/langgraph_automation/apps/automation/services/runtime.py:RunExecutionServices.build_graph_runtime`
+  -> `src/langgraph_automation/apps/automation/services/runtime.py:ApplicationRuntimeFactory.build_graph_runtime`
   -> `src/langgraph_automation/apps/automation/services/runtime.py:build_graph_runtime`
   -> `src/langgraph_automation/apps/automation/services/runtime.py:build_event_sink`
   -> `src/langgraph_automation/apps/automation/services/runtime.py:build_artifact_store`
@@ -159,14 +172,14 @@ Propagation path:
   -> `src/langgraph_automation/workflows/prepare.py:WorkflowPreparer.prepare`
   -> `src/langgraph_automation/workflows/requirements.py:check_workflow_requirements`
 
-For the execution plane, the actual owner is `GraphRuntime`:
+For the execution plane, the actual owner is `GraphRuntime`, but its store selection is now owned by a composition-bound runtime services object:
 
 `src/langgraph_automation/apps/automation/services/runtime.py:build_graph_runtime`
   -> `src/langgraph_automation/graphs/runtime.py:GraphRuntime`
   -> `src/langgraph_automation/apps/automation/services/execution.py:dispatch_run_execution`
   -> `src/langgraph_automation/graphs/runner.py:LangGraphRunner`
 
-The application runtime selects artifact and checkpoint stores from trusted normalized package settings and delegates construction to the canonical runtime builders before handing the exact instances to `GraphRuntime`.
+The application runtime selects artifact and checkpoint stores from trusted normalized package settings that were bound once into `RunExecutionServices`, and delegates construction to the canonical runtime builders before handing the exact instances to `GraphRuntime`.
 Workflow payload physical persistence config is rejected at validation time, so it cannot source backend selection or filesystem roots.
 
 Classification:

@@ -48,7 +48,8 @@ def test_dispatch_run_execution_returns_normalized_result(monkeypatch: pytest.Mo
     )
     run = Run.objects.create(workflow=workflow, name='run-dispatch', input_payload={'text': 'summarize this'})
 
-    result = dispatch_run_execution(run)
+    runtime = runtime_module.build_graph_runtime(run)
+    result = dispatch_run_execution(run, runtime=runtime)
 
     assert result.status == 'succeeded'
     assert result.output_payload['summary'] == 'final summary'

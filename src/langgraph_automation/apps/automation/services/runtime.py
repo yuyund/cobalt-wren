@@ -9,6 +9,8 @@ lifecycle state.
 from __future__ import annotations
 
 import logging
+from collections.abc import Mapping
+from dataclasses import dataclass
 
 from langgraph_automation.apps.automation.models.run import Run
 from langgraph_automation.apps.automation.services.errors import WorkflowConfigurationError
@@ -51,6 +53,38 @@ from langgraph_automation.workflows.catalog import build_builtin_graph_registry
 
 from langgraph_automation.runtime.artifact_store import build_artifact_store as build_package_artifact_store
 from langgraph_automation.runtime.checkpoint_store import build_checkpoint_store as build_package_checkpoint_store
+
+
+@dataclass(frozen=True, slots=True)
+class ApplicationRuntimeFactory:
+    """Bind normalized package config once for application composition."""
+
+    package_config: NormalizedPackageConfig
+
+    def build_graph_runtime(self, run: Run) -> GraphRuntime:
+        return build_graph_runtime(run, package_settings=self.package_config)
+
+
+@dataclass(frozen=True, slots=True)
+class RunExecutionServices:
+    """Bound execution services for run lifecycle orchestration."""
+
+    runtime_factory: ApplicationRuntimeFactory
+
+    def build_graph_runtime(self, run: Run) -> GraphRuntime:
+        return self.runtime_factory.build_graph_runtime(run)
+
+
+def get_run_execution_services() -> RunExecutionServices:
+    """Return the app-config bound run execution services instance."""
+
+    from django.apps import apps as django_apps
+
+    app_config = django_apps.get_app_config("automation")
+    services = getattr(app_config, "run_execution_services", None)
+    if services is None:
+        raise RuntimeError("automation app runtime services have not been initialized")
+    return services
 
 
 def build_event_sink(run: Run) -> EventSink:
@@ -197,6 +231,24 @@ def build_tool_registry(
 
 def _default_package_settings() -> NormalizedPackageConfig:
     return load_normalized_package_config_from_mapping({"version": 1})
+
+
+def build_application_runtime_factory(package_config: NormalizedPackageConfig) -> ApplicationRuntimeFactory:
+    """Bind normalized package config to the application runtime composition owner."""
+
+    return ApplicationRuntimeFactory(package_config=package_config)
+
+
+def build_run_execution_services(package_config: NormalizedPackageConfig) -> RunExecutionServices:
+    """Build run execution services from normalized package config."""
+
+    return RunExecutionServices(runtime_factory=build_application_runtime_factory(package_config))
+
+
+def build_run_execution_services_from_mapping(config: Mapping[str, object]) -> RunExecutionServices:
+    """Normalize trusted raw package config once and bind it to execution services."""
+
+    return build_run_execution_services(load_normalized_package_config_from_mapping(config))
 
 
 def _artifact_store_settings(package_settings: NormalizedPackageConfig | None) -> StoreBackendConfig | None:

@@ -139,6 +139,11 @@ Current:
 - Persistence Configuration Ownership Closure X1C2
 - 状態: 完了
 
+Current:
+
+- Persistence Configuration Composition Proof X1C3
+- 状態: 完了
+
 After Block G:
 
 - Package / Foundation MVP gate complete
@@ -337,6 +342,13 @@ Persistence Runtime Propagation Closure X1C:
 - complete
 - selected artifact/checkpoint stores now propagate into `GraphRuntime`: complete
 - direct concrete store construction in application runtime: removed
+- next block: Artifact Emission and Identity Contract X2
+
+Persistence Configuration Composition Proof X1C3:
+
+- complete
+- normalized package config bound once at application composition: complete
+- per-run physical persistence override removed: complete
 - next block: Artifact Emission and Identity Contract X2
 
 Package Complete+ future work:

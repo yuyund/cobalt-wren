@@ -58,6 +58,8 @@ These contracts describe the current internal foundation surface. If parts of th
 - `Workflow.definition_payload` is database-backed workflow instance-specific config.
 - `Run.input_payload` is a single execution input, not runtime config.
 - Normalized runtime config is package config plus validated `Workflow.definition_payload`.
+- physical persistence configuration is application-composition scoped and bound once into run services
+- `start_run()` / `retry_run()` consume bound run services, not raw package config or per-run backend/root values
 - `Run.input_payload` must not be used to read model, `api_key`, `base_url`, or `tools.allowed`.
 - artifact backend selection is represented by `stores.artifact`
 - missing `stores.artifact` normalizes to `MemoryArtifactStore`

@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from types import SimpleNamespace
+
 import pytest
 
 from langgraph_automation.apps.automation.models.run import Run, RunStatus
@@ -11,6 +13,22 @@ from langgraph_automation.core.redaction import REDACTED_VALUE
 from langgraph_automation.core.result_safety import safe_run_error_message, safe_run_output_payload
 from langgraph_automation.config.normalizer import load_normalized_package_config_from_mapping
 from langgraph_automation.graphs.runner import ExecutionResult
+
+
+class _FakeRuntimeFactory:
+    def __init__(self, package_config: object) -> None:
+        self.package_config = package_config
+        self.calls: list[object] = []
+
+    def build_graph_runtime(self, run_arg: object) -> object:
+        self.calls.append(run_arg)
+        return SimpleNamespace(event_sink=None)
+
+
+def _run_execution_services(package_config: object) -> object:
+    return run_services.runtime_module.RunExecutionServices(
+        runtime_factory=_FakeRuntimeFactory(package_config)
+    )
 
 
 @pytest.mark.django_db
@@ -23,6 +41,8 @@ def test_start_run_saves_safe_output_payload(monkeypatch: pytest.MonkeyPatch) ->
         },
     )
     run = Run.objects.create(workflow=workflow, name='run-safe-output', input_payload={'prompt': 'hello'})
+    package_settings = load_normalized_package_config_from_mapping({"version": 1})
+    services = _run_execution_services(package_settings)
 
     def fake_dispatch(*_args, **_kwargs):
         return ExecutionResult(
@@ -38,7 +58,7 @@ def test_start_run_saves_safe_output_payload(monkeypatch: pytest.MonkeyPatch) ->
 
     monkeypatch.setattr(run_services, 'dispatch_run_execution', fake_dispatch)
 
-    result = run_services.start_run(run=run)
+    result = run_services.start_run(run=run, services=services)
     result.run.refresh_from_db()
 
     assert result.run.status == RunStatus.SUCCEEDED
@@ -54,7 +74,7 @@ def test_start_run_saves_safe_output_payload(monkeypatch: pytest.MonkeyPatch) ->
 
 
 @pytest.mark.django_db
-def test_start_run_forwards_typed_package_settings_to_runtime_construction(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_start_run_uses_bound_package_config_once(monkeypatch: pytest.MonkeyPatch) -> None:
     workflow = Workflow.objects.create(
         name='wf-package-settings',
         definition_payload={
@@ -64,22 +84,19 @@ def test_start_run_forwards_typed_package_settings_to_runtime_construction(monke
     )
     run = Run.objects.create(workflow=workflow, name='run-package-settings')
     package_settings = load_normalized_package_config_from_mapping({"version": 1})
-    captured: list[object] = []
-
-    def fake_build_graph_runtime(run_arg, *, package_settings=None):
-        captured.append(package_settings)
-        return object()
+    factory = _FakeRuntimeFactory(package_settings)
+    services = run_services.runtime_module.RunExecutionServices(runtime_factory=factory)
 
     def fake_dispatch_run_execution(*_args, **_kwargs):
         return ExecutionResult(status=RunStatus.SUCCEEDED, output_payload={}, message='ok')
 
-    monkeypatch.setattr(run_services.runtime_module, 'build_graph_runtime', fake_build_graph_runtime)
     monkeypatch.setattr(run_services, 'dispatch_run_execution', fake_dispatch_run_execution)
 
-    result = run_services.start_run(run=run, package_settings=package_settings)
+    result = run_services.start_run(run=run, services=services)
 
     assert result.run.status == RunStatus.SUCCEEDED
-    assert captured == [package_settings]
+    assert factory.package_config is package_settings
+    assert factory.calls == [run]
 
 
 @pytest.mark.django_db
@@ -92,6 +109,8 @@ def test_retry_run_saves_safe_failed_error_message(monkeypatch: pytest.MonkeyPat
         },
     )
     run = Run.objects.create(workflow=workflow, name='run-safe-error', status=RunStatus.FAILED)
+    package_settings = load_normalized_package_config_from_mapping({"version": 1})
+    services = _run_execution_services(package_settings)
 
     def fake_dispatch(*_args, **_kwargs):
         return ExecutionResult(
@@ -103,7 +122,7 @@ def test_retry_run_saves_safe_failed_error_message(monkeypatch: pytest.MonkeyPat
 
     monkeypatch.setattr(run_services, 'dispatch_run_execution', fake_dispatch)
 
-    result = run_services.retry_run(run=run)
+    result = run_services.retry_run(run=run, services=services)
     result.run.refresh_from_db()
 
     assert result.run.status == RunStatus.FAILED
@@ -124,6 +143,8 @@ def test_start_run_exception_path_saves_safe_error_message(monkeypatch: pytest.M
         },
     )
     run = Run.objects.create(workflow=workflow, name='run-exception')
+    package_settings = load_normalized_package_config_from_mapping({"version": 1})
+    services = _run_execution_services(package_settings)
 
     def fake_dispatch(*_args, **_kwargs):
         raise RuntimeError(
@@ -135,7 +156,7 @@ def test_start_run_exception_path_saves_safe_error_message(monkeypatch: pytest.M
     monkeypatch.setattr(run_services, 'dispatch_run_execution', fake_dispatch)
 
     with pytest.raises(RuntimeError, match='secret-token'):
-        run_services.start_run(run=run)
+        run_services.start_run(run=run, services=services)
 
     run.refresh_from_db()
     assert run.status == RunStatus.FAILED
