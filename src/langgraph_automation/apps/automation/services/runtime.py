@@ -8,10 +8,14 @@ lifecycle state.
 
 from __future__ import annotations
 
+import json
 import logging
 from collections.abc import Mapping
 from dataclasses import dataclass
 
+from django.conf import settings as django_settings
+
+from langgraph_automation.api.errors import ConfigError
 from langgraph_automation.apps.automation.models.run import Run
 from langgraph_automation.apps.automation.services.errors import WorkflowConfigurationError
 from langgraph_automation.apps.automation.services.workflow_config import (
@@ -85,6 +89,30 @@ def get_run_execution_services() -> RunExecutionServices:
     if services is None:
         raise RuntimeError("automation app runtime services have not been initialized")
     return services
+
+
+def load_deployment_package_config_from_settings() -> Mapping[str, object]:
+    """Return the deployment-owned package config mapping from Django settings."""
+
+    config = getattr(django_settings, "LANGGRAPH_AUTOMATION", None)
+    if config is None:
+        return {"version": 1}
+    if isinstance(config, str):
+        try:
+            config = json.loads(config)
+        except json.JSONDecodeError as exc:
+            raise ConfigError(
+                "Configuration is invalid: LANGGRAPH_AUTOMATION must be valid JSON.",
+                code="CONFIG_INVALID_MAPPING",
+                component="automation_runtime",
+            ) from exc
+    if not isinstance(config, Mapping):
+        raise ConfigError(
+            "Configuration is invalid: LANGGRAPH_AUTOMATION must be a mapping.",
+            code="CONFIG_INVALID_MAPPING",
+            component="automation_runtime",
+        )
+    return config
 
 
 def build_event_sink(run: Run) -> EventSink:
@@ -249,6 +277,12 @@ def build_run_execution_services_from_mapping(config: Mapping[str, object]) -> R
     """Normalize trusted raw package config once and bind it to execution services."""
 
     return build_run_execution_services(load_normalized_package_config_from_mapping(config))
+
+
+def build_run_execution_services_from_settings() -> RunExecutionServices:
+    """Normalize deployment-owned package config once and bind it to execution services."""
+
+    return build_run_execution_services_from_mapping(load_deployment_package_config_from_settings())
 
 
 def _artifact_store_settings(package_settings: NormalizedPackageConfig | None) -> StoreBackendConfig | None:

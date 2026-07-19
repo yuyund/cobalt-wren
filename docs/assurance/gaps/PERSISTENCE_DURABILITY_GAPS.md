@@ -28,11 +28,11 @@ This document ranks the remaining persistence gaps after the current code-first 
 - artifact bodies are process-local only in the default runtime wiring
 - checkpoint bodies are process-local in the default runtime wiring, but the filesystem backend is now available for direct use
 - physical persistence backend/root selection is owned by trusted package settings bound once at application composition, not workflow payload or run input
+- deployment startup binding is owned by `AutomationConfig.ready()` and the trusted `LANGGRAPH_AUTOMATION` settings source
 - checkpoint metadata fidelity is lossless and defensively isolated in both current checkpoint backends
 - execution persistence orchestration is still absent from the canonical production run path, even though selected stores now propagate into `GraphRuntime`
 - normalized package config is not recomputed per run; bound run services reuse the same physical persistence policy across start / retry execution
 - restart destroys the default in-memory checkpoint state
-- no deployment-wide default checkpoint durability exists yet
 
 ## Recommended Closure Order
 
@@ -45,6 +45,8 @@ This document ranks the remaining persistence gaps after the current code-first 
 - checkpoint runtime selection is typed and canonical
 - checkpoint runtime selection is complete
 - checkpoint runtime selection is closed
+- deployment startup binding is complete
+- deployment startup fallback behavior is closed
 - reconciliation worker is deferred
 - cleanup command is deferred
 - true resume is deferred

@@ -105,6 +105,14 @@ deployment:
   timezone: Asia/Tokyo
 ```
 
+Deployment-owned startup package config:
+
+- the production startup source may provide a single trusted package config mapping such as `LANGGRAPH_AUTOMATION`
+- this mapping is consumed by application composition, then normalized once into `NormalizedPackageConfig`
+- it is not read from workflow payload, run payload, or user input
+- it is not recomputed per run
+- it is not a backend/root shortcut surface
+
 ### 2. Runtime config
 
 Purpose:
@@ -269,6 +277,7 @@ Runtime rules:
 - default remains `MemoryArtifactStore`
 - explicit filesystem selection is opt-in
 - `FilesystemArtifactStore` root is constructor-injected and not read from Django settings or environment directly
+- the canonical deployment source for the runtime config is a startup-owned package mapping, not workflow or run data
 - one filesystem root is one artifact identity domain
 - Plugin-specific config validation is defined by the plugin type in `../../plugins/PLUGINS.md`.
 - `plugins.enabled` selects from manually registered plugins and is not an import path, install instruction, or discovery mechanism.
@@ -303,6 +312,7 @@ Runtime rules:
 - default remains `MemoryCheckpointStore`
 - explicit filesystem selection is opt-in
 - `FilesystemCheckpointStore` root is constructor-injected and not read from Django settings or environment directly
+- the canonical deployment source for the runtime config is a startup-owned package mapping, not workflow or run data
 - one filesystem root is one checkpoint identity domain
 
 Example:

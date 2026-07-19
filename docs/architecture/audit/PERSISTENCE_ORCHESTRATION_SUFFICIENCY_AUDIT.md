@@ -30,9 +30,23 @@ Recommended target model:
 Configuration ownership note:
 
 - physical persistence configuration is bound once at application composition
+- the production deployment source is `LANGGRAPH_AUTOMATION` in Django settings, loaded once by `AutomationConfig.ready()`
 - `NormalizedPackageConfig` is not accepted as a per-run override on `start_run()` / `retry_run()`
 - `RunExecutionServices` owns the bound runtime factory for the production run path
 - workflow / run payloads remain validation-only inputs and cannot rebuild store selection
+
+Deployment startup binding note:
+
+- `AutomationConfig.ready()` binds services exactly once per composition instance for a given raw deployment config
+- repeated `ready()` calls with the same deployment config are no-ops
+- repeated `ready()` calls with a different deployment config fail closed
+- invalid deployment config fails startup before any runtime services are published
+
+Legacy deployment data note:
+
+- repository scans show workflow payload `stores` shapes only in tests and docs
+- local DB inspection in the current workspace snapshot was unavailable because the automation tables were not present
+- persisted deployment status remains `UNKNOWN` until a deployment-backed preflight or migrated database snapshot is inspected
 
 ## Scope
 

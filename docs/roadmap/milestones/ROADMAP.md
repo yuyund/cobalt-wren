@@ -351,6 +351,13 @@ Persistence Configuration Composition Proof X1C3:
 - per-run physical persistence override removed: complete
 - next block: Artifact Emission and Identity Contract X2
 
+Persistence Deployment Startup Proof X1C4:
+
+- complete
+- deployment-owned production config source: complete
+- startup binding and fail-safe validation: complete
+- next block: Artifact Emission and Identity Contract X2
+
 Package Complete+ future work:
 
 - `run_workflow`

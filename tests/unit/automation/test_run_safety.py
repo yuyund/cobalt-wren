@@ -9,10 +9,12 @@ import pytest
 from langgraph_automation.apps.automation.models.run import Run, RunStatus
 from langgraph_automation.apps.automation.models.workflow import Workflow
 from langgraph_automation.apps.automation.services import runs as run_services
+from langgraph_automation.apps.automation.services import runtime as runtime_module
 from langgraph_automation.core.redaction import REDACTED_VALUE
 from langgraph_automation.core.result_safety import safe_run_error_message, safe_run_output_payload
 from langgraph_automation.config.normalizer import load_normalized_package_config_from_mapping
 from langgraph_automation.graphs.runner import ExecutionResult
+from tests.support.recording_event_sink import RecordingEventSink
 
 
 class _FakeRuntimeFactory:
@@ -189,3 +191,75 @@ def test_resume_run_is_unsupported_and_does_not_dispatch(monkeypatch: pytest.Mon
         run_services.resume_run(run=run)
 
     assert called['value'] is False
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    ("action_name", "initial_status"),
+    [
+        ("start_run", RunStatus.PENDING),
+        ("retry_run", RunStatus.FAILED),
+    ],
+)
+def test_physical_persistence_configuration_is_rejected_before_runtime_and_persistence_side_effects(
+    action_name: str,
+    initial_status: str,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    workflow = Workflow.objects.create(
+        name=f'wf-invalid-physical-config-{action_name}',
+        definition_payload={
+            'llm': {'enabled': True, 'model': 'test-model'},
+            'tools': {'allowed': ['echo']},
+            'stores': {
+                'artifact': {'backend': 'filesystem', 'config': {'root': '/tmp/artifacts'}},
+                'checkpoint': {'backend': 'filesystem', 'config': {'root': '/tmp/checkpoints'}},
+            },
+        },
+    )
+    run = Run.objects.create(workflow=workflow, name=f'run-invalid-physical-config-{action_name}', status=initial_status)
+    services = runtime_module.build_run_execution_services_from_mapping({'version': 1})
+    sink = RecordingEventSink()
+    artifact_builder_called = False
+    checkpoint_builder_called = False
+    dispatch_called = False
+
+    def fake_event_sink(_run: Run) -> RecordingEventSink:
+        return sink
+
+    def fail_artifact_builder(*_args, **_kwargs):
+        nonlocal artifact_builder_called
+        artifact_builder_called = True
+        raise AssertionError('artifact builder should not be called for invalid workflow physical config')
+
+    def fail_checkpoint_builder(*_args, **_kwargs):
+        nonlocal checkpoint_builder_called
+        checkpoint_builder_called = True
+        raise AssertionError('checkpoint builder should not be called for invalid workflow physical config')
+
+    def fail_dispatch(*_args, **_kwargs):
+        nonlocal dispatch_called
+        dispatch_called = True
+        raise AssertionError('dispatch should not be called for invalid workflow physical config')
+
+    monkeypatch.setattr(runtime_module, 'build_event_sink', fake_event_sink)
+    monkeypatch.setattr(runtime_module, 'build_package_artifact_store', fail_artifact_builder)
+    monkeypatch.setattr(runtime_module, 'build_package_checkpoint_store', fail_checkpoint_builder)
+    monkeypatch.setattr(run_services, 'dispatch_run_execution', fail_dispatch)
+
+    action = getattr(run_services, action_name)
+    result = action(run=run, services=services)
+    run.refresh_from_db()
+
+    assert result.run.status == RunStatus.FAILED
+    assert run.status == RunStatus.FAILED
+    assert run.started_at is not None
+    assert run.finished_at is not None
+    assert run.error_message.startswith('WorkflowConfigurationError:')
+    assert '/tmp/artifacts' not in run.error_message
+    assert '/tmp/checkpoints' not in run.error_message
+    assert artifact_builder_called is False
+    assert checkpoint_builder_called is False
+    assert dispatch_called is False
+    assert [event.kind for event in sink.run_events] == ['run.failed']
+    assert all(event.kind != 'run.started' for event in sink.run_events)

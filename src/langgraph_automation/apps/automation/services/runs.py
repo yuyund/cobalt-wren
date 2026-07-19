@@ -7,6 +7,7 @@ from dataclasses import dataclass, field
 from django.db import transaction
 from django.utils import timezone
 
+from langgraph_automation.api.errors import FrameworkError
 from langgraph_automation.apps.automation.models.run import Run, RunStatus
 from langgraph_automation.apps.automation.policies.runs import PolicyResult, can_cancel_run, can_retry_run, can_start_run
 from langgraph_automation.apps.automation.services import runtime as runtime_module
@@ -104,7 +105,7 @@ def _emit_run_failed(*, event_sink, run: Run, error_message: str) -> None:
     )
 
 
-def _handle_runtime_build_failure(run: Run, exc: WorkflowConfigurationError) -> RunActionResult:
+def _handle_runtime_build_failure(run: Run, exc: Exception) -> RunActionResult:
     safe_message = safe_run_error_message(exc)
     with transaction.atomic():
         locked_run = _locked_run(run)
@@ -146,7 +147,7 @@ def start_run(
 
     try:
         runtime = _make_runtime(locked_run, runtime, services=services)
-    except WorkflowConfigurationError as exc:
+    except (WorkflowConfigurationError, FrameworkError) as exc:
         return _handle_runtime_build_failure(locked_run, exc)
 
     try:
@@ -206,7 +207,7 @@ def retry_run(
 
     try:
         runtime = _make_runtime(locked_run, runtime, services=services)
-    except WorkflowConfigurationError as exc:
+    except (WorkflowConfigurationError, FrameworkError) as exc:
         return _handle_runtime_build_failure(locked_run, exc)
 
     try:

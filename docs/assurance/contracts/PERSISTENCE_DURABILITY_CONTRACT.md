@@ -87,6 +87,7 @@ Forbidden:
 
 - `stores.artifact` is the runtime selection boundary for built-in artifact backends in trusted package settings
 - backend selection is deployment/application-owned, not workflow-owned
+- the trusted deployment source is loaded once at application startup and bound by `AutomationConfig.ready()`
 - section absence normalizes to `MemoryArtifactStore`
 - explicit filesystem selection requires an absolute trusted root
 - runtime selection is startup-only
@@ -97,6 +98,7 @@ Forbidden:
 
 - `stores.checkpoint` is the runtime selection boundary for built-in checkpoint backends in trusted package settings
 - backend selection is deployment/application-owned, not workflow-owned
+- the trusted deployment source is loaded once at application startup and bound by `AutomationConfig.ready()`
 - section absence normalizes to `MemoryCheckpointStoreSettings`
 - explicit filesystem selection requires an absolute trusted root
 - runtime selection is startup-only

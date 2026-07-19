@@ -66,6 +66,8 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # Reserved for a future filesystem-backed artifact backend.
 ARTIFACT_ROOT = env("ARTIFACT_ROOT", default=str(BASE_DIR / "artifacts"))
+# Deployment-owned package config for startup composition.
+LANGGRAPH_AUTOMATION = env("LANGGRAPH_AUTOMATION", default='{"version": 1}')
 
 TEMPLATES = [
     {

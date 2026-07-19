@@ -83,6 +83,7 @@ Guidance:
 - `GraphExecutionInput` is the transient raw input boundary and may later be renamed toward `WorkflowExecutionInput`.
 - `GraphRuntimeConfig` is graph-local runtime configuration and must never carry secrets or raw input.
 - `ApplicationRuntimeFactory` and `RunExecutionServices` remain internal composition helpers and are not exported through the public facade.
+- deployment-owned startup config sources such as `LANGGRAPH_AUTOMATION` and `AutomationConfig.ready()` are configuration/bootstrap concerns, not public API surface.
 - Do not over-freeze the concrete `GraphRuntime` class before the package surface is designed.
 
 ## Tool API surface
