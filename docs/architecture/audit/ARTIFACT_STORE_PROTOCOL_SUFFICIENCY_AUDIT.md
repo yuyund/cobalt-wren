@@ -81,8 +81,8 @@ The protocol is now paired with typed runtime configuration:
 - `stores.artifact` normalizes to `MemoryArtifactStoreSettings` when absent
 - explicit `stores.artifact.backend = memory` selects memory-backed runtime composition
 - explicit `stores.artifact.backend = filesystem` selects `FilesystemArtifactStore`
-- runtime assembly constructs the artifact store once during startup
-- filesystem initialization failures are startup failures, not memory fallbacks
+- runtime assembly constructs the artifact store once per runtime build
+- filesystem initialization failures are runtime-initialization failures, not memory fallbacks
 
 ## Protocol Sufficiency Decision
 

@@ -115,6 +115,32 @@ def load_deployment_package_config_from_settings() -> Mapping[str, object]:
     return config
 
 
+def load_normalized_deployment_package_config_from_settings():
+    """Return the normalized deployment-owned package config for startup binding."""
+
+    return load_normalized_package_config_from_mapping(load_deployment_package_config_from_settings())
+
+
+def deployment_package_config_signature(package_config: NormalizedPackageConfig) -> tuple[object, ...]:
+    """Return the canonical startup-binding identity for a normalized package config."""
+
+    artifact_store_settings = normalize_artifact_store_settings(package_config.stores.get("artifact"))
+    return (
+        package_config.version,
+        package_config.environment,
+        package_config.plugins,
+        package_config.providers,
+        package_config.tools,
+        artifact_store_settings,
+        package_config.checkpoint_store,
+        package_config.event_sinks,
+        package_config.limits,
+        package_config.observability,
+        package_config.safety,
+        package_config.metadata,
+    )
+
+
 def build_event_sink(run: Run) -> EventSink:
     """Build the observability sink for a run.
 

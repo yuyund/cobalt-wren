@@ -32,15 +32,18 @@ Configuration ownership note:
 - physical persistence configuration is bound once at application composition
 - the production deployment source is `LANGGRAPH_AUTOMATION` in Django settings, loaded once by `AutomationConfig.ready()`
 - `NormalizedPackageConfig` is not accepted as a per-run override on `start_run()` / `retry_run()`
-- `RunExecutionServices` owns the bound runtime factory for the production run path
+- `AutomationConfig.ready()` binds the normalized startup configuration, then publishes `RunExecutionServices` with a bound runtime factory
+- runtime assembly constructs the concrete artifact and checkpoint stores once per runtime build
 - workflow / run payloads remain validation-only inputs and cannot rebuild store selection
 
 Deployment startup binding note:
 
-- `AutomationConfig.ready()` binds services exactly once per composition instance for a given raw deployment config
+- `AutomationConfig.ready()` compares normalized binding signatures, not raw config strings or mappings
+- `AutomationConfig.ready()` binds services exactly once per composition instance for a given normalized deployment config
 - repeated `ready()` calls with the same deployment config are no-ops
 - repeated `ready()` calls with a different deployment config fail closed
 - invalid deployment config fails startup before any runtime services are published
+- filesystem constructor failure is a runtime-initialization failure on the run path, not a startup-binding failure
 
 Legacy deployment data note:
 

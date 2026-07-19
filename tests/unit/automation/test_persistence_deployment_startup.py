@@ -71,7 +71,7 @@ def test_ready_binds_default_memory_services_and_reuses_them(monkeypatch: pytest
     run = Run.objects.create(workflow=workflow, name="run-startup-default")
     runtime = first_services.build_graph_runtime(run)
 
-    assert normalized_calls == [{"version": 1}]
+    assert normalized_calls == [{"version": 1}, {"version": 1}]
     assert app_config.run_execution_services is first_services
     assert isinstance(runtime.artifact_store, MemoryArtifactStore)
     assert isinstance(runtime.checkpoint_store, MemoryCheckpointStore)
@@ -199,6 +199,21 @@ def test_ready_is_idempotent_for_same_deployment_config_and_rejects_different_co
             {
                 "version": 1,
                 "stores": {
+                    "artifact": {"backend": "memory"},
+                    "checkpoint": {"backend": "memory"},
+                },
+            }
+        )
+    ):
+        app_config.ready()
+
+    assert app_config.run_execution_services is first_services
+
+    with override_settings(
+        LANGGRAPH_AUTOMATION=_deployment_json(
+            {
+                "version": 1,
+                "stores": {
                     "checkpoint": {
                         "backend": "filesystem",
                         "config": {"root": "/srv/langgraph-automation/checkpoints"},
@@ -247,7 +262,7 @@ def test_ready_is_idempotent_for_same_deployment_config_and_rejects_different_co
         ),
     ],
 )
-def test_ready_bound_filesystem_configuration_fails_closed_when_constructor_fails(
+def test_runtime_initialization_fails_closed_when_filesystem_constructor_fails(
     deployment_config: str,
     builder_name: str,
     error_message: str,

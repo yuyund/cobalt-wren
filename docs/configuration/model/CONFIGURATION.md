@@ -273,7 +273,8 @@ Forbidden:
 Runtime rules:
 
 - artifact backend selection is startup-only
-- runtime assembly builds the artifact store exactly once
+- startup binds normalized package config and runtime factory exactly once
+- runtime assembly builds the artifact store once per runtime build
 - default remains `MemoryArtifactStore`
 - explicit filesystem selection is opt-in
 - `FilesystemArtifactStore` root is constructor-injected and not read from Django settings or environment directly
@@ -308,7 +309,8 @@ Forbidden:
 Runtime rules:
 
 - checkpoint backend selection is startup-only
-- runtime assembly builds the checkpoint store exactly once
+- startup binds normalized package config and runtime factory exactly once
+- runtime assembly builds the checkpoint store once per runtime build
 - default remains `MemoryCheckpointStore`
 - explicit filesystem selection is opt-in
 - `FilesystemCheckpointStore` root is constructor-injected and not read from Django settings or environment directly

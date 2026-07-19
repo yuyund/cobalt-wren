@@ -39,7 +39,7 @@ def test_checkpoint_store_protocol_sufficiency_docs_exist_and_cover_core_terms()
         'defensively isolated',
         'request / descriptor / read-result separation',
         'filesystem checkpoint backend is now implemented',
-        'checkpoint runtime selection is typed and startup-only',
+        'checkpoint runtime selection is typed at startup while concrete store construction remains runtime-assembly scoped',
     ):
         assert token in audit_text
 

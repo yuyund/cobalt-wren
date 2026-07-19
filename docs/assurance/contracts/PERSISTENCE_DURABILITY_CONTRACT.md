@@ -91,7 +91,8 @@ Forbidden:
 - section absence normalizes to `MemoryArtifactStore`
 - explicit filesystem selection requires an absolute trusted root
 - runtime selection is startup-only
-- filesystem initialization errors fail startup instead of falling back to memory
+- runtime assembly constructs the artifact store once per runtime build
+- filesystem initialization errors fail runtime initialization instead of falling back to memory
 - one filesystem root is one artifact identity domain
 
 ### Checkpoint backend runtime selection
@@ -102,7 +103,8 @@ Forbidden:
 - section absence normalizes to `MemoryCheckpointStoreSettings`
 - explicit filesystem selection requires an absolute trusted root
 - runtime selection is startup-only
-- filesystem initialization errors fail startup instead of falling back to memory
+- runtime assembly constructs the checkpoint store once per runtime build
+- filesystem initialization errors fail runtime initialization instead of falling back to memory
 - one filesystem root is one checkpoint identity domain
 - `build_checkpoint_store()` is the canonical construction point for checkpoint backends
 

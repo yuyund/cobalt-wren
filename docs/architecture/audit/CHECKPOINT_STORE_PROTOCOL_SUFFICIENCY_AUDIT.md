@@ -4,7 +4,7 @@ This audit determines whether the current `CheckpointStore` protocol can express
 
 The checkpoint store contract is now versioned, linear, serializer-aware, idempotent, and conflict-aware.
 It is a request / descriptor / read-result separation rather than a destructive latest snapshot contract.
-The filesystem checkpoint backend is now implemented, and checkpoint runtime selection is typed and startup-only.
+The filesystem checkpoint backend is now implemented, and checkpoint runtime selection is typed at startup while concrete store construction remains runtime-assembly scoped.
 
 Code is the source of truth.
 Tests are the source of truth.
@@ -47,7 +47,7 @@ The current protocol does not expose destructive delete, latest-state replacemen
 
 Current code-first evidence shows:
 
-- `src/langgraph_automation/apps/automation/services/runtime.py` constructs `MemoryCheckpointStore`
+- `src/langgraph_automation/apps/automation/services/runtime.py` binds normalized deployment configuration and delegates checkpoint store construction to runtime assembly
 - `src/langgraph_automation/runtime/assembly.py` threads the checkpoint store through `RuntimeDependencies`
 - `src/langgraph_automation/graphs/runtime.py` carries the checkpoint store on `GraphRuntime`
 - `src/langgraph_automation/integrations/checkpoint/filesystem_store.py` implements the durable filesystem backend

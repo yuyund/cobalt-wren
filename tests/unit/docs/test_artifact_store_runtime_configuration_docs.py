@@ -86,7 +86,7 @@ def test_artifact_store_runtime_configuration_docs_exist_and_cover_core_terms() 
         "`stores.artifact` is the runtime selection boundary for built-in artifact backends",
         "section absence normalizes to `memoryartifactstore`",
         "runtime selection is startup-only",
-        "filesystem initialization errors fail startup instead of falling back to memory",
+        "filesystem initialization errors fail runtime initialization instead of falling back to memory",
     ):
         assert token in assurance_contracts_text
 

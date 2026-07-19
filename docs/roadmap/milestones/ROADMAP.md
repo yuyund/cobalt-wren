@@ -358,6 +358,14 @@ Persistence Deployment Startup Proof X1C4:
 - startup binding and fail-safe validation: complete
 - next block: Artifact Emission and Identity Contract X2
 
+Persistence Construction Timing Semantics X1C4A:
+
+- complete
+- backend constructor timing: complete
+- normalized ready() equality: complete
+- startup/runtime failure taxonomy: complete
+- next block: Artifact Emission and Identity Contract X2
+
 Package Complete+ future work:
 
 - `run_workflow`
