@@ -6,6 +6,14 @@ This document ranks the remaining persistence gaps after the current code-first 
 
 - none identified in the current in-memory and filesystem persistence boundary
 
+## Closed by X2
+
+- implicit-vs-explicit artifact ambiguity is closed
+- artifact logical identity ambiguity is closed
+- retry identity ambiguity is closed
+- slot/occurrence ambiguity is closed
+- serialization ownership ambiguity is closed
+
 ## P1
 
 | Gap | Evidence | Why it matters | Risk |
@@ -44,6 +52,7 @@ This document ranks the remaining persistence gaps after the current code-first 
 
 ## Deferred Work
 
+- X2 artifact emission contract is complete
 - checkpoint runtime selection is typed and canonical
 - checkpoint runtime selection is complete
 - checkpoint runtime selection is closed

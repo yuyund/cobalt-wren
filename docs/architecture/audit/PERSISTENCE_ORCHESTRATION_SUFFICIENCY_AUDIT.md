@@ -14,7 +14,7 @@ The durable backend layer is complete, but execution persistence orchestration i
 
 Final decision:
 
-- artifact orchestration: `NEEDS_PUBLIC_OR_PLUGIN_CONTRACT`, `BLOCKED_BY_ARTIFACT_IDENTITY`, and `NEEDS_INTERNAL_ORCHESTRATION_CONTRACT`
+- artifact orchestration: `NEEDS_INTERNAL_ORCHESTRATION_CONTRACT`
 - checkpoint adapter: `BLOCKED_BY_PENDING_WRITES` and `BLOCKED_BY_RUN_THREAD_MAPPING`
 - control-plane projection: `BLOCKED_BY_CONTROL_PLANE_SCHEMA`
 - true resume: not approved
@@ -244,6 +244,15 @@ Additional facts:
 
 Current code does not auto-classify or auto-save artifacts from graph return values.
 
+X2 artifact emission contract status:
+
+- explicit artifact emission only
+- logical identity is `run_id + slot + occurrence`
+- serialization is caller-owned
+- retry of the same run must recreate the same logical identity
+- rerun of a new run must produce a different logical identity
+- `ArtifactStore.put()` is still not connected to production execution
+
 ## Artifact Ownership And Identity
 
 ### Current state
@@ -265,6 +274,8 @@ Current code does not auto-classify or auto-save artifacts from graph return val
 - artifact store call owner: package runtime orchestration
 - control-plane projection owner: application adapter
 
+Artifact emission contract now fixes the logical boundary above the store layer, but the execution path still lacks the internal orchestration that will convert that contract into `ArtifactWriteRequest` and store calls.
+
 ### Failure policy recommendation
 
 - explicit required artifact: persistence failure should fail the execution
@@ -274,7 +285,7 @@ Current code does not auto-classify or auto-save artifacts from graph return val
 
 ### Readiness
 
-- artifact orchestration is not yet ready because there is no canonical emission owner in the execution lifecycle
+- artifact orchestration is not yet ready because the internal orchestration layer that bridges explicit emission to store writes is still absent
 - artifact protocol itself is sufficient for implementation
 
 ## Installed LangGraph Checkpointer API Inventory
@@ -602,7 +613,7 @@ Execution persistence should remain behind a package-internal orchestrator and a
 | Gap | Affected component | Evidence | Consequence | Minimum next change | Public API impact | Migration impact | Ordering dependency | Classification |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | no execution persistence calls | `runs.py`, `execution.py`, `runtime.py`, `graphs/runner.py` | code-first call graph | artifacts/checkpoints are not persisted from execution | add an explicit orchestration contract | none yet | none yet | before any save wiring | `NEEDS_INTERNAL_ORCHESTRATION_CONTRACT` |
-| artifact emission owner undefined | workflow / application layer | no explicit emission site exists | no stable artifact identity owner | define emission owner and logical slot policy | possible later facade addition | none yet | before artifact save wiring | `NEEDS_PUBLIC_OR_PLUGIN_CONTRACT` |
+| artifact internal orchestration missing | package runtime / execution layer | explicit emission contract exists, but no orchestrator translates it into store writes | no package-runtime bridge from explicit emission to `ArtifactStore.put()` | define internal orchestration and request mapping | possible later facade addition | none yet | before artifact save wiring | `NEEDS_INTERNAL_ORCHESTRATION_CONTRACT` |
 | checkpoint adapter missing | package / LangGraph boundary | storage contract differs from LangGraph `BaseCheckpointSaver` | no adapter to runtime config shape | define adapter contract and mapping | possible adapter facade later | none yet | before resume | `BLOCKED_BY_PENDING_WRITES` |
 | thread mapping not isolated | run model / checkpoint adapter | `Run.thread_id` is separate from `Run.pk` | no explicit lifecycle mapping owner | define mapping owner and stable policy | none yet | none yet | before adapter | `BLOCKED_BY_RUN_THREAD_MAPPING` |
 | checkpoint namespace policy missing | adapter / subgraph integration | no subgraph policy exists | namespace semantics can drift | define namespace reconstruction policy | none yet | none yet | before adapter | `REQUIRES_NAMESPACE_POLICY` |
@@ -652,7 +663,7 @@ Execution persistence should remain behind a package-internal orchestrator and a
 
 Artifact:
 
-- orchestration readiness: `NEEDS_PUBLIC_OR_PLUGIN_CONTRACT` and `BLOCKED_BY_ARTIFACT_IDENTITY`
+- orchestration readiness: `NEEDS_INTERNAL_ORCHESTRATION_CONTRACT`
 
 Checkpoint:
 
@@ -668,4 +679,4 @@ True resume:
 
 - not approved
 
-The durable backend layer is complete, but execution persistence orchestration still needs explicit ownership, adapter semantics, and safe projection contracts before any production write wiring is added.
+The durable backend layer is complete, but execution persistence orchestration still needs internal request mapping and safe projection contracts before any production write wiring is added.

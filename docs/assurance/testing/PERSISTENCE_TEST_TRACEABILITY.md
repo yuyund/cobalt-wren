@@ -8,6 +8,7 @@ This traceability matrix links the durability contract to the current code and t
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | Store protocols remain minimal | API surface drift | `src/langgraph_automation/api/stores.py` | `tests/unit/api/test_public_api_imports.py` | L1 protocol test | `TEST_CONFIRMED` | none | low |
 | ArtifactStore protocol is body-aware | protocol sufficiency | `src/langgraph_automation/api/stores.py`, `src/langgraph_automation/integrations/artifact/base.py` | `tests/unit/architecture/test_artifact_store_protocol_sufficiency.py` | L1 protocol sufficiency audit | `APPROVED_FOR_IMPLEMENTATION` | none | medium |
+| Artifact emission contract is explicit-only | logical emission semantics | `src/langgraph_automation/integrations/artifact/emission.py`, `docs/assurance/contracts/ARTIFACT_EMISSION_CONTRACT.md` | `tests/unit/artifact/test_artifact_emission_contract.py`, `tests/unit/architecture/test_artifact_emission_boundary.py`, `tests/unit/docs/test_artifact_emission_contract_docs.py` | L1 / L7 / docs | `TEST_CONFIRMED` | artifact identity is run + slot + occurrence; serialization is caller-owned; production write calls remain absent | medium |
 | Artifact backend runtime selection is typed and startup-only | config/runtime composition | `src/langgraph_automation/config/artifact_store.py`, `src/langgraph_automation/runtime/artifact_store.py`, `src/langgraph_automation/apps/automation/services/runtime.py`, `src/langgraph_automation/runtime/assembly.py` | `tests/unit/config/test_artifact_store_settings.py`, `tests/unit/runtime/test_runtime_assembler_stores.py`, `tests/unit/runtime/test_persistence_runtime_wiring.py`, `tests/unit/runtime/test_persistence_configuration_composition.py` | L1 / L3 / L5 | `TEST_CONFIRMED` | trusted package settings select the backend; workflow payload physical persistence config is rejected; filesystem selection is explicit opt-in; normalized package config is bound once at application composition | medium |
 | Physical persistence configuration is bound once at application composition | composition ownership | `src/langgraph_automation/apps/automation/services/runtime.py`, `src/langgraph_automation/apps/automation/services/runs.py`, `src/langgraph_automation/apps/automation/services/execution.py` | `tests/unit/runtime/test_persistence_configuration_composition.py`, `tests/unit/architecture/test_persistence_orchestration_boundary.py`, `tests/unit/automation/test_run_safety.py` | L1 / L3 / L5 | `TEST_CONFIRMED` | no per-run package_settings override remains on the run service API | medium |
 | Deployment startup config source is trusted and startup-only | application bootstrap | `src/langgraph_automation/config/settings.py`, `src/langgraph_automation/apps/automation/apps.py`, `src/langgraph_automation/apps/automation/services/runtime.py` | `tests/unit/automation/test_persistence_deployment_startup.py` | L1 / L5 | `TEST_CONFIRMED` | `LANGGRAPH_AUTOMATION` is loaded once through `AutomationConfig.ready()`, invalid deployment config fails startup, and Filesystem selection remains explicit opt-in | medium |
@@ -84,6 +85,8 @@ Capability-based assertions:
 - current tests do not prove body-store orchestration through the execution path
 - current tests now prove the reusable baseline contract harness, backend registry guard, and deterministic fault harness
 - current tests now prove the ArtifactStore protocol is body-aware and ready for implementation
+- current tests now prove the explicit artifact emission contract is store-independent and deterministic
+- current tests now prove artifact emission is explicit-only and logical identity is run + slot + occurrence
 - current tests now prove artifact backend runtime selection is typed, startup-only, and explicit
 - current tests now prove checkpoint metadata is preserved as a lossless logical JSON value and defensively isolated
 - current tests now prove checkpoint idempotency and conflict detection are JSON-type-aware
@@ -99,6 +102,11 @@ Capability-based assertions:
 - durable default is not enabled
 - current tests now prove execution persistence orchestration is still absent from the production execution path, even though selected stores now propagate into `GraphRuntime`
 - current tests now prove filesystem listing is metadata-bounded and body full verification remains a get-time responsibility
+- current tests now prove artifact identity is deterministic and explicit emission remains disconnected from production execution
+- production ArtifactStore.put callers remain zero
+- artifact emission contract is explicit-only
+- artifact identity is deterministic
+- production artifactstore.put callers remain zero
 
 ## Deferred Work
 

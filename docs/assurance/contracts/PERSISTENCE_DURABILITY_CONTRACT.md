@@ -70,6 +70,19 @@ Forbidden:
 - control-plane exposure of raw body
 - backend credentials in metadata rows
 
+### Explicit artifact emission
+
+Artifact persistence is explicit only.
+
+- graph final state is not automatically persisted as an artifact
+- graph final result is not automatically persisted as an artifact
+- node output is not automatically persisted as an artifact
+- tool output is not automatically persisted as an artifact
+- event payloads are not automatically converted into artifacts
+- the logical artifact identity is `run_id + slot + occurrence`
+- serialization is caller-owned
+- `ArtifactStore.put()` is still not connected to production execution
+
 ## Durability Levels
 
 - `EPHEMERAL`: survives only for the current process lifetime
@@ -207,6 +220,7 @@ Advanced durable semantics remain deferred until runtime selection and orchestra
 - artifact backend selection is canonicalized through typed config and a single runtime builder
 - `GraphRuntime` carries the stores
 - no execution path currently writes artifact or checkpoint bodies through these store protocols
+- the explicit artifact emission contract is fixed in `docs/assurance/contracts/ARTIFACT_EMISSION_CONTRACT.md`
 - execution persistence orchestration is still a separate block
 - Django observability emits metadata rows through `DjangoEventSink`
 - `FilesystemArtifactStore` publishes content-addressed bodies and deterministic manifests on the local filesystem
