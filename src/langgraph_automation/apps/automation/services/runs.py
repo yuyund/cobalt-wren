@@ -13,6 +13,7 @@ from langgraph_automation.apps.automation.services import runtime as runtime_mod
 from langgraph_automation.apps.automation.services.errors import WorkflowConfigurationError
 from langgraph_automation.apps.automation.services.execution import dispatch_run_execution
 from langgraph_automation.core.result_safety import safe_run_error_message, safe_run_output_payload
+from langgraph_automation.config.models import NormalizedPackageConfig
 from langgraph_automation.graphs.runner import ExecutionResult
 from langgraph_automation.graphs.runtime import GraphRuntime
 from langgraph_automation.integrations.observability.failure_policy import suppress_observability_failure
@@ -78,8 +79,13 @@ def _finalize_from_execution(run: Run, execution_result: ExecutionResult) -> Run
     )
 
 
-def _make_runtime(run: Run, runtime: GraphRuntime | None) -> GraphRuntime:
-    return runtime if runtime is not None else runtime_module.build_graph_runtime(run)
+def _make_runtime(
+    run: Run,
+    runtime: GraphRuntime | None,
+    *,
+    package_settings: NormalizedPackageConfig | None = None,
+) -> GraphRuntime:
+    return runtime if runtime is not None else runtime_module.build_graph_runtime(run, package_settings=package_settings)
 
 
 def _emit_run_failed(*, event_sink, run: Run, error_message: str) -> None:
@@ -120,7 +126,13 @@ def _handle_runtime_build_failure(run: Run, exc: WorkflowConfigurationError) -> 
     )
 
 
-def start_run(*, run: Run, runtime: GraphRuntime | None = None, actor: object | None = None) -> RunActionResult:
+def start_run(
+    *,
+    run: Run,
+    runtime: GraphRuntime | None = None,
+    package_settings: NormalizedPackageConfig | None = None,
+    actor: object | None = None,
+) -> RunActionResult:
     '''Start a run.'''
 
     with transaction.atomic():
@@ -130,12 +142,12 @@ def start_run(*, run: Run, runtime: GraphRuntime | None = None, actor: object | 
         _transition_run(locked_run, status=RunStatus.RUNNING, thread_id=thread_id)
 
     try:
-        runtime = _make_runtime(locked_run, runtime)
+        runtime = _make_runtime(locked_run, runtime, package_settings=package_settings)
     except WorkflowConfigurationError as exc:
         return _handle_runtime_build_failure(locked_run, exc)
 
     try:
-        execution_result = dispatch_run_execution(locked_run, runtime=runtime)
+        execution_result = dispatch_run_execution(locked_run, runtime=runtime, package_settings=package_settings)
     except Exception as exc:  # pragma: no cover
         with transaction.atomic():
             locked_run = _locked_run(locked_run)
@@ -169,7 +181,13 @@ def resume_run(*, run: Run, runtime: GraphRuntime | None = None, actor: object |
     raise NotImplementedError('resume_run is not implemented until checkpoint resume semantics are defined; use retry_run instead')
 
 
-def retry_run(*, run: Run, runtime: GraphRuntime | None = None, actor: object | None = None) -> RunActionResult:
+def retry_run(
+    *,
+    run: Run,
+    runtime: GraphRuntime | None = None,
+    package_settings: NormalizedPackageConfig | None = None,
+    actor: object | None = None,
+) -> RunActionResult:
     '''Retry a failed or cancelled run.'''
 
     with transaction.atomic():
@@ -178,12 +196,12 @@ def retry_run(*, run: Run, runtime: GraphRuntime | None = None, actor: object | 
         _transition_run(locked_run, status=RunStatus.RUNNING)
 
     try:
-        runtime = _make_runtime(locked_run, runtime)
+        runtime = _make_runtime(locked_run, runtime, package_settings=package_settings)
     except WorkflowConfigurationError as exc:
         return _handle_runtime_build_failure(locked_run, exc)
 
     try:
-        execution_result = dispatch_run_execution(locked_run, runtime=runtime)
+        execution_result = dispatch_run_execution(locked_run, runtime=runtime, package_settings=package_settings)
     except Exception as exc:  # pragma: no cover
         with transaction.atomic():
             locked_run = _locked_run(locked_run)

@@ -166,7 +166,8 @@ For the execution plane, the actual owner is `GraphRuntime`:
   -> `src/langgraph_automation/apps/automation/services/execution.py:dispatch_run_execution`
   -> `src/langgraph_automation/graphs/runner.py:LangGraphRunner`
 
-The application runtime now selects artifact and checkpoint stores from the workflow payload and delegates construction to the canonical runtime builders before handing the exact instances to `GraphRuntime`.
+The application runtime selects artifact and checkpoint stores from trusted normalized package settings and delegates construction to the canonical runtime builders before handing the exact instances to `GraphRuntime`.
+Workflow payload physical persistence config is rejected at validation time, so it cannot source backend selection or filesystem roots.
 
 Classification:
 

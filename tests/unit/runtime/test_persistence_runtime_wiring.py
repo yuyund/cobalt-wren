@@ -8,8 +8,14 @@ import pytest
 
 from langgraph_automation.apps.automation.models.run import Run
 from langgraph_automation.apps.automation.models.workflow import Workflow
+from langgraph_automation.apps.automation.services.errors import WorkflowConfigurationError
 from langgraph_automation.apps.automation.services.runtime import build_graph_runtime
-from langgraph_automation.config.models import FilesystemArtifactStoreSettings, FilesystemCheckpointStoreSettings
+from langgraph_automation.config.models import (
+    FilesystemArtifactStoreSettings,
+    FilesystemCheckpointStoreSettings,
+    NormalizedPackageConfig,
+)
+from langgraph_automation.config.normalizer import load_normalized_package_config_from_mapping
 from langgraph_automation.integrations.artifact.filesystem_store import FilesystemArtifactStore
 from langgraph_automation.integrations.artifact.memory_store import MemoryArtifactStore
 from langgraph_automation.integrations.checkpoint.filesystem_store import FilesystemCheckpointStore
@@ -17,12 +23,16 @@ from langgraph_automation.integrations.checkpoint.memory_store import MemoryChec
 from tests.support.persistence import DurabilityLevel, artifact_backend_specs, checkpoint_backend_specs
 
 
-def _workflow_payload(
+def _workflow_payload() -> dict[str, object]:
+    return {'llm': {'enabled': True, 'model': 'test-model'}, 'tools': {'allowed': []}}
+
+
+def _package_settings(
     *,
     artifact_store: dict[str, object] | None = None,
     checkpoint_store: dict[str, object] | None = None,
-) -> dict[str, object]:
-    payload: dict[str, object] = {'llm': {'enabled': True, 'model': 'test-model'}, 'tools': {'allowed': []}}
+) -> NormalizedPackageConfig:
+    payload: dict[str, object] = {'version': 1}
     stores: dict[str, object] = {}
     if artifact_store is not None:
         stores['artifact'] = artifact_store
@@ -30,7 +40,7 @@ def _workflow_payload(
         stores['checkpoint'] = checkpoint_store
     if stores:
         payload['stores'] = stores
-    return payload
+    return load_normalized_package_config_from_mapping(payload)
 
 
 @pytest.mark.django_db
@@ -41,7 +51,7 @@ def test_runtime_wires_ephemeral_memory_persistence_backends() -> None:
     )
     run = Run.objects.create(workflow=workflow, name='run-persistence-runtime')
 
-    runtime = build_graph_runtime(run)
+    runtime = build_graph_runtime(run, package_settings=_package_settings())
 
     assert isinstance(runtime.artifact_store, MemoryArtifactStore)
     assert isinstance(runtime.checkpoint_store, MemoryCheckpointStore)
@@ -57,14 +67,16 @@ def test_runtime_wires_explicit_filesystem_artifact_and_memory_checkpoint_backen
     artifact_root = tmp_path / 'artifacts'
     workflow = Workflow.objects.create(
         name='wf-persistence-artifact-filesystem',
-        definition_payload=_workflow_payload(
-            artifact_store={'backend': 'filesystem', 'config': {'root': str(artifact_root)}},
-            checkpoint_store={'backend': 'memory'},
-        ),
+        definition_payload=_workflow_payload(),
     )
     run = Run.objects.create(workflow=workflow, name='run-persistence-artifact-filesystem')
 
-    runtime = build_graph_runtime(run)
+    runtime = build_graph_runtime(
+        run,
+        package_settings=_package_settings(
+            artifact_store={'backend': 'filesystem', 'config': {'root': str(artifact_root)}},
+        ),
+    )
 
     assert isinstance(runtime.artifact_store, FilesystemArtifactStore)
     assert isinstance(runtime.checkpoint_store, MemoryCheckpointStore)
@@ -76,14 +88,16 @@ def test_runtime_wires_memory_artifact_and_explicit_filesystem_checkpoint_backen
     checkpoint_root = tmp_path / 'checkpoints'
     workflow = Workflow.objects.create(
         name='wf-persistence-checkpoint-filesystem',
-        definition_payload=_workflow_payload(
-            artifact_store={'backend': 'memory'},
-            checkpoint_store={'backend': 'filesystem', 'config': {'root': str(checkpoint_root)}},
-        ),
+        definition_payload=_workflow_payload(),
     )
     run = Run.objects.create(workflow=workflow, name='run-persistence-checkpoint-filesystem')
 
-    runtime = build_graph_runtime(run)
+    runtime = build_graph_runtime(
+        run,
+        package_settings=_package_settings(
+            checkpoint_store={'backend': 'filesystem', 'config': {'root': str(checkpoint_root)}},
+        ),
+    )
 
     assert isinstance(runtime.artifact_store, MemoryArtifactStore)
     assert isinstance(runtime.checkpoint_store, FilesystemCheckpointStore)
@@ -96,14 +110,17 @@ def test_runtime_wires_explicit_filesystem_artifact_and_checkpoint_backends_with
     checkpoint_root = tmp_path / 'checkpoints'
     workflow = Workflow.objects.create(
         name='wf-persistence-filesystem-both',
-        definition_payload=_workflow_payload(
+        definition_payload=_workflow_payload(),
+    )
+    run = Run.objects.create(workflow=workflow, name='run-persistence-filesystem-both')
+
+    runtime = build_graph_runtime(
+        run,
+        package_settings=_package_settings(
             artifact_store={'backend': 'filesystem', 'config': {'root': str(artifact_root)}},
             checkpoint_store={'backend': 'filesystem', 'config': {'root': str(checkpoint_root)}},
         ),
     )
-    run = Run.objects.create(workflow=workflow, name='run-persistence-filesystem-both')
-
-    runtime = build_graph_runtime(run)
 
     assert isinstance(runtime.artifact_store, FilesystemArtifactStore)
     assert isinstance(runtime.checkpoint_store, FilesystemCheckpointStore)
@@ -137,14 +154,17 @@ def test_runtime_preserves_selected_store_instances(monkeypatch: pytest.MonkeyPa
 
     workflow = Workflow.objects.create(
         name='wf-persistence-selected-instances',
-        definition_payload=_workflow_payload(
+        definition_payload=_workflow_payload(),
+    )
+    run = Run.objects.create(workflow=workflow, name='run-persistence-selected-instances')
+
+    runtime = build_graph_runtime(
+        run,
+        package_settings=_package_settings(
             artifact_store={'backend': 'filesystem', 'config': {'root': '/srv/langgraph-automation/artifacts'}},
             checkpoint_store={'backend': 'filesystem', 'config': {'root': '/srv/langgraph-automation/checkpoints'}},
         ),
     )
-    run = Run.objects.create(workflow=workflow, name='run-persistence-selected-instances')
-
-    runtime = build_graph_runtime(run)
 
     assert runtime.artifact_store is artifact_store
     assert runtime.checkpoint_store is checkpoint_store
@@ -189,15 +209,17 @@ def test_runtime_does_not_fallback_to_memory_when_artifact_builder_fails(monkeyp
 
     workflow = Workflow.objects.create(
         name='wf-persistence-artifact-failure',
-        definition_payload=_workflow_payload(
-            artifact_store={'backend': 'filesystem', 'config': {'root': str(tmp_path / 'artifacts')}},
-            checkpoint_store={'backend': 'memory'},
-        ),
+        definition_payload=_workflow_payload(),
     )
     run = Run.objects.create(workflow=workflow, name='run-persistence-artifact-failure')
 
     with pytest.raises(RuntimeError, match='filesystem artifact store failed'):
-        build_graph_runtime(run)
+        build_graph_runtime(
+            run,
+            package_settings=_package_settings(
+                artifact_store={'backend': 'filesystem', 'config': {'root': str(tmp_path / 'artifacts')}},
+            ),
+        )
 
     assert calls == ['artifact']
 
@@ -225,14 +247,37 @@ def test_runtime_does_not_fallback_to_memory_when_checkpoint_builder_fails(monke
 
     workflow = Workflow.objects.create(
         name='wf-persistence-checkpoint-failure',
-        definition_payload=_workflow_payload(
-            artifact_store={'backend': 'memory'},
-            checkpoint_store={'backend': 'filesystem', 'config': {'root': str(tmp_path / 'checkpoints')}},
-        ),
+        definition_payload=_workflow_payload(),
     )
     run = Run.objects.create(workflow=workflow, name='run-persistence-checkpoint-failure')
 
     with pytest.raises(RuntimeError, match='filesystem checkpoint store failed'):
-        build_graph_runtime(run)
+        build_graph_runtime(
+            run,
+            package_settings=_package_settings(
+                checkpoint_store={'backend': 'filesystem', 'config': {'root': str(tmp_path / 'checkpoints')}},
+            ),
+        )
 
     assert calls == ['artifact', 'checkpoint']
+
+
+@pytest.mark.django_db
+def test_runtime_rejects_workflow_payload_physical_persistence_configuration(tmp_path: Path) -> None:
+    workflow = Workflow.objects.create(
+        name='wf-persistence-workflow-store-config',
+        definition_payload={
+            'llm': {'enabled': True, 'model': 'test-model'},
+            'tools': {'allowed': []},
+            'stores': {
+                'artifact': {'backend': 'filesystem', 'config': {'root': str(tmp_path / 'artifact-root')}},
+                'checkpoint': {'backend': 'filesystem', 'config': {'root': str(tmp_path / 'checkpoint-root')}},
+            },
+        },
+    )
+    run = Run.objects.create(workflow=workflow, name='run-persistence-workflow-store-config')
+
+    with pytest.raises(WorkflowConfigurationError) as excinfo:
+        build_graph_runtime(run, package_settings=_package_settings())
+
+    assert 'stores.artifact' in str(excinfo.value) or 'stores.checkpoint' in str(excinfo.value)

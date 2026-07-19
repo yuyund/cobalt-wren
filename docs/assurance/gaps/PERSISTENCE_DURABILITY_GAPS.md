@@ -27,6 +27,7 @@ This document ranks the remaining persistence gaps after the current code-first 
 
 - artifact bodies are process-local only in the default runtime wiring
 - checkpoint bodies are process-local in the default runtime wiring, but the filesystem backend is now available for direct use
+- physical persistence backend/root selection is owned by trusted package settings, not workflow payload or run input
 - checkpoint metadata fidelity is lossless and defensively isolated in both current checkpoint backends
 - execution persistence orchestration is still absent from the canonical production run path, even though selected stores now propagate into `GraphRuntime`
 - restart destroys the default in-memory checkpoint state

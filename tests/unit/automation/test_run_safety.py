@@ -9,6 +9,7 @@ from langgraph_automation.apps.automation.models.workflow import Workflow
 from langgraph_automation.apps.automation.services import runs as run_services
 from langgraph_automation.core.redaction import REDACTED_VALUE
 from langgraph_automation.core.result_safety import safe_run_error_message, safe_run_output_payload
+from langgraph_automation.config.normalizer import load_normalized_package_config_from_mapping
 from langgraph_automation.graphs.runner import ExecutionResult
 
 
@@ -50,6 +51,35 @@ def test_start_run_saves_safe_output_payload(monkeypatch: pytest.MonkeyPatch) ->
     assert REDACTED_VALUE in repr(result.run.output_payload)
     assert 'abc123' not in repr(result.run.output_payload)
     assert '/tmp/secret.txt' not in repr(result.run.output_payload)
+
+
+@pytest.mark.django_db
+def test_start_run_forwards_typed_package_settings_to_runtime_construction(monkeypatch: pytest.MonkeyPatch) -> None:
+    workflow = Workflow.objects.create(
+        name='wf-package-settings',
+        definition_payload={
+            'llm': {'enabled': True, 'model': 'test-model'},
+            'tools': {'allowed': ['echo']},
+        },
+    )
+    run = Run.objects.create(workflow=workflow, name='run-package-settings')
+    package_settings = load_normalized_package_config_from_mapping({"version": 1})
+    captured: list[object] = []
+
+    def fake_build_graph_runtime(run_arg, *, package_settings=None):
+        captured.append(package_settings)
+        return object()
+
+    def fake_dispatch_run_execution(*_args, **_kwargs):
+        return ExecutionResult(status=RunStatus.SUCCEEDED, output_payload={}, message='ok')
+
+    monkeypatch.setattr(run_services.runtime_module, 'build_graph_runtime', fake_build_graph_runtime)
+    monkeypatch.setattr(run_services, 'dispatch_run_execution', fake_dispatch_run_execution)
+
+    result = run_services.start_run(run=run, package_settings=package_settings)
+
+    assert result.run.status == RunStatus.SUCCEEDED
+    assert captured == [package_settings]
 
 
 @pytest.mark.django_db

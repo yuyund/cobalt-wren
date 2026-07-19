@@ -357,6 +357,22 @@ def validate_workflow_runtime_config(
                     )
                 )
 
+    stores_section = definition_payload.get('stores')
+    if isinstance(stores_section, Mapping):
+        for store_name in ('artifact', 'checkpoint'):
+            store_config = stores_section.get(store_name)
+            if not isinstance(store_config, Mapping):
+                continue
+            if any(key in store_config for key in ('backend', 'config', 'root')):
+                issues.append(
+                    WorkflowConfigIssue(
+                        path=f'stores.{store_name}',
+                        code=f'reserved_{store_name}_store_config',
+                        message=f'Workflow definition payload must not declare {store_name} store backend configuration.',
+                        level='error',
+                    )
+                )
+
     allowed_tools = _extract_allowed_tool_names(definition_payload)
 
     supported = tuple(supported_graph_kinds or ())

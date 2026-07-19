@@ -156,7 +156,7 @@ Guidance:
 - `ArtifactReadResult` returns descriptor plus body from `get()`.
 - `api.stores` remains the minimal public store facade.
 - `FilesystemArtifactStore` is the first durable backend, but it is not exported from `api.stores`.
-- artifact runtime selection is controlled by typed config under `stores.artifact`
+- artifact runtime selection is controlled by typed config under `stores.artifact` in trusted package settings
 - `MemoryArtifactStore` remains the default when the section is absent
 - `FilesystemArtifactStore` is explicit opt-in and must fail startup on initialization errors
 - the filesystem root is trusted configuration and must not be echoed in runtime diagnostics
@@ -177,7 +177,7 @@ Guidance:
 - FilesystemCheckpointStore is implemented in `langgraph_automation.integrations.checkpoint`.
 - `FilesystemCheckpointStore` is implemented in `langgraph_automation.integrations.checkpoint` and is not re-exported from `api.stores`.
 - `FilesystemCheckpointStore` is implemented in `langgraph_automation.integrations.checkpoint` and is not re-exported from `api.stores`.
-- checkpoint runtime selection is controlled by typed config under `stores.checkpoint`.
+- checkpoint runtime selection is controlled by typed config under `stores.checkpoint` in trusted package settings.
 - `MemoryCheckpointStore` remains the default checkpoint backend when the section is absent.
 - `FilesystemCheckpointStore` is explicit opt-in and must fail startup on initialization errors.
 - `build_checkpoint_store()` is the canonical construction point, and `api.stores` remains the minimal public facade.

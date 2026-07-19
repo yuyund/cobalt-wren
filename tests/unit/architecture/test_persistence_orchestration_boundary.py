@@ -37,3 +37,20 @@ def test_application_runtime_does_not_directly_construct_concrete_persistence_st
         'FilesystemCheckpointStore(',
     ):
         assert token not in text, f'{path} still directly constructs concrete persistence stores: {token}'
+
+
+def test_application_runtime_does_not_source_physical_store_selection_from_workflow_payload() -> None:
+    path = Path('src/langgraph_automation/apps/automation/services/runtime.py')
+    text = path.read_text()
+
+    forbidden_tokens = (
+        'load_normalized_package_config_from_mapping(run.workflow.definition_payload',
+        'normalize_artifact_store_settings(run.workflow.definition_payload',
+        'normalize_checkpoint_store_settings(run.workflow.definition_payload',
+        'build_package_artifact_store(run.workflow.definition_payload',
+        'build_package_checkpoint_store(run.workflow.definition_payload',
+        'load_package_config_from_mapping(run.workflow.definition_payload',
+    )
+
+    offenders = [token for token in forbidden_tokens if token in text]
+    assert offenders == [], f'{path} still sources persistence selection from workflow payload: {offenders}'

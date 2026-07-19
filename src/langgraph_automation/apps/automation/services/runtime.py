@@ -1,14 +1,14 @@
 """Runtime factory for the Django control plane.
 
 This module is the dependency assembly boundary for execution-plane services.
-It composes concrete dependencies from settings, Workflow, and Run context, but
-it does not execute graphs or mutate Run lifecycle state.
+It composes concrete dependencies from trusted package settings, workflow
+configuration, and run context, but it does not execute graphs or mutate Run
+lifecycle state.
 """
 
 from __future__ import annotations
 
 import logging
-from collections.abc import Mapping
 
 from langgraph_automation.apps.automation.models.run import Run
 from langgraph_automation.apps.automation.services.errors import WorkflowConfigurationError
@@ -20,8 +20,8 @@ from langgraph_automation.apps.automation.services.workflow_config import (
 )
 from langgraph_automation.config import settings as app_settings
 from langgraph_automation.config.artifact_store import normalize_artifact_store_settings
-from langgraph_automation.config.checkpoint_store import normalize_checkpoint_store_settings
-from langgraph_automation.config.models import StoreBackendConfig
+from langgraph_automation.config.normalizer import load_normalized_package_config_from_mapping
+from langgraph_automation.config.models import NormalizedPackageConfig, StoreBackendConfig
 from langgraph_automation.graphs.config import (
     GraphRuntimeConfig,
     GraphRuntimeGraphConfig,
@@ -31,6 +31,7 @@ from langgraph_automation.graphs.config import (
 from langgraph_automation.graphs.registry import GraphRegistry, default_graph_kind
 from langgraph_automation.graphs.runtime import GraphRuntime
 from langgraph_automation.integrations.artifact.base import ArtifactStore
+from langgraph_automation.integrations.checkpoint.base import CheckpointStore
 from langgraph_automation.integrations.llm import LiteLLMClient, ObservedLLMClient
 from langgraph_automation.integrations.llm.base import LLMClient
 from langgraph_automation.integrations.observability.base import EventSink
@@ -73,35 +74,43 @@ def _runtime_config(run: Run) -> WorkflowRuntimeConfig:
     return parse_workflow_runtime_config(run.workflow.definition_payload, default_graph_kind=default_graph_kind())
 
 
-def _store_backend_config(definition_payload: Mapping[str, object] | None, store_name: str) -> StoreBackendConfig | None:
-    if not isinstance(definition_payload, Mapping):
-        return None
+def _reserved_physical_persistence_issues(definition_payload: object) -> tuple[WorkflowConfigIssue, ...]:
+    if not isinstance(definition_payload, dict):
+        return ()
+
+    issues: list[WorkflowConfigIssue] = []
     stores = definition_payload.get("stores")
-    if stores is None:
-        return None
-    if not isinstance(stores, Mapping):
-        raise WorkflowConfigurationError("Workflow store configuration must be a mapping.")
-    raw_store_config = stores.get(store_name)
-    if raw_store_config is None:
-        return None
-    if not isinstance(raw_store_config, Mapping):
-        raise WorkflowConfigurationError(f"Workflow {store_name} store configuration must be a mapping.")
+    if not isinstance(stores, dict):
+        return ()
 
-    backend = raw_store_config.get("backend")
-    if not isinstance(backend, str) or not backend.strip():
-        raise WorkflowConfigurationError(f"Workflow {store_name} store backend is invalid.")
-    config = raw_store_config.get("config", {})
-    if config is None:
-        config = {}
-    if not isinstance(config, Mapping):
-        raise WorkflowConfigurationError(f"Workflow {store_name} store config must be a mapping.")
-    metadata = raw_store_config.get("metadata", {})
-    if metadata is None:
-        metadata = {}
-    if not isinstance(metadata, Mapping):
-        raise WorkflowConfigurationError(f"Workflow {store_name} store metadata must be a mapping.")
+    for store_name, issue_path, issue_code, issue_message in (
+        (
+            "artifact",
+            "stores.artifact",
+            "reserved_artifact_store_config",
+            "Workflow definition payload must not declare artifact store backend configuration.",
+        ),
+        (
+            "checkpoint",
+            "stores.checkpoint",
+            "reserved_checkpoint_store_config",
+            "Workflow definition payload must not declare checkpoint store backend configuration.",
+        ),
+    ):
+        store_config = stores.get(store_name)
+        if not isinstance(store_config, dict):
+            continue
+        if any(key in store_config for key in {"backend", "config", "root"}):
+            issues.append(
+                WorkflowConfigIssue(
+                    path=issue_path,
+                    code=issue_code,
+                    message=issue_message,
+                    level="error",
+                )
+            )
 
-    return StoreBackendConfig(backend=backend, config=config, metadata=metadata)
+    return tuple(issues)
 
 
 def _to_graph_runtime_config(workflow_config: WorkflowRuntimeConfig) -> GraphRuntimeConfig:
@@ -125,7 +134,8 @@ def _validate_runtime_config(run: Run, graph_registry: GraphRegistry) -> tuple[W
         supported_graph_kinds=graph_registry.supported_graph_kinds(),
         graph_requirements=graph_registry.graph_requirements(),
     )
-    return runtime_config, validation.issues
+    reserved = _reserved_physical_persistence_issues(run.workflow.definition_payload)
+    return runtime_config, (*validation.issues, *reserved)
 
 
 def build_llm_client(
@@ -185,33 +195,58 @@ def build_tool_registry(
     )
 
 
-def build_artifact_store(run: Run, event_sink: EventSink | None = None) -> ArtifactStore:
+def _default_package_settings() -> NormalizedPackageConfig:
+    return load_normalized_package_config_from_mapping({"version": 1})
+
+
+def _artifact_store_settings(package_settings: NormalizedPackageConfig | None) -> StoreBackendConfig | None:
+    settings = package_settings or _default_package_settings()
+    return settings.stores.get("artifact")
+
+
+def build_artifact_store(
+    run: Run,
+    event_sink: EventSink | None = None,
+    *,
+    package_settings: NormalizedPackageConfig | None = None,
+) -> ArtifactStore:
     """Build the artifact store dependency.
 
-    The store is selected from the workflow payload and then constructed through
-    the canonical runtime builder so the chosen instance reaches the execution
-    owner unchanged.
+    The store is selected from trusted package settings and then constructed
+    through the canonical runtime builder so the chosen instance reaches the
+    execution owner unchanged.
     """
 
     del event_sink
-    settings = normalize_artifact_store_settings(_store_backend_config(run.workflow.definition_payload, "artifact"))
+    del run
+    settings = normalize_artifact_store_settings(_artifact_store_settings(package_settings))
     return build_package_artifact_store(settings)
 
 
-def build_checkpoint_store(run: Run, event_sink: EventSink | None = None) -> object:
+def build_checkpoint_store(
+    run: Run,
+    event_sink: EventSink | None = None,
+    *,
+    package_settings: NormalizedPackageConfig | None = None,
+) -> CheckpointStore:
     """Build the checkpoint store dependency for a run.
 
-    The store is selected from the workflow payload and then constructed through
-    the canonical runtime builder so the chosen instance reaches the execution
-    owner unchanged.
+    The store is selected from trusted package settings and then constructed
+    through the canonical runtime builder so the chosen instance reaches the
+    execution owner unchanged.
     """
 
     del event_sink
-    settings = normalize_checkpoint_store_settings(_store_backend_config(run.workflow.definition_payload, "checkpoint"))
+    del run
+    settings = (package_settings or _default_package_settings()).checkpoint_store
     return build_package_checkpoint_store(settings)
 
 
-def build_graph_runtime(run: Run) -> GraphRuntime:
+def build_graph_runtime(
+    run: Run,
+    *,
+    package_settings: NormalizedPackageConfig | None = None,
+) -> GraphRuntime:
     """Build the execution-plane dependency bundle for a run.
 
     This function reads configuration and assembles concrete dependencies only.
@@ -234,6 +269,6 @@ def build_graph_runtime(run: Run) -> GraphRuntime:
         event_sink=event_sink,
         llm_client=build_llm_client(run, event_sink, runtime_config),
         tool_registry=build_tool_registry(run, event_sink, runtime_config),
-        artifact_store=build_artifact_store(run, event_sink),
-        checkpoint_store=build_checkpoint_store(run, event_sink),
+        artifact_store=build_artifact_store(run, event_sink, package_settings=package_settings),
+        checkpoint_store=build_checkpoint_store(run, event_sink, package_settings=package_settings),
     )
