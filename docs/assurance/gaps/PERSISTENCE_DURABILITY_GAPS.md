@@ -14,6 +14,17 @@ This document ranks the remaining persistence gaps after the current code-first 
 - slot/occurrence ambiguity is closed
 - serialization ownership ambiguity is closed
 
+## Closed by X2A
+
+- internal/plugin boundary ambiguity is closed
+- producer-controlled run_id ambiguity is closed
+- attempt identity ambiguity is closed
+- optional policy ambiguity is closed
+- request equivalence ambiguity is closed
+- validation bounds ambiguity is closed
+- metadata boundedness ambiguity is closed
+- deterministic write mapping ambiguity is closed
+
 ## P1
 
 | Gap | Evidence | Why it matters | Risk |

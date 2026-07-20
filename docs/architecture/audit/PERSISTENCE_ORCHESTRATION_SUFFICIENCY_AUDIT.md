@@ -247,8 +247,12 @@ Current code does not auto-classify or auto-save artifacts from graph return val
 X2 artifact emission contract status:
 
 - explicit artifact emission only
+- package-internal emission contract; external plugin import is unsupported
 - logical identity is `run_id + slot + occurrence`
+- execution-owned `run_id` is injected through `ArtifactEmissionContext`
+- attempt identifiers are excluded from identity and storage encoding
 - serialization is caller-owned
+- initial artifact emission policy is required-only
 - retry of the same run must recreate the same logical identity
 - rerun of a new run must produce a different logical identity
 - `ArtifactStore.put()` is still not connected to production execution
@@ -262,17 +266,21 @@ X2 artifact emission contract status:
 - `StoredArtifact` carries normalized descriptor fields plus size and digest.
 - `MemoryArtifactStore` and `FilesystemArtifactStore` already provide idempotent and conflict-aware writes.
 - current production execution path does not create `ArtifactWriteRequest` instances.
-- current artifact identity is `storage_key` plus canonical body and metadata comparison
+- current store-layer identity is `storage_key` plus canonical body and metadata comparison
 - same identity / same canonical request is idempotent in the store layer
 - same identity / different canonical request is a conflict in the store layer
+- the package-internal emission contract maps `ArtifactEmissionContext` + `ArtifactEmissionRequest` into a deterministic internal write request
+- the mapping helper remains package-internal and does not create production writes
 
 ### Recommended target ownership
 
 - artifact emission owner: workflow / plugin / application code that produced the candidate
 - artifact serialization owner: caller or emitter
-- artifact identity owner: caller or emitter, usually via a logical `storage_key`
+- artifact logical identity owner: caller or emitter via `run_id + slot + occurrence`
+- artifact storage-key owner: internal orchestrator
 - artifact store call owner: package runtime orchestration
 - control-plane projection owner: application adapter
+- external plugin import of the emission contract remains unsupported until a versioned adapter exists
 
 Artifact emission contract now fixes the logical boundary above the store layer, but the execution path still lacks the internal orchestration that will convert that contract into `ArtifactWriteRequest` and store calls.
 

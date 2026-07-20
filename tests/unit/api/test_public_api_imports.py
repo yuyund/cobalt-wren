@@ -112,3 +112,28 @@ def test_event_api_all() -> None:
     import langgraph_automation.api.events as events_api
 
     assert set(events_api.__all__) == {'EventSink'}
+
+
+def test_artifact_emission_contract_is_not_public_api() -> None:
+    import langgraph_automation as package_root
+    import langgraph_automation.api as api_package
+    import langgraph_automation.api.stores as stores_api
+    import langgraph_automation.api.plugins as plugins_api
+
+    assert not hasattr(package_root, 'ArtifactEmissionRequest')
+    assert not hasattr(package_root, 'ArtifactIdentity')
+    assert not hasattr(package_root, 'ArtifactSlot')
+    assert not hasattr(package_root, 'ArtifactOccurrence')
+    assert not hasattr(api_package, 'ArtifactEmissionRequest')
+    assert not hasattr(api_package, 'ArtifactIdentity')
+    assert not hasattr(api_package, 'ArtifactSlot')
+    assert not hasattr(api_package, 'ArtifactOccurrence')
+    assert not hasattr(stores_api, 'ArtifactEmissionRequest')
+    assert not hasattr(stores_api, 'ArtifactIdentity')
+    assert not hasattr(stores_api, 'ArtifactSlot')
+    assert not hasattr(stores_api, 'ArtifactOccurrence')
+    assert not hasattr(plugins_api, 'ArtifactEmissionRequest')
+    assert not hasattr(plugins_api, 'ArtifactIdentity')
+    assert not hasattr(plugins_api, 'ArtifactSlot')
+    assert not hasattr(plugins_api, 'ArtifactOccurrence')
+    assert 'ArtifactEmissionRequest' not in getattr(api_package, '__all__', [])

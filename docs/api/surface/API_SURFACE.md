@@ -142,18 +142,18 @@ Current candidates:
 - `ArtifactWriteRequest`
 - `StoredArtifact`
 - `ArtifactReadResult`
-- `ArtifactEmissionRequest`
-- `ArtifactIdentity`
-- `ArtifactSlot`
-- `ArtifactOccurrence`
-- `ArtifactEmitter`
 - `CheckpointStore`
 - `CheckpointWriteRequest`
 - `StoredCheckpoint`
 - `CheckpointReadResult`
 
-Future concepts:
+Internal / provisional concepts:
 
+- `ArtifactEmissionRequest`
+- `ArtifactIdentity`
+- `ArtifactSlot`
+- `ArtifactOccurrence`
+- `ArtifactEmitter`
 - `ArtifactStorePlugin`
 - `CheckpointStorePlugin`
 - `ArtifactEmissionCollector`
@@ -168,10 +168,14 @@ Guidance:
 - `ArtifactWriteRequest` owns caller serialization.
 - `StoredArtifact` is the normalized descriptor returned from `put()`.
 - `ArtifactReadResult` returns descriptor plus body from `get()`.
-- `ArtifactEmissionRequest` is the explicit internal emission contract and remains store-independent.
+- `ArtifactEmissionRequest` is the explicit package-internal emission contract and remains store-independent.
 - `ArtifactIdentity` is logical identity only and does not imply a storage location.
 - `ArtifactSlot` and `ArtifactOccurrence` are caller-issued logical discriminators.
-- `ArtifactEmitter` remains internal until a future orchestration layer is approved.
+- `ArtifactEmitter` remains package-internal until a future orchestration layer is approved.
+- external plugin import of `langgraph_automation.integrations.artifact.emission` is unsupported
+- `ArtifactEmissionContext` owns the execution-provided `run_id`
+- attempt identifiers are excluded from the default identity and storage encoding
+- explicit emission is required-only in X2A; optional / best-effort modes are deferred
 - `api.stores` remains the minimal public store facade.
 - `FilesystemArtifactStore` is the first durable backend, but it is not exported from `api.stores`.
 - artifact runtime selection is controlled by typed config under `stores.artifact` in trusted package settings

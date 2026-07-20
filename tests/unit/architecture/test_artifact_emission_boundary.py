@@ -39,3 +39,16 @@ def test_artifact_emission_module_stays_free_of_store_call_sites() -> None:
         'transaction.atomic',
     ):
         assert token not in text
+
+
+def test_artifact_emission_contract_is_not_publicly_reexported() -> None:
+    import langgraph_automation as package_root
+    import langgraph_automation.api as api_package
+    import langgraph_automation.api.stores as stores_api
+    import langgraph_automation.api.plugins as plugins_api
+
+    for module in (package_root, api_package, stores_api, plugins_api):
+        assert not hasattr(module, 'ArtifactEmissionRequest')
+        assert not hasattr(module, 'ArtifactIdentity')
+        assert not hasattr(module, 'ArtifactSlot')
+        assert not hasattr(module, 'ArtifactOccurrence')

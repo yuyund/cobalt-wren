@@ -29,6 +29,7 @@ def test_persistence_orchestration_audit_docs_exist_and_cover_core_terms() -> No
         'run lifecycle matrix',
         'artifact ownership and identity',
         'explicit artifact emission only',
+        'package-internal emission contract',
         'caller-owned serialization',
         'package-runtime-owned store calls',
         'installed langgraph checkpointer api inventory',
@@ -40,10 +41,13 @@ def test_persistence_orchestration_audit_docs_exist_and_cover_core_terms() -> No
         'blocked_by_control_plane_schema',
         'option_2_required',
         'requires_namespace_policy',
+        'execution-owned `run_id`',
+        'attempt identifiers are excluded',
+        'initial artifact emission policy is required-only',
     ):
         assert token in audit_text
 
     assert 'persistence_orchestration_sufficiency_audit.md' in audit_index_text
     assert 'persistence orchestration sufficiency audit x1' in roadmap_text
     assert 'execution persistence orchestration is still absent from the production execution path' in traceability_text
-    assert 'no execution-owned persistence orchestration contract' in gaps_text
+    assert 'internal/plugin boundary ambiguity is closed' in gaps_text

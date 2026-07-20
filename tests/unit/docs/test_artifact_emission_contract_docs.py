@@ -26,13 +26,20 @@ def test_artifact_emission_contract_docs_exist_and_cover_core_terms() -> None:
 
     for token in (
         'explicit artifact emission only',
+        'package-internal contract',
+        'external plugin import is unsupported',
         'artifactemissionrequest',
         'artifactidentity',
         'artifactslot',
         'artifactoccurrence',
         'run_id + slot + occurrence',
+        'execution-owned `run_id`',
+        'attempt identifiers are excluded',
         'caller-owned serialization',
         'bounded logical json',
+        'required-only policy',
+        'deeply immutable metadata normalization',
+        'deterministic internal mapping to `artifactwriterequest`',
         'same run / same logical artifact -> same identity',
         'new run / rerun -> different identity',
         'artifactstore.put is still not connected to production execution',
@@ -43,14 +50,18 @@ def test_artifact_emission_contract_docs_exist_and_cover_core_terms() -> None:
         'explicit artifact emission only',
         'caller-owned serialization',
         'package-runtime-owned store calls',
+        'package-internal emission contract',
         'artifact ownership and identity',
     ):
         assert token in audit_text
 
     for token in (
         'artifact emission contract is explicit-only',
+        'artifact emission is explicit-only, package-internal, and logical identity is run + slot + occurrence',
         'artifact identity is deterministic',
         'production artifactstore.put callers remain zero',
+        'execution-owned `run_id`',
+        'required-only policy',
     ):
         assert token in traceability_text
 
@@ -59,6 +70,14 @@ def test_artifact_emission_contract_docs_exist_and_cover_core_terms() -> None:
         'retry identity ambiguity',
         'slot/occurrence ambiguity',
         'serialization ownership ambiguity',
+        'internal/plugin boundary ambiguity is closed',
+        'producer-controlled run_id ambiguity is closed',
+        'attempt identity ambiguity is closed',
+        'optional policy ambiguity is closed',
+        'request equivalence ambiguity is closed',
+        'validation bounds ambiguity is closed',
+        'metadata boundedness ambiguity is closed',
+        'deterministic write mapping ambiguity is closed',
     ):
         assert token in gaps_text
 
@@ -66,6 +85,8 @@ def test_artifact_emission_contract_docs_exist_and_cover_core_terms() -> None:
         'artifact emission and identity contract x2',
         'status: complete',
         'next block: artifact persistence orchestration implementation x4',
+        'artifact emission contract completeness closure x2a',
+        'package-internal contract: complete',
     ):
         assert token in roadmap_text
 
@@ -74,7 +95,8 @@ def test_artifact_emission_contract_docs_exist_and_cover_core_terms() -> None:
         'artifactidentity',
         'artifactslot',
         'artifactoccurrence',
-        'internal',
+        'package-internal',
         'provisional',
+        'execution-provided `run_id`',
     ):
         assert token in api_text

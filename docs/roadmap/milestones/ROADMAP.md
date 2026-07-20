@@ -376,6 +376,16 @@ Artifact Emission and Identity Contract X2:
 - next block: artifact persistence orchestration implementation x4
 - next block: Artifact Persistence Orchestration Implementation X4
 
+Artifact Emission Contract Completeness Closure X2A:
+
+- status: complete
+- package-internal contract: complete
+- execution-owned `run_id`: complete
+- attempt exclusion: complete
+- required-only policy: complete
+- validation bounds and deterministic mapping: complete
+- next block: artifact persistence orchestration implementation x4
+
 Package Complete+ future work:
 
 - `run_workflow`

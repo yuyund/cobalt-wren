@@ -18,7 +18,6 @@ from urllib.parse import quote
 from langgraph_automation.api.errors import ArtifactConflictError, ArtifactValidationError
 from langgraph_automation.core.redaction import redact_mapping
 from langgraph_automation.core.summary import hash_text
-from langgraph_automation.integrations.artifact.base import normalize_artifact_run_id
 from langgraph_automation.integrations.artifact.keys import validate_storage_key
 
 __all__ = [
@@ -37,16 +36,27 @@ __all__ = [
     'build_artifact_identity',
     'build_artifact_storage_key',
     'artifact_emission_request_signature',
+    'artifact_emission_requests_equivalent',
+    'validate_duplicate_emission',
     'normalize_artifact_occurrence',
     'normalize_artifact_slot',
 ]
 
 _ARTIFACT_EMISSION_COMPONENT = 'artifact_emission'
-_MAX_IDENTIFIER_LENGTH = 255
-_MAX_METADATA_DEPTH = 16
-_MAX_METADATA_ITEMS = 1000
-_MAX_METADATA_STRING_LENGTH = 65_536
-_ARTIFACT_SLOT_RE = re.compile(r'^[a-z0-9][a-z0-9-]*$')
+_MAX_RUN_ID = 2**63 - 1
+_MAX_SLOT_LENGTH = 64
+_MAX_OCCURRENCE_LENGTH = 64
+_MAX_CONTENT_TYPE_LENGTH = 255
+_MAX_METADATA_DEPTH = 8
+_MAX_METADATA_TOP_LEVEL_KEYS = 64
+_MAX_METADATA_MAPPING_ITEMS = 64
+_MAX_METADATA_LIST_ITEMS = 256
+_MAX_METADATA_STRING_LENGTH = 4096
+_MAX_METADATA_TOTAL_NODES = 2048
+_MAX_METADATA_KEY_LENGTH = 128
+_LOGICAL_IDENTIFIER_RE = re.compile(r'^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$')
+_MEDIA_TYPE_RE = re.compile(r'^[a-z0-9!#$&^_.+-]+/[a-z0-9!#$&^_.+-]+$')
+_MEDIA_TYPE_PARAMETER_RE = re.compile(r'^[a-z0-9!#$&^_.+-]+=[a-z0-9!#$&^_.+-]+$')
 
 
 class ArtifactEmissionError(ArtifactValidationError):
@@ -103,7 +113,29 @@ def _raise_serialization_error(message: str, *, code: str) -> ArtifactSerializat
     return ArtifactSerializationContractError(message, code=code, component=_ARTIFACT_EMISSION_COMPONENT)
 
 
-def _normalize_artifact_label(value: str, *, code: str, error_type: type[ArtifactEmissionValidationError]) -> str:
+def _normalize_artifact_run_id(run_id: int) -> int:
+    if isinstance(run_id, bool) or not isinstance(run_id, int):
+        raise ArtifactEmissionValidationError(
+            'Artifact emission rejected an invalid run identifier.',
+            code='ARTIFACT_EMISSION_INVALID_RUN_ID',
+            component=_ARTIFACT_EMISSION_COMPONENT,
+        )
+    if run_id <= 0 or run_id > _MAX_RUN_ID:
+        raise ArtifactEmissionValidationError(
+            'Artifact emission rejected an invalid run identifier.',
+            code='ARTIFACT_EMISSION_INVALID_RUN_ID',
+            component=_ARTIFACT_EMISSION_COMPONENT,
+        )
+    return run_id
+
+
+def _normalize_artifact_label(
+    value: str,
+    *,
+    code: str,
+    error_type: type[ArtifactEmissionValidationError],
+    max_length: int,
+) -> str:
     if not isinstance(value, str):
         raise error_type(
             'Artifact emission rejected an invalid identifier.',
@@ -116,14 +148,14 @@ def _normalize_artifact_label(value: str, *, code: str, error_type: type[Artifac
             code=code,
             component=_ARTIFACT_EMISSION_COMPONENT,
         )
-    if not value or len(value) > _MAX_IDENTIFIER_LENGTH or '\x00' in value:
+    if not value or len(value) > max_length or '\x00' in value:
         raise error_type(
             'Artifact emission rejected an invalid identifier.',
             code=code,
             component=_ARTIFACT_EMISSION_COMPONENT,
         )
     normalized = value.lower()
-    if normalized != value or not _ARTIFACT_SLOT_RE.fullmatch(normalized):
+    if normalized != value or not _LOGICAL_IDENTIFIER_RE.fullmatch(normalized):
         raise error_type(
             'Artifact emission rejected an invalid identifier.',
             code=code,
@@ -170,26 +202,26 @@ def normalize_artifact_content_type(content_type: str) -> str:
             code='ARTIFACT_EMISSION_INVALID_CONTENT_TYPE',
         )
     normalized = content_type.strip().lower()
-    if not normalized or len(normalized) > _MAX_IDENTIFIER_LENGTH or '\x00' in normalized:
+    if not normalized or len(normalized) > _MAX_CONTENT_TYPE_LENGTH or '\x00' in normalized:
         raise _raise_serialization_error(
             'Artifact emission rejected an invalid content type.',
             code='ARTIFACT_EMISSION_INVALID_CONTENT_TYPE',
         )
     parts = [part.strip() for part in normalized.split(';')]
     base = parts[0]
-    if not base or '/' not in base or base.count('/') != 1 or any(ch.isspace() for ch in base):
+    if not base or not _MEDIA_TYPE_RE.fullmatch(base):
         raise _raise_serialization_error(
             'Artifact emission rejected an invalid content type.',
             code='ARTIFACT_EMISSION_INVALID_CONTENT_TYPE',
         )
     parameters: list[str] = []
     for parameter in parts[1:]:
-        if not parameter:
+        if not parameter or any(ch.isspace() for ch in parameter):
             raise _raise_serialization_error(
                 'Artifact emission rejected an invalid content type.',
                 code='ARTIFACT_EMISSION_INVALID_CONTENT_TYPE',
             )
-        if '\x00' in parameter or any(ch in parameter for ch in '\r\n\t'):
+        if '\x00' in parameter or not _MEDIA_TYPE_PARAMETER_RE.fullmatch(parameter):
             raise _raise_serialization_error(
                 'Artifact emission rejected an invalid content type.',
                 code='ARTIFACT_EMISSION_INVALID_CONTENT_TYPE',
@@ -198,7 +230,20 @@ def normalize_artifact_content_type(content_type: str) -> str:
     return '; '.join([base, *parameters]) if parameters else base
 
 
-def _normalize_metadata_value(value: Any, *, depth: int, seen: set[int]) -> Any:
+def _freeze_metadata_value(
+    value: Any,
+    *,
+    depth: int,
+    seen: set[int],
+    counts: dict[str, int],
+) -> Any:
+    counts['nodes'] += 1
+    if counts['nodes'] > _MAX_METADATA_TOTAL_NODES:
+        raise ArtifactSerializationContractError(
+            'Artifact emission rejected invalid metadata.',
+            code='ARTIFACT_EMISSION_INVALID_METADATA',
+            component=_ARTIFACT_EMISSION_COMPONENT,
+        )
     if depth > _MAX_METADATA_DEPTH:
         raise ArtifactSerializationContractError(
             'Artifact emission rejected invalid metadata.',
@@ -237,7 +282,13 @@ def _normalize_metadata_value(value: Any, *, depth: int, seen: set[int]) -> Any:
                 code='ARTIFACT_EMISSION_INVALID_METADATA',
                 component=_ARTIFACT_EMISSION_COMPONENT,
             )
-        if len(value) > _MAX_METADATA_ITEMS:
+        if depth == 0 and len(value) > _MAX_METADATA_TOP_LEVEL_KEYS:
+            raise ArtifactSerializationContractError(
+                'Artifact emission rejected invalid metadata.',
+                code='ARTIFACT_EMISSION_INVALID_METADATA',
+                component=_ARTIFACT_EMISSION_COMPONENT,
+            )
+        if len(value) > _MAX_METADATA_MAPPING_ITEMS:
             raise ArtifactSerializationContractError(
                 'Artifact emission rejected invalid metadata.',
                 code='ARTIFACT_EMISSION_INVALID_METADATA',
@@ -247,20 +298,14 @@ def _normalize_metadata_value(value: Any, *, depth: int, seen: set[int]) -> Any:
         try:
             normalized: dict[str, Any] = {}
             for key in value.keys():
-                if not isinstance(key, str):
+                if not isinstance(key, str) or not key or len(key) > _MAX_METADATA_KEY_LENGTH:
                     raise ArtifactSerializationContractError(
                         'Artifact emission rejected invalid metadata.',
                         code='ARTIFACT_EMISSION_INVALID_METADATA',
                         component=_ARTIFACT_EMISSION_COMPONENT,
                     )
-                if len(key) > _MAX_IDENTIFIER_LENGTH:
-                    raise ArtifactSerializationContractError(
-                        'Artifact emission rejected invalid metadata.',
-                        code='ARTIFACT_EMISSION_INVALID_METADATA',
-                        component=_ARTIFACT_EMISSION_COMPONENT,
-                    )
-                normalized[key] = _normalize_metadata_value(value[key], depth=depth + 1, seen=seen)
-            return normalized
+                normalized[key] = _freeze_metadata_value(value[key], depth=depth + 1, seen=seen, counts=counts)
+            return MappingProxyType(normalized)
         finally:
             seen.remove(value_id)
     if isinstance(value, list):
@@ -271,7 +316,7 @@ def _normalize_metadata_value(value: Any, *, depth: int, seen: set[int]) -> Any:
                 code='ARTIFACT_EMISSION_INVALID_METADATA',
                 component=_ARTIFACT_EMISSION_COMPONENT,
             )
-        if len(value) > _MAX_METADATA_ITEMS:
+        if len(value) > _MAX_METADATA_LIST_ITEMS:
             raise ArtifactSerializationContractError(
                 'Artifact emission rejected invalid metadata.',
                 code='ARTIFACT_EMISSION_INVALID_METADATA',
@@ -279,7 +324,10 @@ def _normalize_metadata_value(value: Any, *, depth: int, seen: set[int]) -> Any:
             )
         seen.add(value_id)
         try:
-            return [_normalize_metadata_value(item, depth=depth + 1, seen=seen) for item in value]
+            return tuple(
+                _freeze_metadata_value(item, depth=depth + 1, seen=seen, counts=counts)
+                for item in value
+            )
         finally:
             seen.remove(value_id)
     raise ArtifactSerializationContractError(
@@ -290,7 +338,7 @@ def _normalize_metadata_value(value: Any, *, depth: int, seen: set[int]) -> Any:
 
 
 def normalize_artifact_metadata(metadata: Mapping[str, Any] | None) -> Mapping[str, Any]:
-    """Return a bounded, JSON-compatible metadata mapping."""
+    """Return a bounded, deeply immutable JSON-compatible metadata mapping."""
 
     if metadata is None:
         return MappingProxyType({})
@@ -300,22 +348,29 @@ def normalize_artifact_metadata(metadata: Mapping[str, Any] | None) -> Mapping[s
             code='ARTIFACT_EMISSION_INVALID_METADATA',
             component=_ARTIFACT_EMISSION_COMPONENT,
         )
-    redacted = redact_mapping(metadata)
-    normalized = _normalize_metadata_value(redacted, depth=0, seen=set())
-    if not isinstance(normalized, dict):
+    redacted = redact_mapping(metadata, max_depth=_MAX_METADATA_DEPTH + 2)
+    normalized = _freeze_metadata_value(redacted, depth=0, seen=set(), counts={'nodes': 0})
+    if not isinstance(normalized, Mapping):
         raise ArtifactSerializationContractError(
             'Artifact emission rejected invalid metadata.',
             code='ARTIFACT_EMISSION_INVALID_METADATA',
             component=_ARTIFACT_EMISSION_COMPONENT,
         )
-    return MappingProxyType(normalized)
+    return normalized
 
 
 def canonicalize_artifact_metadata(metadata: Mapping[str, Any] | None) -> str:
     """Return a stable comparison token for artifact metadata."""
 
+    def _thaw(value: Any) -> Any:
+        if isinstance(value, Mapping):
+            return {str(key): _thaw(nested) for key, nested in value.items()}
+        if isinstance(value, tuple):
+            return [_thaw(item) for item in value]
+        return value
+
     normalized = normalize_artifact_metadata(metadata)
-    return hash_text(json.dumps(dict(normalized), ensure_ascii=False, sort_keys=True, separators=(',', ':'), default=str))
+    return hash_text(json.dumps(_thaw(normalized), ensure_ascii=False, sort_keys=True, separators=(',', ':'), allow_nan=False))
 
 
 @dataclass(frozen=True, slots=True)
@@ -325,7 +380,16 @@ class ArtifactSlot:
     value: str
 
     def __post_init__(self) -> None:
-        object.__setattr__(self, 'value', _normalize_artifact_label(self.value, code='ARTIFACT_EMISSION_INVALID_SLOT', error_type=ArtifactSlotError))
+        object.__setattr__(
+            self,
+            'value',
+            _normalize_artifact_label(
+                self.value,
+                code='ARTIFACT_EMISSION_INVALID_SLOT',
+                error_type=ArtifactSlotError,
+                max_length=_MAX_SLOT_LENGTH,
+            ),
+        )
 
 
 @dataclass(frozen=True, slots=True)
@@ -335,34 +399,43 @@ class ArtifactOccurrence:
     value: str
 
     def __post_init__(self) -> None:
-        object.__setattr__(self, 'value', _normalize_artifact_label(self.value, code='ARTIFACT_EMISSION_INVALID_OCCURRENCE', error_type=ArtifactOccurrenceError))
+        object.__setattr__(
+            self,
+            'value',
+            _normalize_artifact_label(
+                self.value,
+                code='ARTIFACT_EMISSION_INVALID_OCCURRENCE',
+                error_type=ArtifactOccurrenceError,
+                max_length=_MAX_OCCURRENCE_LENGTH,
+            ),
+        )
 
 
 @dataclass(frozen=True, slots=True)
 class ArtifactEmissionContext:
     """Execution context that injects the run identity into an emission request."""
 
-    run_id: int | str
+    run_id: int
 
     def __post_init__(self) -> None:
-        object.__setattr__(self, 'run_id', normalize_artifact_run_id(self.run_id))
+        object.__setattr__(self, 'run_id', _normalize_artifact_run_id(self.run_id))
 
 
 @dataclass(frozen=True, slots=True)
 class ArtifactIdentity:
     """Deterministic logical artifact identity."""
 
-    run_id: int | str
-    slot: ArtifactSlot | str
-    occurrence: ArtifactOccurrence | str | None = None
+    run_id: int
+    slot: ArtifactSlot
+    occurrence: ArtifactOccurrence | None = None
 
     def __post_init__(self) -> None:
-        object.__setattr__(self, 'run_id', normalize_artifact_run_id(self.run_id))
+        object.__setattr__(self, 'run_id', _normalize_artifact_run_id(self.run_id))
         object.__setattr__(self, 'slot', normalize_artifact_slot(self.slot))
         object.__setattr__(self, 'occurrence', normalize_artifact_occurrence(self.occurrence))
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True, slots=True, kw_only=True)
 class ArtifactEmissionRequest:
     """Explicit artifact emission request.
 
@@ -371,10 +444,10 @@ class ArtifactEmissionRequest:
     """
 
     slot: ArtifactSlot | str
-    body: bytes = field(repr=False)
     occurrence: ArtifactOccurrence | str | None = None
-    content_type: str = ''
-    metadata: Mapping[str, Any] = field(default_factory=dict, repr=False)
+    body: bytes = field(repr=False)
+    content_type: str
+    metadata: Mapping[str, Any] = field(repr=False)
 
     def __post_init__(self) -> None:
         object.__setattr__(self, 'slot', normalize_artifact_slot(self.slot))
@@ -386,13 +459,12 @@ class ArtifactEmissionRequest:
 
 def build_artifact_identity(
     *,
-    run_id: int | str,
-    slot: ArtifactSlot | str,
-    occurrence: ArtifactOccurrence | str | None = None,
+    context: ArtifactEmissionContext,
+    request: ArtifactEmissionRequest,
 ) -> ArtifactIdentity:
     """Return the deterministic logical identity for an explicit artifact."""
 
-    return ArtifactIdentity(run_id=run_id, slot=slot, occurrence=occurrence)
+    return ArtifactIdentity(run_id=context.run_id, slot=request.slot, occurrence=request.occurrence)
 
 
 def _encode_identity_component(value: int | str) -> str:
@@ -402,11 +474,7 @@ def _encode_identity_component(value: int | str) -> str:
 def build_artifact_storage_key(identity: ArtifactIdentity) -> str:
     """Return a deterministic opaque storage key for a logical artifact."""
 
-    normalized_identity = build_artifact_identity(
-        run_id=identity.run_id,
-        slot=identity.slot,
-        occurrence=identity.occurrence,
-    )
+    normalized_identity = ArtifactIdentity(run_id=identity.run_id, slot=identity.slot, occurrence=identity.occurrence)
     parts = [
         'artifact',
         'v1',
@@ -420,18 +488,49 @@ def build_artifact_storage_key(identity: ArtifactIdentity) -> str:
 
 
 def artifact_emission_request_signature(
-    context: ArtifactEmissionContext | int | str,
+    context: ArtifactEmissionContext,
     request: ArtifactEmissionRequest,
 ) -> tuple[Any, ...]:
     """Return a deterministic logical equivalence token for an emission request."""
 
-    emission_context = context if isinstance(context, ArtifactEmissionContext) else ArtifactEmissionContext(context)
-    identity = build_artifact_identity(run_id=emission_context.run_id, slot=request.slot, occurrence=request.occurrence)
+    identity = build_artifact_identity(context=context, request=request)
     return (
         identity,
         request.body,
         request.content_type,
         canonicalize_artifact_metadata(request.metadata),
+    )
+
+
+def artifact_emission_requests_equivalent(
+    left: ArtifactEmissionRequest,
+    right: ArtifactEmissionRequest,
+) -> bool:
+    """Return True when two explicit emission requests are logically equivalent."""
+
+    return (
+        left.slot == right.slot
+        and left.occurrence == right.occurrence
+        and left.body == right.body
+        and left.content_type == right.content_type
+        and canonicalize_artifact_metadata(left.metadata) == canonicalize_artifact_metadata(right.metadata)
+    )
+
+
+def validate_duplicate_emission(
+    *,
+    identity: ArtifactIdentity,
+    existing: ArtifactEmissionRequest,
+    incoming: ArtifactEmissionRequest,
+) -> None:
+    """Raise when two requests for the same logical artifact conflict."""
+
+    if artifact_emission_requests_equivalent(existing, incoming):
+        return
+    raise ArtifactEmissionConflict(
+        'Artifact emission rejected a conflicting logical request.',
+        code='ARTIFACT_EMISSION_CONFLICT',
+        metadata={'slot': identity.slot.value, 'run_id': identity.run_id},
     )
 
 
