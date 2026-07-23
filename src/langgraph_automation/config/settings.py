@@ -14,6 +14,8 @@ BASE_DIR = Path(__file__).resolve().parents[3]
 env = environ.Env(
     DEBUG=(bool, False),
     SECRET_KEY=(str, "django-insecure-placeholder"),
+    LANGGRAPH_AUTOMATION_REQUIRE_LOGIN=(bool, False),
+    LANGGRAPH_AUTOMATION_EXECUTION_MODE=(str, "inline"),
 )
 
 environ.Env.read_env(BASE_DIR / ".env")
@@ -68,6 +70,10 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 ARTIFACT_ROOT = env("ARTIFACT_ROOT", default=str(BASE_DIR / "artifacts"))
 # Deployment-owned package config for startup composition.
 LANGGRAPH_AUTOMATION = env("LANGGRAPH_AUTOMATION", default='{"version": 1}')
+LANGGRAPH_AUTOMATION_CONFIG_FILE = env("LANGGRAPH_AUTOMATION_CONFIG_FILE", default="")
+LANGGRAPH_AUTOMATION_REQUIRE_LOGIN = env("LANGGRAPH_AUTOMATION_REQUIRE_LOGIN")
+LANGGRAPH_AUTOMATION_EXECUTION_MODE = env("LANGGRAPH_AUTOMATION_EXECUTION_MODE")
+LOGIN_URL = "/admin/login/"
 
 TEMPLATES = [
     {

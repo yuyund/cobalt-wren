@@ -14,6 +14,7 @@ if TYPE_CHECKING:
 
 __all__ = [
     'DEFAULT_PLUGIN_ENTRY_POINT_GROUP',
+    'PLUGIN_API_VERSION',
     'discover_plugins',
     'Plugin',
     'PluginMetadata',
@@ -26,6 +27,7 @@ __all__ = [
 
 
 DEFAULT_PLUGIN_ENTRY_POINT_GROUP = "langgraph_automation.plugins"
+PLUGIN_API_VERSION = 1
 _PLUGIN_DISCOVERY_COMPONENT = "plugin_discovery"
 
 
@@ -50,6 +52,14 @@ def discover_plugins(*, group: str = DEFAULT_PLUGIN_ENTRY_POINT_GROUP) -> tuple[
                 code="PLUGIN_DISCOVERY_INVALID_RESULT",
                 component=_PLUGIN_DISCOVERY_COMPONENT,
                 metadata={"entry_point": entry_point.name, "group": group},
+            )
+        declared_api = plugin.metadata.metadata.get("plugin_api_version", PLUGIN_API_VERSION)
+        if not isinstance(declared_api, int) or isinstance(declared_api, bool) or declared_api != PLUGIN_API_VERSION:
+            raise PluginResolutionError(
+                f"Plugin discovery failed: entry point '{entry_point.name}' uses an incompatible plugin API version.",
+                code="PLUGIN_API_VERSION_INCOMPATIBLE",
+                component=_PLUGIN_DISCOVERY_COMPONENT,
+                metadata={"entry_point": entry_point.name, "declared_version": declared_api, "supported_version": PLUGIN_API_VERSION},
             )
         discovered.append(plugin)
     return tuple(discovered)

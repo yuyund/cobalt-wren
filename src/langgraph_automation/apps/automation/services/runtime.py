@@ -228,7 +228,21 @@ def get_run_execution_services() -> RunExecutionServices:
 def load_deployment_package_config_from_settings() -> Mapping[str, object]:
     """Return the deployment-owned package config mapping from Django settings."""
 
-    config = getattr(django_settings, "LANGGRAPH_AUTOMATION", None)
+    config_file = str(getattr(django_settings, "LANGGRAPH_AUTOMATION_CONFIG_FILE", "") or "").strip()
+    if config_file:
+        from pathlib import Path
+        path = Path(config_file).expanduser().resolve()
+        try:
+            config = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            raise ConfigError(
+                "Configuration file could not be loaded.",
+                code="CONFIG_FILE_INVALID",
+                component="automation_runtime",
+                metadata={"path": str(path)},
+            ) from exc
+    else:
+        config = getattr(django_settings, "LANGGRAPH_AUTOMATION", None)
     if config is None:
         return {"version": 1}
     if isinstance(config, str):

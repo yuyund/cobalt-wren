@@ -31,6 +31,7 @@ def test_public_plugins_api_all() -> None:
 
     assert set(plugins_api.__all__) == {
         'DEFAULT_PLUGIN_ENTRY_POINT_GROUP',
+        'PLUGIN_API_VERSION',
         'discover_plugins',
         'Plugin',
         'PluginMetadata',

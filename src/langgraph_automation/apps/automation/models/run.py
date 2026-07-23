@@ -38,6 +38,7 @@ class Run(models.Model):
 
     class Meta:
         ordering = ['-created_at']
+        permissions = [("start_run", "Can start run"), ("resume_run", "Can resume run"), ("cancel_run", "Can cancel run"), ("retry_run", "Can retry run")]
         indexes = [
             models.Index(fields=['workflow', 'status']),
             models.Index(fields=['thread_id']),

@@ -8,12 +8,13 @@ from typing import Any
 
 from langgraph_automation.api.errors import ConfigError
 
-from .models import ArtifactStoreSettings, FilesystemArtifactStoreSettings, MemoryArtifactStoreSettings, StoreBackendConfig
+from .models import ArtifactStoreSettings, FilesystemArtifactStoreSettings, MemoryArtifactStoreSettings, S3ArtifactStoreSettings, StoreBackendConfig
 
 __all__ = [
     "ArtifactStoreSettings",
     "FilesystemArtifactStoreSettings",
     "MemoryArtifactStoreSettings",
+    "S3ArtifactStoreSettings",
     "normalize_artifact_store_settings",
 ]
 
@@ -51,6 +52,12 @@ def normalize_artifact_store_settings(store_config: StoreBackendConfig | None) -
             )
         root = _normalize_root_value(store_config.config.get("root"))
         return FilesystemArtifactStoreSettings(root=root)
+
+    if backend == "s3":
+        allowed = {"bucket", "prefix", "endpoint_url", "region_name"}
+        if set(store_config.config) - allowed or not isinstance(store_config.config.get("bucket"), str) or not store_config.config.get("bucket", "").strip():
+            raise _config_error("Configuration is invalid: S3 artifact store requires a bucket and known options.", code="CONFIG_ARTIFACT_STORE_INVALID_OPTIONS", metadata={"backend": backend})
+        return S3ArtifactStoreSettings(bucket=store_config.config["bucket"].strip(), prefix=str(store_config.config.get("prefix", "")), endpoint_url=store_config.config.get("endpoint_url"), region_name=store_config.config.get("region_name"))
 
     raise _config_error(
         "Configuration is invalid: artifact store backend is not supported.",

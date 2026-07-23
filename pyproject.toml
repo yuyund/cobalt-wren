@@ -14,6 +14,9 @@ dependencies = [
   "django-environ",
 ]
 
+[project.scripts]
+langgraph-automation = "langgraph_automation.cli.main:main"
+
 [project.optional-dependencies]
 dev = [
   "pytest",
@@ -25,6 +28,9 @@ dev = [
 ]
 postgres = [
   "psycopg[binary]>=3.2",
+]
+s3 = [
+  "boto3>=1.34",
 ]
 
 [dependency-groups]

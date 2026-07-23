@@ -8,8 +8,9 @@ from langgraph_automation.config.models import (
     CheckpointStoreSettings,
     FilesystemCheckpointStoreSettings,
     MemoryCheckpointStoreSettings,
+    PostgresCheckpointStoreSettings,
 )
-from langgraph_automation.integrations.checkpoint import CheckpointStore, FilesystemCheckpointStore, MemoryCheckpointStore
+from langgraph_automation.integrations.checkpoint import CheckpointStore, FilesystemCheckpointStore, MemoryCheckpointStore, PostgresCheckpointStore
 
 __all__ = ["build_checkpoint_store"]
 
@@ -21,4 +22,6 @@ def build_checkpoint_store(settings: CheckpointStoreSettings) -> CheckpointStore
         return MemoryCheckpointStore()
     if isinstance(settings, FilesystemCheckpointStoreSettings):
         return FilesystemCheckpointStore(settings.root)
+    if isinstance(settings, PostgresCheckpointStoreSettings):
+        return PostgresCheckpointStore(settings.dsn, table_name=settings.table_name)
     assert_never(settings)

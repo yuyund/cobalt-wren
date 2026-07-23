@@ -17,6 +17,10 @@ Start here when you are trying to understand the repository.
 - `./contracts/`: cross-cutting invariants and error taxonomy.
 - `./package/`: package completion, verification, and audit material.
 - `./plugins/`: plugin model, registration, and API shape.
+- `./runtime/`: worker execution topology and operational lifecycle.
+- `./persistence/`: durable shared artifact and checkpoint stores.
+- `./security/`: authentication, authorization, and audit controls.
+- `./release/`: public API versioning and compatibility policy.
 - `./workflows/`: workflow authoring and readiness guidance.
 - `./roadmap/`: sequencing, milestones, and completion gates.
 - `./assurance/`: system assurance scope, gaps, and safety contracts.

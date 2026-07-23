@@ -1,14 +1,26 @@
 '''Dynamic page views for list, detail, and form pages.'''
-
 from __future__ import annotations
 
-from django.http import HttpRequest, HttpResponse, HttpResponseNotFound
+from django.contrib.auth.views import redirect_to_login
+from django.http import HttpRequest, HttpResponse, HttpResponseForbidden, HttpResponseNotFound
 from django.shortcuts import render
 
 from langgraph_automation.apps.automation.ui.builders import build_detail_page_spec, build_form_spec, build_list_page_spec
+from langgraph_automation.apps.web.access import actor_allowed, require_login_enabled
+
+
+def _guard(request: HttpRequest, permission: str) -> HttpResponse | None:
+    if actor_allowed(request, permission):
+        return None
+    if require_login_enabled() and not bool(getattr(request.user, "is_authenticated", False)):
+        return redirect_to_login(request.get_full_path())
+    return HttpResponseForbidden("Forbidden")
 
 
 def dynamic_list_view(request: HttpRequest, model_key: str) -> HttpResponse:
+    denied = _guard(request, f"automation.view_{model_key.rstrip('s')}")
+    if denied is not None:
+        return denied
     try:
         page = build_list_page_spec(model_key, actor=getattr(request, 'user', None))
     except LookupError:
@@ -17,6 +29,9 @@ def dynamic_list_view(request: HttpRequest, model_key: str) -> HttpResponse:
 
 
 def dynamic_detail_view(request: HttpRequest, model_key: str, object_id: int) -> HttpResponse:
+    denied = _guard(request, f"automation.view_{model_key.rstrip('s')}")
+    if denied is not None:
+        return denied
     try:
         page = build_detail_page_spec(model_key, object_id, actor=getattr(request, 'user', None))
     except LookupError:
@@ -25,6 +40,9 @@ def dynamic_detail_view(request: HttpRequest, model_key: str, object_id: int) ->
 
 
 def dynamic_form_view(request: HttpRequest, model_key: str, object_id: int | None = None) -> HttpResponse:
+    denied = _guard(request, f"automation.change_{model_key.rstrip('s')}")
+    if denied is not None:
+        return denied
     try:
         page = build_form_spec(model_key, object_id, actor=getattr(request, 'user', None))
     except LookupError:

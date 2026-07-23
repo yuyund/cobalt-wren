@@ -22,7 +22,9 @@ __all__ = [
     "RawPackageConfig",
     "SafetyConfig",
     "MemoryArtifactStoreSettings",
+    "S3ArtifactStoreSettings",
     "MemoryCheckpointStoreSettings",
+    "PostgresCheckpointStoreSettings",
     "SecretRef",
     "StoreBackendConfig",
     "ToolsConfig",
@@ -213,7 +215,16 @@ class FilesystemArtifactStoreSettings:
         object.__setattr__(self, "root", root)
 
 
-ArtifactStoreSettings = MemoryArtifactStoreSettings | FilesystemArtifactStoreSettings
+@dataclass(frozen=True, slots=True)
+class S3ArtifactStoreSettings:
+    bucket: str
+    prefix: str = ""
+    endpoint_url: str | None = None
+    region_name: str | None = None
+    backend: Literal["s3"] = "s3"
+
+
+ArtifactStoreSettings = MemoryArtifactStoreSettings | FilesystemArtifactStoreSettings | S3ArtifactStoreSettings
 
 
 @dataclass(frozen=True, slots=True)
@@ -233,7 +244,14 @@ class FilesystemCheckpointStoreSettings:
         object.__setattr__(self, "root", root)
 
 
-CheckpointStoreSettings = MemoryCheckpointStoreSettings | FilesystemCheckpointStoreSettings
+@dataclass(frozen=True, slots=True)
+class PostgresCheckpointStoreSettings:
+    dsn: str = field(repr=False)
+    table_name: str = "langgraph_automation_checkpoints"
+    backend: Literal["postgres"] = "postgres"
+
+
+CheckpointStoreSettings = MemoryCheckpointStoreSettings | FilesystemCheckpointStoreSettings | PostgresCheckpointStoreSettings
 
 
 @dataclass(frozen=True, slots=True)

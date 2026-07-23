@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from django.contrib import admin
 
-from langgraph_automation.apps.automation.models import Artifact, CheckpointMetadata, ExecutionSpan, Run, RunEvent, Workflow
+from langgraph_automation.apps.automation.models import Artifact, CheckpointMetadata, ExecutionSpan, OperationAuditLog, Run, RunEvent, Workflow
 from langgraph_automation.apps.automation.ui.formatters import format_value
 from langgraph_automation.core.summary import summarize_display_value
 
@@ -171,3 +171,11 @@ class CheckpointMetadataAdmin(admin.ModelAdmin):
     def get_fields(self, request, obj=None):
         del request, obj
         return ('run', 'span', 'thread_id', 'checkpoint_id', 'checkpoint_namespace', 'backend', 'node_name', 'state_summary', 'created_at')
+
+
+@admin.register(OperationAuditLog)
+class OperationAuditLogAdmin(admin.ModelAdmin):
+    list_display = ("id", "created_at", "actor_identifier", "action", "target_type", "target_id", "outcome")
+    list_filter = ("action", "outcome", "target_type")
+    search_fields = ("actor_identifier", "target_id", "message")
+    readonly_fields = ("actor_identifier", "action", "target_type", "target_id", "run", "outcome", "safe_payload_summary", "message", "created_at")

@@ -1,4 +1,5 @@
 """Safe workflow metadata projection into dynamic UI action specs."""
+
 from __future__ import annotations
 
 from collections.abc import Mapping
@@ -8,8 +9,10 @@ from django.http import HttpRequest
 from langgraph_automation.apps.automation.models.run import Run
 from langgraph_automation.apps.automation.policies.runs import can_resume_run
 from langgraph_automation.apps.automation.services import runtime as runtime_module
-from langgraph_automation.apps.automation.services.runs import resume_run
-from langgraph_automation.apps.automation.services.workflow_reference import parse_workflow_reference
+from langgraph_automation.apps.automation.services.dispatch import dispatch_resume
+from langgraph_automation.apps.automation.services.workflow_reference import (
+    parse_workflow_reference,
+)
 from langgraph_automation.apps.automation.ui.specs import ActionSpec, FieldSpec
 
 _MAX_ACTIONS = 10
@@ -53,7 +56,11 @@ def _schema_fields(schema: object) -> list[FieldSpec]:
     properties = schema.get("properties", {})
     if not isinstance(properties, Mapping):
         return []
-    required = {str(item) for item in schema.get("required", [])} if isinstance(schema.get("required"), list) else set()
+    required = (
+        {str(item) for item in schema.get("required", [])}
+        if isinstance(schema.get("required"), list)
+        else set()
+    )
     fields: list[FieldSpec] = []
     for name, raw in list(properties.items())[:_MAX_FIELDS]:
         if not isinstance(name, str) or not isinstance(raw, Mapping):
@@ -63,7 +70,11 @@ def _schema_fields(schema: object) -> list[FieldSpec]:
             continue
         enum = raw.get("enum")
         choices = tuple(str(item) for item in enum) if isinstance(enum, list) else ()
-        component = "textarea" if raw.get("format") == "textarea" else ("select" if choices else "input")
+        component = (
+            "textarea"
+            if raw.get("format") == "textarea"
+            else ("select" if choices else "input")
+        )
         fields.append(
             FieldSpec(
                 name=name,
@@ -74,14 +85,18 @@ def _schema_fields(schema: object) -> list[FieldSpec]:
                 component=component,
                 readonly=False,
                 required=name in required,
-                help_text=str(raw.get("description")) if raw.get("description") else None,
+                help_text=str(raw.get("description"))
+                if raw.get("description")
+                else None,
                 choices=choices,
             )
         )
     return fields
 
 
-def build_resume_action_specs(run: Run, actor: object | None = None) -> list[ActionSpec]:
+def build_resume_action_specs(
+    run: Run, actor: object | None = None
+) -> list[ActionSpec]:
     policy = can_resume_run(actor, run)
     if not policy.allowed:
         return []
@@ -130,7 +145,9 @@ def _coerce(field: FieldSpec, value: str) -> object:
     return value
 
 
-def dispatch_resume_action(run: Run, action_name: str, request: HttpRequest, actor: object | None = None) -> object:
+def dispatch_resume_action(
+    run: Run, action_name: str, request: HttpRequest, actor: object | None = None
+) -> object:
     policy = can_resume_run(actor, run)
     if not policy.allowed:
         raise PermissionError(policy.reason)
@@ -147,16 +164,18 @@ def dispatch_resume_action(run: Run, action_name: str, request: HttpRequest, act
     if allowed is not None and action_name not in allowed:
         raise PermissionError("Resume action is not allowed for the current checkpoint")
     fields = _schema_fields(raw.get("schema"))
-    payload = dict(raw.get("payload", {})) if isinstance(raw.get("payload"), Mapping) else {}
+    payload = (
+        dict(raw.get("payload", {})) if isinstance(raw.get("payload"), Mapping) else {}
+    )
     for field in fields:
         value = request.POST.get(field.name, "")
         if field.required and not value.strip():
             raise ValueError(f"{field.label} is required")
         if value or field.field_type == "boolean":
             payload[field.name] = _coerce(field, value)
-    return resume_run(
+    return dispatch_resume(
         run=run,
-        resume_payload=payload,
+        payload=payload,
         checkpoint_id=request.POST.get("checkpoint_id") or None,
         actor=actor,
     )

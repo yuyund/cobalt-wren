@@ -12,6 +12,7 @@ from .models import (
     CheckpointStoreSettings,
     FilesystemCheckpointStoreSettings,
     MemoryCheckpointStoreSettings,
+    PostgresCheckpointStoreSettings,
     StoreBackendConfig,
 )
 
@@ -19,6 +20,7 @@ __all__ = [
     "CheckpointStoreSettings",
     "FilesystemCheckpointStoreSettings",
     "MemoryCheckpointStoreSettings",
+    "PostgresCheckpointStoreSettings",
     "normalize_checkpoint_store_settings",
 ]
 
@@ -56,6 +58,13 @@ def normalize_checkpoint_store_settings(store_config: StoreBackendConfig | None)
             )
         root = _normalize_root_value(store_config.config.get("root"))
         return FilesystemCheckpointStoreSettings(root=root)
+
+    if backend == "postgres":
+        allowed = {"dsn", "table_name"}
+        dsn = store_config.config.get("dsn")
+        if set(store_config.config) - allowed or not isinstance(dsn, str) or not dsn.strip():
+            raise _config_error("Configuration is invalid: PostgreSQL checkpoint store requires a DSN and known options.", code="CONFIG_CHECKPOINT_STORE_INVALID_OPTIONS", metadata={"backend": backend})
+        return PostgresCheckpointStoreSettings(dsn=dsn.strip(), table_name=str(store_config.config.get("table_name", "langgraph_automation_checkpoints")))
 
     raise _config_error(
         "Configuration is invalid: checkpoint store backend is not supported.",

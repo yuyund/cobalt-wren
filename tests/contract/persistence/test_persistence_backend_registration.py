@@ -18,8 +18,12 @@ def test_artifact_backend_registry_covers_all_concrete_implementations() -> None
     discovered = discover_concrete_artifact_store_types()
 
     assert discovered == registered
-    assert {spec.name for spec in specs} == {'memory', 'filesystem'}
-    assert {spec.durability for spec in specs} == {DurabilityLevel.EPHEMERAL, DurabilityLevel.PROCESS_DURABLE}
+    assert {spec.name for spec in specs} == {"memory", "filesystem", "s3"}
+    assert {spec.durability for spec in specs} == {
+        DurabilityLevel.EPHEMERAL,
+        DurabilityLevel.PROCESS_DURABLE,
+        DurabilityLevel.DEPLOYMENT_DURABLE,
+    }
     assert {
         ContractCapability.BASELINE,
         ContractCapability.DEFENSIVE_COPY,
@@ -41,8 +45,12 @@ def test_checkpoint_backend_registry_covers_all_concrete_implementations() -> No
     discovered = discover_concrete_checkpoint_store_types()
 
     assert discovered == registered
-    assert {spec.name for spec in specs} == {'memory', 'filesystem'}
-    assert {spec.durability for spec in specs} == {DurabilityLevel.EPHEMERAL, DurabilityLevel.PROCESS_DURABLE}
+    assert {spec.name for spec in specs} == {"memory", "filesystem", "postgres"}
+    assert {spec.durability for spec in specs} == {
+        DurabilityLevel.EPHEMERAL,
+        DurabilityLevel.PROCESS_DURABLE,
+        DurabilityLevel.DEPLOYMENT_DURABLE,
+    }
     assert {
         ContractCapability.BASELINE,
         ContractCapability.DEFENSIVE_COPY,
