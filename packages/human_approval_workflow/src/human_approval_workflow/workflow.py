@@ -12,7 +12,7 @@ from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.graph import END, START, StateGraph
 from langgraph.types import Command, interrupt
 
-from langgraph_automation.api.stores import ArtifactStore, ArtifactWriteRequest, CheckpointStore, CheckpointWriteRequest
+from langgraph_automation.api.stores import ArtifactStore, ArtifactWriteRequest, CheckpointStore, CheckpointWriteRequest, StoredArtifact, StoredCheckpoint
 from langgraph_automation.api.workflow import WorkflowExecutionContext, WorkflowExecutionResult, WorkflowResumeRequest
 
 _NAMESPACE = "human-approval"
@@ -76,6 +76,7 @@ class HumanApprovalExecutable:
             decision = "approved" if state["decision"] == "approve" else "rejected"
             body = json.dumps({"title": state["title"], "proposal": state["proposal"], "decision": decision, "reviewer_note": state.get("reviewer_note", ""), "revision_count": state.get("revision_count", 0)}, ensure_ascii=False, sort_keys=True).encode()
             stored = self.artifact_store.put(ArtifactWriteRequest(run_id=run_id, storage_key=f"human-approval/{run_id}/decision.json", body=body, name="approval decision", kind="approval", content_type="application/json", metadata={"decision": decision}))
+            _emit_artifact(context, stored)
             return {"decision": decision, "artifact_key": stored.storage_key}
 
         graph = StateGraph(ApprovalState)
@@ -119,6 +120,7 @@ class HumanApprovalExecutable:
                     },
                 )
             )
+            _emit_checkpoint(context, checkpoint, checkpoint_namespace=_NAMESPACE)
             return WorkflowExecutionResult(status="paused", output={"approval_request": request_value, "checkpoint_id": checkpoint.checkpoint_id}, metadata={"pause_reason": "human_approval"})
         return WorkflowExecutionResult(output={"decision": result.get("decision", ""), "proposal": result.get("proposal", ""), "reviewer_note": result.get("reviewer_note", ""), "revision_count": result.get("revision_count", 0), "artifact_key": result.get("artifact_key", "")}, metadata={"resumed": True})
 
@@ -170,3 +172,15 @@ def _restore_saver(body: bytes) -> InMemorySaver:
         saver.writes[(thread, namespace, checkpoint_id)][(task_id, index)] = (stored_task_id, channel, _untyped(value), task_path)
     saver.blobs = {(thread, namespace, channel, version): _untyped(value) for thread, namespace, channel, version, value in payload["blobs"]}
     return saver
+
+
+def _emit_artifact(context: WorkflowExecutionContext, artifact: StoredArtifact) -> None:
+    callback = getattr(context.event_sink, "artifact_created", None)
+    if callable(callback) and isinstance(context.run_id, int):
+        callback(context.run_id, artifact.storage_key, artifact.name, artifact.kind, metadata=artifact.metadata, content_type=artifact.content_type, size=artifact.size)
+
+
+def _emit_checkpoint(context: WorkflowExecutionContext, checkpoint: StoredCheckpoint, *, checkpoint_namespace: str) -> None:
+    callback = getattr(context.event_sink, "checkpoint_saved", None)
+    if callable(callback) and isinstance(context.run_id, int):
+        callback(context.run_id, context.thread_id, checkpoint.checkpoint_id, "filesystem", state_summary=str(checkpoint.metadata), checkpoint_namespace=checkpoint_namespace)

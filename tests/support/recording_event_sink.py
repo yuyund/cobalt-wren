@@ -125,8 +125,10 @@ class RecordingEventSink:
     def tool_failed(self, span: SpanRef, error_message: str, metrics: Mapping[str, Any] | None = None) -> RecordedSpan:
         return self.span_failed(span, error_message=error_message, metrics=metrics)
 
-    def artifact_created(self, run_id: int, storage_key: str, name: str, kind: str, span: SpanRef | None = None, metadata: Mapping[str, Any] | None = None) -> RecordedEvent:
-        return self._record_event(run_id, "artifact.created", storage_key, metadata, node_name=name)
+    def artifact_created(self, run_id: int, storage_key: str, name: str, kind: str, span: SpanRef | None = None, metadata: Mapping[str, Any] | None = None, content_type: str = '', size: int | None = None) -> RecordedEvent:
+        payload = dict(metadata or {})
+        payload.update({"content_type": content_type, "size": size})
+        return self._record_event(run_id, "artifact.created", storage_key, payload, node_name=name)
 
-    def checkpoint_saved(self, run_id: int, thread_id: str, checkpoint_id: str, backend: str, span: SpanRef | None = None, state_summary: str | None = None) -> RecordedEvent:
-        return self._record_event(run_id, "checkpoint.saved", checkpoint_id, {"thread_id": thread_id, "backend": backend, "state_summary": state_summary or ""})
+    def checkpoint_saved(self, run_id: int, thread_id: str, checkpoint_id: str, backend: str, span: SpanRef | None = None, state_summary: str | None = None, checkpoint_namespace: str = '') -> RecordedEvent:
+        return self._record_event(run_id, "checkpoint.saved", checkpoint_id, {"thread_id": thread_id, "backend": backend, "state_summary": state_summary or "", "checkpoint_namespace": checkpoint_namespace})

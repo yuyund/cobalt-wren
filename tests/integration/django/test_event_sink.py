@@ -32,8 +32,8 @@ def test_event_sink_creates_events_spans_and_metadata() -> None:
     )
     llm_ref = sink.llm_started(run.pk, 'demo-llm', node_name='planner', parent=node_ref, provider='fake', model='fake')
     sink.llm_failed(llm_ref, error_message='llm failed', metrics={'retryable': False})
-    sink.artifact_created(run.pk, 'artifact-1', 'report', 'text', span=node_ref, metadata={'x': 1})
-    sink.checkpoint_saved(run.pk, 'thread-1', 'checkpoint-1', 'sqlite', span=node_ref, state_summary='state')
+    sink.artifact_created(run.pk, 'artifact-1', 'report', 'text', span=node_ref, metadata={'x': 1}, content_type='text/markdown', size=42)
+    sink.checkpoint_saved(run.pk, 'thread-1', 'checkpoint-1', 'sqlite', span=node_ref, state_summary='state', checkpoint_namespace='demo')
     sink.span_completed(graph_ref, output_summary='graph ok', metrics={'ok': True})
 
     run.refresh_from_db()
@@ -58,8 +58,11 @@ def test_event_sink_creates_events_spans_and_metadata() -> None:
     assert semantic_event.payload == {'route': 'plan'}
     assert semantic_event.span_id == node_span.pk
     assert run.events.filter(event_type='llm.failed', level=RunEventLevel.ERROR).exists()
-    assert run.artifacts.filter(name='report').exists()
-    assert run.checkpoint_metadata.filter(checkpoint_id='checkpoint-1').exists()
+    artifact = run.artifacts.get(name='report')
+    checkpoint = run.checkpoint_metadata.get(checkpoint_id='checkpoint-1')
+    assert artifact.content_type == 'text/markdown'
+    assert artifact.size == 42
+    assert checkpoint.checkpoint_namespace == 'demo'
 
 
 @pytest.mark.django_db

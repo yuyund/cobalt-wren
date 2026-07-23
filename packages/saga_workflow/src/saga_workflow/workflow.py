@@ -9,7 +9,7 @@ from typing import Annotated, TypedDict, cast
 from langgraph.graph import END, START, StateGraph
 from langgraph.types import Send
 
-from langgraph_automation.api.stores import ArtifactStore, ArtifactWriteRequest, CheckpointStore, CheckpointWriteRequest
+from langgraph_automation.api.stores import ArtifactStore, ArtifactWriteRequest, CheckpointStore, CheckpointWriteRequest, StoredArtifact, StoredCheckpoint
 from langgraph_automation.api.workflow import WorkflowExecutionContext, WorkflowExecutionResult, WorkflowResumeRequest
 
 _NAMESPACE = "saga-order-fulfillment"
@@ -126,6 +126,7 @@ class SagaExecutable:
                 metadata={"status": "partial_failure", "retryable_count": len(retryable), "fatal_count": len(fatal)},
             ))
             allowed = (["retry_failed"] if retryable else []) + ["compensate"]
+            _emit_checkpoint(context, checkpoint, checkpoint_namespace=_NAMESPACE)
             return WorkflowExecutionResult(
                 status="paused",
                 output={"status": "partial_failure", "results": results, "checkpoint_id": checkpoint.checkpoint_id, "allowed_actions": allowed},
@@ -153,7 +154,9 @@ class SagaExecutable:
         body = json.dumps(payload, sort_keys=True).encode()
         run_id = _run_id(context)
         artifact = self.artifact_store.put(ArtifactWriteRequest(run_id=run_id, storage_key=f"saga/{run_id}/reconciliation.json", body=body, name="saga reconciliation", kind="reconciliation", content_type="application/json", metadata={"status": status}))
+        _emit_artifact(context, artifact)
         checkpoint = self.checkpoint_store.save(CheckpointWriteRequest(run_id=run_id, checkpoint_id=f"final-{status}", parent_checkpoint_id=parent_checkpoint_id, body=body, serializer_name="json", serializer_version=1, content_type="application/json", checkpoint_namespace=_NAMESPACE, metadata={"status": status}))
+        _emit_checkpoint(context, checkpoint, checkpoint_namespace=_NAMESPACE)
         return WorkflowExecutionResult(output={**payload, "artifact_key": artifact.storage_key, "checkpoint_id": checkpoint.checkpoint_id})
 
 
@@ -176,3 +179,15 @@ def _failure_plan(value: object) -> dict[str, str]:
     if invalid:
         raise ValueError("failure_plan contains unsupported operation or failure type")
     return plan
+
+
+def _emit_artifact(context: WorkflowExecutionContext, artifact: StoredArtifact) -> None:
+    callback = getattr(context.event_sink, "artifact_created", None)
+    if callable(callback) and isinstance(context.run_id, int):
+        callback(context.run_id, artifact.storage_key, artifact.name, artifact.kind, metadata=artifact.metadata, content_type=artifact.content_type, size=artifact.size)
+
+
+def _emit_checkpoint(context: WorkflowExecutionContext, checkpoint: StoredCheckpoint, *, checkpoint_namespace: str) -> None:
+    callback = getattr(context.event_sink, "checkpoint_saved", None)
+    if callable(callback) and isinstance(context.run_id, int):
+        callback(context.run_id, context.thread_id, checkpoint.checkpoint_id, "filesystem", state_summary=str(checkpoint.metadata), checkpoint_namespace=checkpoint_namespace)

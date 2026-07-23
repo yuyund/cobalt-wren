@@ -353,7 +353,7 @@ class DjangoEventSink(EventSink):
         return self._complete_span(span, status=ExecutionSpanStatus.FAILED, metrics=metrics, error_message=error_message)
 
     @transaction.atomic
-    def artifact_created(self, run_id: int, storage_key: str, name: str, kind: str, span: SpanRef | None = None, metadata: Mapping[str, Any] | None = None) -> Artifact:
+    def artifact_created(self, run_id: int, storage_key: str, name: str, kind: str, span: SpanRef | None = None, metadata: Mapping[str, Any] | None = None, content_type: str = '', size: int | None = None) -> Artifact:
         run = self._get_run(run_id)
         span_obj = self._get_span(span) if span is not None else None
         validated_storage_key = validate_storage_key(storage_key)
@@ -363,6 +363,8 @@ class DjangoEventSink(EventSink):
             name=name,
             kind=kind,
             storage_key=validated_storage_key,
+            content_type=_bounded_summary_text(content_type),
+            size=size,
             metadata=_sanitize_mapping(metadata),
         )
         self._emit_event(
@@ -377,7 +379,7 @@ class DjangoEventSink(EventSink):
         return artifact
 
     @transaction.atomic
-    def checkpoint_saved(self, run_id: int, thread_id: str, checkpoint_id: str, backend: str, span: SpanRef | None = None, state_summary: str | None = None) -> CheckpointMetadata:
+    def checkpoint_saved(self, run_id: int, thread_id: str, checkpoint_id: str, backend: str, span: SpanRef | None = None, state_summary: str | None = None, checkpoint_namespace: str = '') -> CheckpointMetadata:
         run = self._get_run(run_id)
         span_obj = self._get_span(span) if span is not None else None
         checkpoint = CheckpointMetadata.objects.create(
@@ -385,7 +387,7 @@ class DjangoEventSink(EventSink):
             span=span_obj,
             thread_id=thread_id,
             checkpoint_id=checkpoint_id,
-            checkpoint_namespace='',
+            checkpoint_namespace=_bounded_summary_text(checkpoint_namespace),
             backend=backend,
             node_name=span_obj.node_name if span_obj else '',
             state_summary=_bounded_summary_text(state_summary),
