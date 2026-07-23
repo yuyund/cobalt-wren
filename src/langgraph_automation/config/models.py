@@ -5,7 +5,8 @@ from __future__ import annotations
 from collections.abc import Mapping
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Literal
+from collections.abc import Callable
+from typing import Any, Literal, Protocol, TypeVar
 
 __all__ = [
     "ArtifactStoreSettings",
@@ -29,7 +30,53 @@ __all__ = [
 ]
 
 
-def _copy_mapping(mapping: Mapping[str, Any] | None) -> dict[str, Any]:
+class _PluginMetadataLike(Protocol):
+    @property
+    def name(self) -> str: ...
+
+
+class PluginLike(Protocol):
+    @property
+    def metadata(self) -> _PluginMetadataLike: ...
+
+
+class ToolContributionLike(Protocol):
+    @property
+    def validate_config(self) -> Callable[..., None] | None: ...
+
+    @property
+    def create_tool(self) -> Callable[..., object] | None: ...
+
+
+class ProviderContributionLike(Protocol):
+    @property
+    def validate_profile(self) -> Callable[..., None] | None: ...
+
+    @property
+    def create_client(self) -> Callable[..., object] | None: ...
+
+
+class StoreContributionLike(Protocol):
+    @property
+    def validate_config(self) -> Callable[..., None] | None: ...
+
+    @property
+    def create_store(self) -> Callable[..., object] | None: ...
+
+
+class EventSinkContributionLike(Protocol):
+    @property
+    def validate_config(self) -> Callable[..., None] | None: ...
+
+    @property
+    def create_sink(self) -> Callable[..., object] | None: ...
+
+
+_K = TypeVar("_K")
+_V = TypeVar("_V")
+
+
+def _copy_mapping(mapping: Mapping[_K, _V] | None) -> dict[_K, _V]:
     return dict(mapping or {})
 
 
@@ -216,12 +263,12 @@ class NormalizedPackageConfig:
 
 @dataclass(frozen=True, slots=True)
 class EffectivePluginSet:
-    plugins: tuple[object, ...]
+    plugins: tuple[PluginLike, ...]
     plugin_names: tuple[str, ...]
-    tools: Mapping[str, object]
-    providers: Mapping[str, object]
-    stores: Mapping[tuple[str, str], object]
-    event_sinks: Mapping[str, object]
+    tools: Mapping[str, ToolContributionLike]
+    providers: Mapping[str, ProviderContributionLike]
+    stores: Mapping[tuple[str, str], StoreContributionLike]
+    event_sinks: Mapping[str, EventSinkContributionLike]
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "plugins", tuple(self.plugins))

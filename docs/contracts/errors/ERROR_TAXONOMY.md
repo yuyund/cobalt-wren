@@ -2,17 +2,20 @@
 type: contract
 status: current
 authority: normative
-summary: Framework error categories and safe error propagation boundaries.
+summary: Stable public error categories, safe payload shape, and execution-stage normalization.
 code_refs:
   - src/langgraph_automation/api/errors.py
+  - src/langgraph_automation/workflows/prepare.py
   - src/langgraph_automation/apps/automation/services/execution.py
+  - src/langgraph_automation/apps/automation/services/runs.py
 test_refs:
-  - tests/unit/api
+  - tests/unit/api/test_error_contracts.py
+  - tests/unit/api/test_public_errors_imports.py
   - tests/unit/automation/test_run_execution_public_workflow.py
 verified:
   date: 2026-07-23
   commit: WORKTREE
-  base_commit: 8e2f19b9ed39bb3b5bf2ce07bbc31cbd58587e33
+  base_commit: ed0702a
   method:
     - code-and-test-review
 ---
@@ -620,3 +623,11 @@ Deferred or internal candidates:
 - `InternalInvariantError`
 
 `ErrorCode` enum / `ErrorCategory` enum are not implemented in this phase.
+
+
+## Workflow-stage categories
+
+- `workflow_preparation`: workflow-specific configuration or executable construction failed after package dependencies were assembled.
+- `execution`: an unexpected executable failure was normalized at the control-plane boundary.
+
+Unexpected exceptions are converted to `ExecutionError` with `WORKFLOW_EXECUTION_FAILED`. The persisted and observable message is redacted and bounded before it crosses the control-plane result boundary. Existing `FrameworkError` instances retain their original category and code.

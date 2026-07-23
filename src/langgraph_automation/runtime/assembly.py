@@ -7,6 +7,7 @@ from collections.abc import Callable, Mapping
 from langgraph_automation.api.errors import RuntimeAssemblyError
 from langgraph_automation.config.artifact_store import normalize_artifact_store_settings
 from langgraph_automation.config.models import ValidatedPackageConfig
+from langgraph_automation.integrations.checkpoint.base import CheckpointStore
 
 from .artifact_store import build_artifact_store
 from .context import FactoryContext
@@ -39,7 +40,7 @@ class RuntimeAssembler:
         checkpoint_store = self._assemble_checkpoint_store(config)
         providers = self._assemble_providers(config, context)
         tools = self._assemble_tools(config, context)
-        self._assemble_stores(config, context)
+        self._initialize_additional_stores(config, context)
         event_sinks = self._assemble_event_sinks(config, context)
 
         return RuntimeDependencies(
@@ -77,7 +78,7 @@ class RuntimeAssembler:
         settings = normalize_artifact_store_settings(config.normalized.stores.get("artifact"))
         return build_artifact_store(settings)
 
-    def _assemble_checkpoint_store(self, config: ValidatedPackageConfig) -> object:
+    def _assemble_checkpoint_store(self, config: ValidatedPackageConfig) -> CheckpointStore:
         return build_checkpoint_store(config.normalized.checkpoint_store)
 
     def _assemble_tools(self, config: ValidatedPackageConfig, context: FactoryContext) -> dict[str, object]:
@@ -114,7 +115,9 @@ class RuntimeAssembler:
             assembled[tool_name] = tool
         return assembled
 
-    def _assemble_stores(self, config: ValidatedPackageConfig, context: FactoryContext) -> tuple[object | None, object | None]:
+    def _initialize_additional_stores(
+        self, config: ValidatedPackageConfig, context: FactoryContext
+    ) -> None:
         for store_type, store_config in config.normalized.stores.items():
             if store_type in {"artifact", "checkpoint"}:
                 continue
@@ -135,8 +138,6 @@ class RuntimeAssembler:
                 contribution_scope="store",
                 contribution_name=f"{store_type}:{store_config.backend}",
             )
-        return None, None
-
     def _assemble_event_sinks(self, config: ValidatedPackageConfig, context: FactoryContext) -> dict[str, object]:
         assembled: dict[str, object] = {}
         for sink_name, sink_config in config.normalized.event_sinks.items():

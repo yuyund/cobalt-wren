@@ -16,4 +16,6 @@ jobs:
       - run: python -m pip install -e '.[dev]'
       - run: ruff check .
       - run: pytest -q
+      - run: mypy src
       - run: python scripts/classify_mypy.py --check-baseline
+      - run: python scripts/benchmark_runtime.py --iterations 5 --output /tmp/runtime-benchmark.json

@@ -63,5 +63,7 @@ def test_public_errors_api_all() -> None:
         'PluginResolutionError',
         'PluginValidationError',
         'RuntimeAssemblyError',
+        'WorkflowPreparationError',
+        'ExecutionError',
         'SafetyBoundaryError',
     }

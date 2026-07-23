@@ -63,10 +63,11 @@ class ObservedToolRegistry:
     def run(self, name: str, **kwargs: Any) -> ToolResult:
         input_summary = _input_summary(name, kwargs)
 
-        if self.event_sink is None:
+        event_sink = self.event_sink
+        if event_sink is None:
             return self.inner.run(name, **kwargs)
 
-        span = self.event_sink.span_started(
+        span = event_sink.span_started(
             self.observability.run_id or 0,
             span_type=SPAN_TOOL,
             name=f'tool:{name}',
@@ -83,7 +84,7 @@ class ObservedToolRegistry:
         except Exception as primary_exc:
             error_message = redact_text(str(primary_exc))
             suppress_observability_failure(
-                lambda: self.event_sink.span_failed(
+                lambda: event_sink.span_failed(
                     span,
                     error_message=error_message,
                     metadata={
@@ -104,7 +105,7 @@ class ObservedToolRegistry:
         if result.exit_code != 0 or bool(result.error_message):
             failure_message = _failure_message(result)
             suppress_observability_failure(
-                lambda: self.event_sink.span_failed(
+                lambda: event_sink.span_failed(
                     span,
                     error_message=failure_message,
                     metrics=metrics,
@@ -122,7 +123,7 @@ class ObservedToolRegistry:
             )
             return result
 
-        self.event_sink.span_completed(
+        event_sink.span_completed(
             span,
             output_summary=_output_summary(result),
             metrics=metrics,

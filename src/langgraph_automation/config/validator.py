@@ -19,6 +19,7 @@ from langgraph_automation.config.models import (
     EventSinkBackendConfig,
     NormalizedPackageConfig,
     PluginsConfig,
+    ProviderContributionLike,
     ProviderProfileConfig,
     StoreBackendConfig,
     ToolsConfig,
@@ -199,7 +200,7 @@ class ConfigValidator:
 
     def _call_validate_profile(
         self,
-        contribution: ProviderContribution,
+        contribution: ProviderContributionLike,
         profile: ProviderProfileConfig,
         context: _ValidationContext,
         profile_name: str,

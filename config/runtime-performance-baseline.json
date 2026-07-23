@@ -1,0 +1,26 @@
+{
+  "operations": {
+    "engine_create": {
+      "iterations": 25,
+      "max_ns": 128869,
+      "median_ns": 84512,
+      "min_ns": 81513,
+      "p95_ns": 94544
+    },
+    "workflow_execute": {
+      "iterations": 25,
+      "max_ns": 29507,
+      "median_ns": 14894,
+      "min_ns": 14200,
+      "p95_ns": 20226
+    },
+    "workflow_prepare": {
+      "iterations": 25,
+      "max_ns": 38962,
+      "median_ns": 15965,
+      "min_ns": 15327,
+      "p95_ns": 21735
+    }
+  },
+  "schema_version": 1
+}

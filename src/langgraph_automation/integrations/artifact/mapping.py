@@ -29,5 +29,5 @@ def build_artifact_write_request(
         name=identity.slot.value,
         kind='artifact',
         content_type=request.content_type,
-        metadata=request.metadata,
+        metadata=dict(request.metadata),
     )

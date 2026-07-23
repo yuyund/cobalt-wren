@@ -24,6 +24,8 @@ def _resolve_object(model_key: str, obj_or_id: object, actor: object | None = No
         raise LookupError(f'Model {model_key!r} is not registered for UI rendering')
     if _is_model_instance(obj_or_id):
         return obj_or_id
+    if not isinstance(obj_or_id, (str, int)) or isinstance(obj_or_id, bool):
+        raise TypeError("object identifier must be a string or integer")
     resolved = config.detail_selector(int(obj_or_id), actor)
     if resolved is None:
         raise LookupError(f'Object {model_key!r}:{obj_or_id!r} was not found')

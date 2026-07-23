@@ -20,7 +20,12 @@ from langgraph_automation.api.plugins import (
     ToolContribution,
 )
 from langgraph_automation.config.loader import load_package_config_from_mapping
-from langgraph_automation.config.models import NormalizedPackageConfig, PluginsConfig, ProviderProfileConfig
+from langgraph_automation.config.models import (
+    NormalizedPackageConfig,
+    PluginsConfig,
+    ProviderProfileConfig,
+    ValidatedPackageConfig,
+)
 from langgraph_automation.config.normalizer import normalize_package_config
 from langgraph_automation.config.validator import ConfigValidator
 from langgraph_automation.integrations.llm.litellm_client import LiteLLMClient
@@ -69,7 +74,7 @@ class AutomationEngine:
     def __init__(
         self,
         *,
-        validated_config: NormalizedPackageConfig,
+        validated_config: ValidatedPackageConfig,
         dependencies: RuntimeDependencies,
         registry: PluginRegistry,
     ) -> None:

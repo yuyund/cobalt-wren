@@ -70,7 +70,7 @@ def _summarize_sequence(value: Sequence[Any], *, depth: int) -> list[Any]:
     return [_summarize_any(item, depth=depth - 1) for item in items]
 
 
-def _summarize_mapping(value: Mapping[str, Any], *, depth: int) -> dict[str, Any]:
+def _summarize_mapping(value: Mapping[str, Any], *, depth: int) -> dict[str, Any] | str:
     if depth < 0:
         return REDACTED_VALUE
     redacted = redact_mapping(value)

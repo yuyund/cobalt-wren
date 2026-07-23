@@ -8,6 +8,12 @@ code_refs:
   - config/mypy-baseline.json
   - pyproject.toml
   - .github/workflows/ci.yml
+  - src/langgraph_automation/apps/automation/migrations/0001_initial.py
+  - src/langgraph_automation/apps/automation/ui/builders.py
+  - src/langgraph_automation/config/models.py
+  - src/langgraph_automation/config/validator.py
+  - src/langgraph_automation/integrations/llm/observed_client.py
+  - src/langgraph_automation/integrations/tools/observed_registry.py
 test_refs:
   - tests/unit/architecture/test_type_checking_baseline.py
 verified:
@@ -19,12 +25,12 @@ verified:
 ---
 # Type Checking Baseline
 
-Full-source mypy is executed against `src`. Existing findings are classified rather than globally suppressed.
+Full-source mypy runs against all package source with the Django plugin enabled.
 
-- `external_stub`: third-party packages without installed typing metadata, primarily Django and django-environ.
-- `django_choice_typing`: Django runtime choice constants represented as `(value, label)` tuples where application code expects the stored string value.
-- `internal_code`: package-owned typing defects that must be reduced directly.
+- `django-stubs` and `django-stubs-ext` type the Django model, selector, URL, view, and migration boundaries.
+- `django-environ` is the only targeted missing-stub override; the override applies only to the `environ` module.
+- Package-owned source has no accepted mypy findings.
 
-`config/mypy-baseline.json` records the current category counts, error codes, and affected files. CI runs `scripts/classify_mypy.py --check-baseline`; any category or total count increase fails. Reductions are accepted and require regenerating the baseline in the same reviewed change.
+`config/mypy-baseline.json` is therefore a zero baseline. CI runs both `mypy src` and `scripts/classify_mypy.py --check-baseline`. Any new error fails immediately; the classifier remains as a diagnostic report if third-party typing changes introduce a new category.
 
-The baseline is not a waiver. New `type: ignore` directives or broad `ignore_missing_imports` settings are not permitted as substitutes for fixing package-owned errors.
+Broad `ignore_missing_imports`, `follow_imports = "skip"`, and unreviewed `type: ignore` directives are prohibited.

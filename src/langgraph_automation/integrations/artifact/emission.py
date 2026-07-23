@@ -464,7 +464,11 @@ def build_artifact_identity(
 ) -> ArtifactIdentity:
     """Return the deterministic logical identity for an explicit artifact."""
 
-    return ArtifactIdentity(run_id=context.run_id, slot=request.slot, occurrence=request.occurrence)
+    return ArtifactIdentity(
+        run_id=context.run_id,
+        slot=normalize_artifact_slot(request.slot),
+        occurrence=normalize_artifact_occurrence(request.occurrence),
+    )
 
 
 def _encode_identity_component(value: int | str) -> str:

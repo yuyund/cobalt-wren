@@ -9,7 +9,11 @@ from __future__ import annotations
 from collections.abc import Mapping
 from dataclasses import dataclass
 
-from langgraph_automation.api.errors import PluginResolutionError
+from langgraph_automation.api.errors import (
+    PluginResolutionError,
+    RuntimeAssemblyError,
+    WorkflowPreparationError,
+)
 from langgraph_automation.api.workflow import WorkflowBuildContext, WorkflowContribution, WorkflowDefinition
 from langgraph_automation.plugins.registry import PluginRegistry
 from langgraph_automation.runtime.dependencies import RuntimeDependencies
@@ -61,7 +65,17 @@ class WorkflowPreparer:
             checkpoint_store=dependencies.checkpoint_store,
             event_sinks=dependencies.event_sinks,
         )
-        executable = build_workflow_graph(definition, context)
+        try:
+            executable = build_workflow_graph(definition, context)
+        except RuntimeAssemblyError:
+            raise
+        except Exception as exc:
+            raise WorkflowPreparationError(
+                "Workflow preparation failed while building the executable.",
+                code="WORKFLOW_PREPARATION_BUILD_FAILED",
+                component=_WORKFLOW_PREPARER_COMPONENT,
+                metadata={"workflow_kind": workflow_kind, "workflow_stage": "build"},
+            ) from exc
         return PreparedWorkflow(
             kind=contribution.kind,
             contribution=contribution,
@@ -88,14 +102,12 @@ def _validate_workflow_config(
     hook = contribution.validate_config
     if hook is None:
         return
-    from langgraph_automation.api.errors import RuntimeAssemblyError
-
     try:
         hook(config=dict(config))
     except RuntimeAssemblyError:
         raise
     except Exception as exc:
-        raise RuntimeAssemblyError(
+        raise WorkflowPreparationError(
             "Workflow configuration validation failed.",
             code="WORKFLOW_CONFIG_INVALID",
             component=_WORKFLOW_PREPARER_COMPONENT,

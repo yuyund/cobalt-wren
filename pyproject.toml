@@ -20,6 +20,8 @@ dev = [
   "pytest-django",
   "ruff",
   "mypy",
+  "django-stubs>=5.2,<6",
+  "django-stubs-ext>=5.2,<6",
 ]
 postgres = [
   "psycopg[binary]>=3.2",
@@ -31,6 +33,8 @@ dev = [
   "pytest-django",
   "ruff",
   "mypy",
+  "django-stubs>=5.2,<6",
+  "django-stubs-ext>=5.2,<6",
 ]
 
 [tool.setuptools]
@@ -42,3 +46,14 @@ where = ["src"]
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "langgraph_automation.config.settings"
 pythonpath = ["src"]
+
+[tool.mypy]
+plugins = ["mypy_django_plugin.main"]
+
+[tool.django-stubs]
+django_settings_module = "langgraph_automation.config.settings"
+strict_settings = true
+
+[[tool.mypy.overrides]]
+module = "environ"
+ignore_missing_imports = true

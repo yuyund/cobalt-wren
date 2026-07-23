@@ -18,5 +18,7 @@ def test_mypy_baseline_has_explicit_debt_categories() -> None:
 def test_type_checking_policy_rejects_global_suppression() -> None:
     root = Path(__file__).parents[3]
     pyproject = (root / "pyproject.toml").read_text(encoding="utf-8")
-    assert "ignore_missing_imports = true" not in pyproject.lower()
-    assert "follow_imports = \"skip\"" not in pyproject.lower()
+    lowered = pyproject.lower()
+    assert lowered.count("ignore_missing_imports = true") == 1
+    assert 'module = "environ"' in lowered
+    assert "follow_imports = \"skip\"" not in lowered

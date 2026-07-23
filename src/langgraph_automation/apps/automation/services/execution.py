@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from langgraph_automation.api.engine import EnginePreparedWorkflow
 from langgraph_automation.api.workflow import WorkflowExecutionContext
-from langgraph_automation.api.errors import FrameworkError
+from langgraph_automation.api.errors import ExecutionError, FrameworkError
 from langgraph_automation.apps.automation.models.run import Run
 from langgraph_automation.apps.automation.services.execution_result import ControlPlaneExecutionResult
 from langgraph_automation.core.result_safety import safe_run_error_message
@@ -52,7 +52,17 @@ def dispatch_prepared_workflow_execution(
             ),
         )
     except Exception as exc:
-        safe_message = safe_run_error_message(exc)
+        if isinstance(exc, FrameworkError):
+            normalized_error = exc
+        else:
+            normalized_error = ExecutionError(
+                safe_run_error_message(exc),
+                code="WORKFLOW_EXECUTION_FAILED",
+                component="execution",
+                retryable=False,
+                metadata={"workflow_kind": prepared_workflow.kind},
+            )
+        safe_message = normalized_error.safe_message
         if event_sink is not None and control_plane_owns_lifecycle:
             if graph_span is not None:
                 suppress_observability_failure(
@@ -73,12 +83,15 @@ def dispatch_prepared_workflow_execution(
             )
         return ControlPlaneExecutionResult(
             status="failed",
-            error_message=str(exc),
+            error_message=safe_message,
             message="run failed",
             details={
                 "execution_path": "public_executable",
                 "workflow_kind": prepared_workflow.kind,
-                "framework_error": isinstance(exc, FrameworkError),
+                "framework_error": True,
+                "error_category": normalized_error.category,
+                "error_code": normalized_error.code,
+                "error_retryable": normalized_error.retryable,
                 "lifecycle_events_owner": prepared_workflow.lifecycle_events_owner,
                 "engine_generation": prepared_workflow.engine_generation,
                 "engine_signature": prepared_workflow.engine_signature,

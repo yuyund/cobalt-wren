@@ -22,6 +22,8 @@ __all__ = [
     'PluginResolutionError',
     'PluginValidationError',
     'RuntimeAssemblyError',
+    'WorkflowPreparationError',
+    'ExecutionError',
     'SafetyBoundaryError',
 ]
 
@@ -345,6 +347,47 @@ class RuntimeAssemblyError(FrameworkError):
             safe_message,
             code=code,
             category='runtime_assembly',
+            component=component,
+            retryable=retryable,
+            metadata=metadata,
+        )
+
+
+class WorkflowPreparationError(RuntimeAssemblyError):
+    def __init__(
+        self,
+        safe_message: str,
+        *,
+        code: str,
+        component: str | None = None,
+        retryable: bool | None = None,
+        metadata: Mapping[str, Any] | None = None,
+    ) -> None:
+        FrameworkError.__init__(
+            self,
+            safe_message,
+            code=code,
+            category="workflow_preparation",
+            component=component,
+            retryable=retryable,
+            metadata=metadata,
+        )
+
+
+class ExecutionError(FrameworkError):
+    def __init__(
+        self,
+        safe_message: str,
+        *,
+        code: str,
+        component: str | None = None,
+        retryable: bool | None = None,
+        metadata: Mapping[str, Any] | None = None,
+    ) -> None:
+        super().__init__(
+            safe_message,
+            code=code,
+            category="execution",
             component=component,
             retryable=retryable,
             metadata=metadata,

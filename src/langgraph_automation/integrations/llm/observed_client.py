@@ -53,17 +53,18 @@ class ObservedLLMClient:
     observability: ObservabilityContext
 
     def complete(self, messages: LLMRequest, **kwargs: Any) -> LLMResult:
-        input_summary = summarize_messages(messages)
+        input_summary = summarize_messages([dict(message) for message in messages])
         start_metadata = {
             'provider': getattr(self.inner, 'provider', '') or 'unknown',
             'model': getattr(self.inner, 'model', '') or 'unknown',
             'input_summary': input_summary,
         }
 
-        if self.event_sink is None:
+        event_sink = self.event_sink
+        if event_sink is None:
             return self.inner.complete(messages, **kwargs)
 
-        span = self.event_sink.span_started(
+        span = event_sink.span_started(
             self.observability.run_id or 0,
             span_type=SPAN_LLM,
             name=f"llm:{start_metadata['model']}",
@@ -77,7 +78,7 @@ class ObservedLLMClient:
         except Exception as primary_exc:
             error_message = redact_text(str(primary_exc))
             suppress_observability_failure(
-                lambda: self.event_sink.span_failed(
+                lambda: event_sink.span_failed(
                     span,
                     error_message=error_message,
                     metadata={
@@ -92,7 +93,7 @@ class ObservedLLMClient:
             )
             raise
 
-        self.event_sink.span_completed(
+        event_sink.span_completed(
             span,
             output_summary=_output_summary(result),
             metrics=_metrics_from_result(result),

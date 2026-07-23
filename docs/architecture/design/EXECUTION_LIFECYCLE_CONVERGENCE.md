@@ -1,3 +1,28 @@
+---
+type: architecture
+status: current
+authority: normative
+summary: Converged control-plane execution through public workflow executables and framework-neutral results.
+code_refs:
+  - src/langgraph_automation/api/engine.py
+  - src/langgraph_automation/api/workflow.py
+  - src/langgraph_automation/workflows/prepare.py
+  - src/langgraph_automation/runtime/assembly.py
+  - src/langgraph_automation/apps/automation/services/execution.py
+  - src/langgraph_automation/apps/automation/services/runs.py
+  - src/langgraph_automation/apps/automation/services/runtime.py
+test_refs:
+  - tests/integration/api/test_public_execution_persistence.py
+  - tests/unit/automation/test_run_execution_public_workflow.py
+  - tests/unit/architecture/test_public_execution_architecture.py
+  - tests/unit/architecture/test_execution_convergence_final_boundary.py
+verified:
+  date: 2026-07-23
+  commit: WORKTREE
+  base_commit: ed0702a
+  method:
+    - code-and-test-review
+---
 # Execution Lifecycle Convergence
 
 ## Current State

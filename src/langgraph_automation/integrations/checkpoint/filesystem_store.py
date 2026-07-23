@@ -1141,7 +1141,8 @@ class FilesystemCheckpointStore(CheckpointStore):
                         self._publish_immutable_link(by_id_path, by_revision_path)
                         self._fsync_directory(by_revision_path.parent)
                     self._verify_hard_link_pair(by_id_path, by_revision_path, purpose='record')
-                    if self._load_head(stream_key) is None or self._load_head(stream_key).revision < descriptor.revision:
+                    current_head = self._load_head(stream_key)
+                    if current_head is None or current_head.revision < descriptor.revision:
                         self._write_head(
                             stream_key,
                             _StreamHead(
