@@ -9,8 +9,10 @@ from typing import Any, Protocol, runtime_checkable
 __all__ = [
     "WorkflowBuildContext",
     "WorkflowExecutionContext",
+    "WorkflowResumeRequest",
     "WorkflowExecutionResult",
     "WorkflowExecutable",
+    "WorkflowResumable",
     "WorkflowMetadata",
     "WorkflowRequirements",
     "WorkflowDefinition",
@@ -77,7 +79,7 @@ class WorkflowBuildContext:
 
 @dataclass(frozen=True, slots=True)
 class WorkflowExecutionContext:
-    """Per-run context supplied when a workflow executes."""
+    """Per-run context supplied when a workflow executes or resumes."""
 
     run_id: int | None = None
     thread_id: str = ""
@@ -86,15 +88,34 @@ class WorkflowExecutionContext:
 
 
 @dataclass(frozen=True, slots=True)
+class WorkflowResumeRequest:
+    """Framework-neutral input used to continue a paused workflow."""
+
+    value: Mapping[str, object] = field(default_factory=dict)
+    checkpoint_id: str | None = None
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "value", _copy_mapping(self.value))
+        if self.checkpoint_id is not None:
+            normalized = self.checkpoint_id.strip()
+            if not normalized:
+                raise ValueError("checkpoint_id must not be blank")
+            object.__setattr__(self, "checkpoint_id", normalized)
+
+
+@dataclass(frozen=True, slots=True)
 class WorkflowExecutionResult:
     """Framework-neutral normalized workflow execution result."""
 
     output: Mapping[str, object] = field(default_factory=dict)
     metadata: Mapping[str, object] = field(default_factory=dict)
+    status: str = "completed"
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "output", _copy_mapping(self.output))
         object.__setattr__(self, "metadata", _copy_mapping(self.metadata))
+        if self.status not in {"completed", "paused"}:
+            raise ValueError("workflow execution status must be 'completed' or 'paused'")
 
 
 @runtime_checkable
@@ -102,6 +123,16 @@ class WorkflowExecutable(Protocol):
     def execute(
         self,
         input_payload: Mapping[str, object],
+        *,
+        context: WorkflowExecutionContext,
+    ) -> object: ...
+
+
+@runtime_checkable
+class WorkflowResumable(Protocol):
+    def resume(
+        self,
+        request: WorkflowResumeRequest,
         *,
         context: WorkflowExecutionContext,
     ) -> object: ...

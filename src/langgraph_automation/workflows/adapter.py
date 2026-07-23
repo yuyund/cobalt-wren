@@ -12,6 +12,7 @@ from langgraph_automation.api.workflow import (
     WorkflowDefinition,
     WorkflowExecutionContext,
     WorkflowExecutionResult,
+    WorkflowResumeRequest,
 )
 
 _WORKFLOW_ADAPTER_COMPONENT = "workflow_adapter"
@@ -19,6 +20,10 @@ _WORKFLOW_ADAPTER_COMPONENT = "workflow_adapter"
 
 class _ExecuteCapable(Protocol):
     def execute(self, input_payload: Mapping[str, object], **kwargs: object) -> object: ...
+
+
+class _ResumeCapable(Protocol):
+    def resume(self, request: WorkflowResumeRequest, **kwargs: object) -> object: ...
 
 
 class _InvokeCapable(Protocol):
@@ -52,6 +57,18 @@ def build_workflow_graph(definition: WorkflowDefinition, context: WorkflowBuildC
     return graph
 
 
+def _normalize_result(result: object) -> WorkflowExecutionResult:
+    if isinstance(result, WorkflowExecutionResult):
+        return result
+    if isinstance(result, Mapping):
+        return WorkflowExecutionResult(output=result)
+    raise RuntimeAssemblyError(
+        "Workflow execution failed: workflow returned an unsupported result.",
+        code="WORKFLOW_EXECUTION_INVALID_RESULT",
+        component=_WORKFLOW_ADAPTER_COMPONENT,
+    )
+
+
 def execute_workflow(
     executable: object,
     input_payload: Mapping[str, object] | None = None,
@@ -80,13 +97,36 @@ def execute_workflow(
             code="WORKFLOW_EXECUTION_FAILED",
             component=_WORKFLOW_ADAPTER_COMPONENT,
         ) from exc
+    return _normalize_result(result)
 
-    if isinstance(result, WorkflowExecutionResult):
-        return result
-    if isinstance(result, Mapping):
-        return WorkflowExecutionResult(output=result)
-    raise RuntimeAssemblyError(
-        "Workflow execution failed: workflow returned an unsupported result.",
-        code="WORKFLOW_EXECUTION_INVALID_RESULT",
-        component=_WORKFLOW_ADAPTER_COMPONENT,
-    )
+
+def resume_workflow(
+    executable: object,
+    request: WorkflowResumeRequest,
+    *,
+    context: WorkflowExecutionContext | None = None,
+) -> WorkflowExecutionResult:
+    """Resume an opaque workflow through an optional capability."""
+
+    method = getattr(executable, "resume", None)
+    if not callable(method):
+        raise RuntimeAssemblyError(
+            "Workflow resume is not supported.",
+            code="WORKFLOW_RESUME_UNSUPPORTED",
+            component=_WORKFLOW_ADAPTER_COMPONENT,
+        )
+    try:
+        parameters = inspect.signature(method).parameters
+        result = cast(_ResumeCapable, executable).resume(
+            request,
+            context=context or WorkflowExecutionContext(),
+        ) if "context" in parameters else cast(_ResumeCapable, executable).resume(request)
+    except RuntimeAssemblyError:
+        raise
+    except Exception as exc:
+        raise RuntimeAssemblyError(
+            "Workflow resume failed.",
+            code="WORKFLOW_RESUME_FAILED",
+            component=_WORKFLOW_ADAPTER_COMPONENT,
+        ) from exc
+    return _normalize_result(result)

@@ -18,5 +18,6 @@ jobs:
       - run: pytest -q
       - run: mypy src
       - run: MYPYPATH=src:packages/opportunity_research_workflow/src mypy packages/opportunity_research_workflow/src/opportunity_research_workflow
+      - run: MYPYPATH=src:packages/human_approval_workflow/src mypy packages/human_approval_workflow/src/human_approval_workflow
       - run: python scripts/classify_mypy.py --check-baseline
       - run: python scripts/benchmark_runtime.py --iterations 5 --output /tmp/runtime-benchmark.json

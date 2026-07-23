@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass, field
 
 from django.db import transaction
@@ -9,12 +10,20 @@ from django.utils import timezone
 
 from langgraph_automation.api.engine import EnginePreparedWorkflow
 from langgraph_automation.api.errors import FrameworkError
+from langgraph_automation.api.workflow import WorkflowResumeRequest
 from langgraph_automation.apps.automation.models.run import Run, RunStatus
-from langgraph_automation.apps.automation.policies.runs import PolicyResult, can_cancel_run, can_retry_run, can_start_run
+from langgraph_automation.apps.automation.policies.runs import (
+    PolicyResult,
+    can_cancel_run,
+    can_resume_run,
+    can_retry_run,
+    can_start_run,
+)
 from langgraph_automation.apps.automation.services import runtime as runtime_module
 from langgraph_automation.apps.automation.services.errors import WorkflowConfigurationError
 from langgraph_automation.apps.automation.services.execution import (
     dispatch_prepared_workflow_execution,
+    dispatch_prepared_workflow_resume,
 )
 from langgraph_automation.apps.automation.services.execution_result import ControlPlaneExecutionResult
 from langgraph_automation.apps.automation.services.workflow_reference import parse_workflow_reference
@@ -24,8 +33,6 @@ from langgraph_automation.integrations.observability.failure_policy import suppr
 
 @dataclass(slots=True)
 class RunActionResult:
-    '''Result from a run lifecycle action.'''
-
     run: Run
     message: str = ''
     output_payload: dict[str, object] = field(default_factory=dict)
@@ -71,9 +78,7 @@ def _transition_run(
     return run
 
 
-def _finalize_from_execution(
-    run: Run, execution_result: ControlPlaneExecutionResult
-) -> Run:
+def _finalize_from_execution(run: Run, execution_result: ControlPlaneExecutionResult) -> Run:
     status = execution_result.status or RunStatus.FAILED
     message = safe_run_error_message(execution_result.error_message) if status == RunStatus.FAILED else ''
     return _transition_run(
@@ -93,7 +98,12 @@ def _emit_run_failed(*, event_sink, run: Run, error_message: str) -> None:
             error_message=error_message,
             payload={'run_id': run.pk, 'workflow_id': run.workflow_id},
         ),
-        context={'component': 'runs', 'operation': 'run_failed', 'run_id': run.pk, 'workflow_id': run.workflow_id},
+        context={
+            'component': 'runs',
+            'operation': 'run_failed',
+            'run_id': run.pk,
+            'workflow_id': run.workflow_id,
+        },
     )
 
 
@@ -105,7 +115,7 @@ def _handle_runtime_build_failure(run: Run, exc: Exception) -> RunActionResult:
 
     try:
         event_sink = runtime_module.build_event_sink(locked_run)
-    except Exception:  # pragma: no cover - observability failures are best-effort
+    except Exception:
         event_sink = None
     _emit_run_failed(event_sink=event_sink, run=locked_run, error_message=safe_message)
 
@@ -130,9 +140,26 @@ def _prepare_workflow_for_run(
     reference = parse_workflow_reference(run.workflow.definition_payload)
     if reference is None:
         raise WorkflowConfigurationError("workflow reference is required.")
-    services = services or runtime_module.get_run_execution_services()
-    return services.prepare_workflow(reference)
+    return (services or runtime_module.get_run_execution_services()).prepare_workflow(reference)
 
+
+def _event_sink(run: Run):
+    try:
+        return runtime_module.build_event_sink(run)
+    except Exception:
+        return None
+
+
+def _complete_action(run: Run, execution_result: ControlPlaneExecutionResult) -> RunActionResult:
+    with transaction.atomic():
+        locked_run = _locked_run(run)
+        _finalize_from_execution(locked_run, execution_result)
+    return RunActionResult(
+        run=locked_run,
+        message=execution_result.message,
+        output_payload=safe_run_output_payload(execution_result.output_payload),
+        execution_result=execution_result,
+    )
 
 
 def start_run(
@@ -141,42 +168,26 @@ def start_run(
     services: runtime_module.RunExecutionServices | None = None,
     actor: object | None = None,
 ) -> RunActionResult:
-    '''Start a run.'''
-
     with transaction.atomic():
         locked_run = _locked_run(run)
         _policy_or_raise(can_start_run(actor, locked_run))
-        thread_id = locked_run.thread_id or f'run-{locked_run.pk}'
-        _transition_run(locked_run, status=RunStatus.RUNNING, thread_id=thread_id)
-
+        _transition_run(
+            locked_run,
+            status=RunStatus.RUNNING,
+            thread_id=locked_run.thread_id or f'run-{locked_run.pk}',
+        )
     try:
-        prepared_workflow = _prepare_workflow_for_run(locked_run, services=services)
+        prepared = _prepare_workflow_for_run(locked_run, services=services)
     except (WorkflowConfigurationError, FrameworkError) as exc:
         return _handle_runtime_build_failure(locked_run, exc)
-
-    try:
-        try:
-            effective_sink = runtime_module.build_event_sink(locked_run)
-        except Exception:
-            effective_sink = None
-        execution_result = dispatch_prepared_workflow_execution(
-            locked_run, prepared_workflow=prepared_workflow, event_sink=effective_sink
-        )
-    except Exception as exc:  # pragma: no cover
-        with transaction.atomic():
-            locked_run = _locked_run(locked_run)
-            _transition_run(locked_run, status=RunStatus.FAILED, message=safe_run_error_message(exc))
-        _emit_run_failed(
-            event_sink=runtime_module.build_event_sink(locked_run),
-            run=locked_run,
-            error_message=safe_run_error_message(exc),
-        )
-        raise
-
-    with transaction.atomic():
-        locked_run = _locked_run(locked_run)
-        _finalize_from_execution(locked_run, execution_result)
-    return RunActionResult(run=locked_run, message=execution_result.message, output_payload=safe_run_output_payload(execution_result.output_payload), execution_result=execution_result)
+    return _complete_action(
+        locked_run,
+        dispatch_prepared_workflow_execution(
+            locked_run,
+            prepared_workflow=prepared,
+            event_sink=_event_sink(locked_run),
+        ),
+    )
 
 
 def cancel_run(
@@ -185,26 +196,47 @@ def cancel_run(
     services: runtime_module.RunExecutionServices | None = None,
     actor: object | None = None,
 ) -> RunActionResult:
-    '''Cancel a run.'''
-
+    del services
     with transaction.atomic():
         locked_run = _locked_run(run)
         _policy_or_raise(can_cancel_run(actor, locked_run))
         _transition_run(locked_run, status=RunStatus.CANCELLED)
-
-    try:
-        event_sink = runtime_module.build_event_sink(locked_run)
-    except Exception:
-        event_sink = None
-    if event_sink is not None:
-        event_sink.run_cancelled(locked_run.pk, message='run cancelled', payload={'run_id': locked_run.pk, 'workflow_id': locked_run.workflow_id})
+    sink = _event_sink(locked_run)
+    if sink is not None:
+        sink.run_cancelled(
+            locked_run.pk,
+            message='run cancelled',
+            payload={'run_id': locked_run.pk, 'workflow_id': locked_run.workflow_id},
+        )
     return RunActionResult(run=locked_run, message='run cancelled')
 
 
-def resume_run(*, run: Run, actor: object | None = None) -> RunActionResult:
-    '''Resume a run from checkpoint.'''
-
-    raise NotImplementedError('resume_run is not implemented until checkpoint resume semantics are defined; use retry_run instead')
+def resume_run(
+    *,
+    run: Run,
+    resume_payload: Mapping[str, object],
+    checkpoint_id: str | None = None,
+    services: runtime_module.RunExecutionServices | None = None,
+    actor: object | None = None,
+) -> RunActionResult:
+    with transaction.atomic():
+        locked_run = _locked_run(run)
+        _policy_or_raise(can_resume_run(actor, locked_run))
+        _transition_run(locked_run, status=RunStatus.RUNNING)
+    try:
+        prepared = _prepare_workflow_for_run(locked_run, services=services)
+    except (WorkflowConfigurationError, FrameworkError) as exc:
+        return _handle_runtime_build_failure(locked_run, exc)
+    request = WorkflowResumeRequest(value=resume_payload, checkpoint_id=checkpoint_id)
+    return _complete_action(
+        locked_run,
+        dispatch_prepared_workflow_resume(
+            locked_run,
+            prepared_workflow=prepared,
+            request=request,
+            event_sink=_event_sink(locked_run),
+        ),
+    )
 
 
 def retry_run(
@@ -213,38 +245,19 @@ def retry_run(
     services: runtime_module.RunExecutionServices | None = None,
     actor: object | None = None,
 ) -> RunActionResult:
-    '''Retry a failed or cancelled run.'''
-
     with transaction.atomic():
         locked_run = _locked_run(run)
         _policy_or_raise(can_retry_run(actor, locked_run))
         _transition_run(locked_run, status=RunStatus.RUNNING)
-
     try:
-        prepared_workflow = _prepare_workflow_for_run(locked_run, services=services)
+        prepared = _prepare_workflow_for_run(locked_run, services=services)
     except (WorkflowConfigurationError, FrameworkError) as exc:
         return _handle_runtime_build_failure(locked_run, exc)
-
-    try:
-        try:
-            effective_sink = runtime_module.build_event_sink(locked_run)
-        except Exception:
-            effective_sink = None
-        execution_result = dispatch_prepared_workflow_execution(
-            locked_run, prepared_workflow=prepared_workflow, event_sink=effective_sink
-        )
-    except Exception as exc:  # pragma: no cover
-        with transaction.atomic():
-            locked_run = _locked_run(locked_run)
-            _transition_run(locked_run, status=RunStatus.FAILED, message=safe_run_error_message(exc))
-        _emit_run_failed(
-            event_sink=runtime_module.build_event_sink(locked_run),
-            run=locked_run,
-            error_message=safe_run_error_message(exc),
-        )
-        raise
-
-    with transaction.atomic():
-        locked_run = _locked_run(locked_run)
-        _finalize_from_execution(locked_run, execution_result)
-    return RunActionResult(run=locked_run, message=execution_result.message, output_payload=safe_run_output_payload(execution_result.output_payload), execution_result=execution_result)
+    return _complete_action(
+        locked_run,
+        dispatch_prepared_workflow_execution(
+            locked_run,
+            prepared_workflow=prepared,
+            event_sink=_event_sink(locked_run),
+        ),
+    )

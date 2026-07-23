@@ -24,11 +24,11 @@ def can_start_run(actor: object | None, run: Run) -> PolicyResult:
 
 
 def can_cancel_run(actor: object | None, run: Run) -> PolicyResult:
-    return _result(run.status in {RunStatus.PENDING, RunStatus.RUNNING}, f'Run cannot be cancelled from {run.status}')
+    return _result(run.status in {RunStatus.PENDING, RunStatus.RUNNING, RunStatus.WAITING}, f'Run cannot be cancelled from {run.status}')
 
 
 def can_resume_run(actor: object | None, run: Run) -> PolicyResult:
-    return _result(False, 'Checkpoint resume is not implemented yet; use retry instead')
+    return _result(run.status == RunStatus.WAITING, f'Run cannot be resumed from {run.status}')
 
 
 def can_retry_run(actor: object | None, run: Run) -> PolicyResult:

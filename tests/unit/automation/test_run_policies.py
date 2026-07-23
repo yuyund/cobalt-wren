@@ -13,36 +13,29 @@ from langgraph_automation.apps.automation.policies.runs import can_cancel_run, c
 def test_pending_run_can_start() -> None:
     workflow = Workflow.objects.create(name='wf-start')
     run = Run.objects.create(workflow=workflow, name='run-start', status=RunStatus.PENDING)
-
-    result = can_start_run(None, run)
-
-    assert result.allowed is True
+    assert can_start_run(None, run).allowed is True
 
 
 @pytest.mark.django_db
-def test_running_run_can_cancel() -> None:
-    workflow = Workflow.objects.create(name='wf-cancel')
-    run = Run.objects.create(workflow=workflow, name='run-cancel', status=RunStatus.RUNNING)
-
-    result = can_cancel_run(None, run)
-
-    assert result.allowed is True
-
-
-@pytest.mark.django_db
-def test_succeeded_run_cannot_cancel() -> None:
-    workflow = Workflow.objects.create(name='wf-cancel-block')
-    run = Run.objects.create(workflow=workflow, name='run-cancel-block', status=RunStatus.SUCCEEDED)
-
-    result = can_cancel_run(None, run)
-
-    assert result.allowed is False
+def test_waiting_run_can_cancel_and_resume() -> None:
+    workflow = Workflow.objects.create(name='wf-waiting')
+    run = Run.objects.create(workflow=workflow, name='run-waiting', status=RunStatus.WAITING)
+    assert can_cancel_run(None, run).allowed is True
+    assert can_resume_run(None, run).allowed is True
+    assert can_retry_run(None, run).allowed is False
 
 
 @pytest.mark.django_db
-def test_failed_run_can_retry_but_resume_is_unsupported() -> None:
+def test_succeeded_run_cannot_cancel_or_resume() -> None:
+    workflow = Workflow.objects.create(name='wf-complete')
+    run = Run.objects.create(workflow=workflow, name='run-complete', status=RunStatus.SUCCEEDED)
+    assert can_cancel_run(None, run).allowed is False
+    assert can_resume_run(None, run).allowed is False
+
+
+@pytest.mark.django_db
+def test_failed_run_can_retry_but_not_resume() -> None:
     workflow = Workflow.objects.create(name='wf-retry')
     run = Run.objects.create(workflow=workflow, name='run-retry', status=RunStatus.FAILED)
-
     assert can_resume_run(None, run).allowed is False
     assert can_retry_run(None, run).allowed is True

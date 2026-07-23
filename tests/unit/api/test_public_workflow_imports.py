@@ -9,12 +9,16 @@ def test_public_workflow_api_exports() -> None:
         WorkflowDefinition,
         WorkflowMetadata,
         WorkflowRequirements,
+        WorkflowResumeRequest,
+        WorkflowResumable,
     )
 
     assert WorkflowContribution is not None
     assert WorkflowDefinition is not None
     assert WorkflowMetadata is not None
     assert WorkflowRequirements is not None
+    assert WorkflowResumeRequest is not None
+    assert WorkflowResumable is not None
 
 
 def test_public_workflow_api_all() -> None:
@@ -23,8 +27,10 @@ def test_public_workflow_api_all() -> None:
     assert set(workflow_api.__all__) == {
         "WorkflowBuildContext",
         "WorkflowExecutionContext",
+        "WorkflowResumeRequest",
         "WorkflowExecutionResult",
         "WorkflowExecutable",
+        "WorkflowResumable",
         "WorkflowMetadata",
         "WorkflowRequirements",
         "WorkflowDefinition",

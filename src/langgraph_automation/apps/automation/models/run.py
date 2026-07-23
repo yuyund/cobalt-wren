@@ -12,6 +12,7 @@ class RunStatus(models.TextChoices):
 
     PENDING = 'pending', 'Pending'
     RUNNING = 'running', 'Running'
+    WAITING = 'waiting', 'Waiting'
     SUCCEEDED = 'succeeded', 'Succeeded'
     FAILED = 'failed', 'Failed'
     CANCELLED = 'cancelled', 'Cancelled'

@@ -1,10 +1,16 @@
-"""Execution adapters for legacy graphs and public prepared workflows."""
+"""Execution adapters for public prepared workflows."""
 from __future__ import annotations
 
+from collections.abc import Callable
+
 from langgraph_automation.api.engine import EnginePreparedWorkflow
-from langgraph_automation.api.workflow import WorkflowExecutionContext
 from langgraph_automation.api.errors import ExecutionError, FrameworkError
-from langgraph_automation.apps.automation.models.run import Run
+from langgraph_automation.api.workflow import (
+    WorkflowExecutionContext,
+    WorkflowExecutionResult,
+    WorkflowResumeRequest,
+)
+from langgraph_automation.apps.automation.models.run import Run, RunStatus
 from langgraph_automation.apps.automation.services.execution_result import ControlPlaneExecutionResult
 from langgraph_automation.core.result_safety import safe_run_error_message
 from langgraph_automation.integrations.observability.base import EventSink
@@ -18,7 +24,39 @@ def dispatch_prepared_workflow_execution(
     prepared_workflow: EnginePreparedWorkflow,
     event_sink: EventSink | None = None,
 ) -> ControlPlaneExecutionResult:
-    """Execute a public workflow and adapt it to the control-plane result."""
+    return _dispatch(
+        run,
+        prepared_workflow=prepared_workflow,
+        event_sink=event_sink,
+        operation="execute",
+        invoke=lambda context: prepared_workflow.execute(run.input_payload, context=context),
+    )
+
+
+def dispatch_prepared_workflow_resume(
+    run: Run,
+    *,
+    prepared_workflow: EnginePreparedWorkflow,
+    request: WorkflowResumeRequest,
+    event_sink: EventSink | None = None,
+) -> ControlPlaneExecutionResult:
+    return _dispatch(
+        run,
+        prepared_workflow=prepared_workflow,
+        event_sink=event_sink,
+        operation="resume",
+        invoke=lambda context: prepared_workflow.resume(request, context=context),
+    )
+
+
+def _dispatch(
+    run: Run,
+    *,
+    prepared_workflow: EnginePreparedWorkflow,
+    event_sink: EventSink | None,
+    operation: str,
+    invoke: Callable[[WorkflowExecutionContext], WorkflowExecutionResult],
+) -> ControlPlaneExecutionResult:
     control_plane_owns_lifecycle = prepared_workflow.lifecycle_events_owner == "control_plane"
     graph_span: SpanRef | None = None
     try:
@@ -26,8 +64,8 @@ def dispatch_prepared_workflow_execution(
             suppress_observability_failure(
                 lambda: event_sink.run_started(
                     run.pk,
-                    message="run started",
-                    payload={"execution_path": "public_executable"},
+                    message="run started" if operation == "execute" else "run resume started",
+                    payload={"execution_path": "public_executable", "operation": operation},
                 ),
                 context={"component": "execution", "operation": "run_started", "run_id": run.pk},
             )
@@ -35,33 +73,33 @@ def dispatch_prepared_workflow_execution(
                 graph_span = event_sink.span_started(
                     run.pk,
                     span_type="graph",
-                    name="public-executable",
+                    name="public-executable" if operation == "execute" else "public-executable-resume",
                     node_name="workflow",
-                    metadata={"workflow_kind": prepared_workflow.kind},
+                    metadata={"workflow_kind": prepared_workflow.kind, "operation": operation},
                 )
             except Exception:
                 graph_span = None
 
-        result = prepared_workflow.execute(
-            run.input_payload,
-            context=WorkflowExecutionContext(
+        result = invoke(
+            WorkflowExecutionContext(
                 run_id=run.pk,
                 thread_id=run.thread_id,
                 event_sink=event_sink,
                 parent_span=graph_span,
-            ),
+            )
         )
     except Exception as exc:
-        if isinstance(exc, FrameworkError):
-            normalized_error = exc
-        else:
-            normalized_error = ExecutionError(
+        normalized_error = (
+            exc
+            if isinstance(exc, FrameworkError)
+            else ExecutionError(
                 safe_run_error_message(exc),
                 code="WORKFLOW_EXECUTION_FAILED",
                 component="execution",
                 retryable=False,
                 metadata={"workflow_kind": prepared_workflow.kind},
             )
+        )
         safe_message = normalized_error.safe_message
         if event_sink is not None and control_plane_owns_lifecycle:
             if graph_span is not None:
@@ -69,7 +107,7 @@ def dispatch_prepared_workflow_execution(
                     lambda: event_sink.span_failed(
                         graph_span,
                         error_message=safe_message,
-                        metadata={"execution_path": "public_executable"},
+                        metadata={"execution_path": "public_executable", "operation": operation},
                     ),
                     context={"component": "execution", "operation": "span_failed", "run_id": run.pk},
                 )
@@ -77,12 +115,12 @@ def dispatch_prepared_workflow_execution(
                 lambda: event_sink.run_failed(
                     run.pk,
                     error_message=safe_message,
-                    payload={"execution_path": "public_executable"},
+                    payload={"execution_path": "public_executable", "operation": operation},
                 ),
                 context={"component": "execution", "operation": "run_failed", "run_id": run.pk},
             )
         return ControlPlaneExecutionResult(
-            status="failed",
+            status=RunStatus.FAILED,
             error_message=safe_message,
             message="run failed",
             details={
@@ -95,33 +133,36 @@ def dispatch_prepared_workflow_execution(
                 "lifecycle_events_owner": prepared_workflow.lifecycle_events_owner,
                 "engine_generation": prepared_workflow.engine_generation,
                 "engine_signature": prepared_workflow.engine_signature,
+                "operation": operation,
             },
         )
 
+    paused = result.status == "paused"
     if event_sink is not None and control_plane_owns_lifecycle:
         if graph_span is not None:
             suppress_observability_failure(
                 lambda: event_sink.span_completed(
                     graph_span,
                     output_summary=str(dict(result.output)),
-                    metrics={"ok": True},
-                    metadata={"execution_path": "public_executable"},
+                    metrics={"ok": True, "paused": paused},
+                    metadata={"execution_path": "public_executable", "operation": operation},
                 ),
                 context={"component": "execution", "operation": "span_completed", "run_id": run.pk},
             )
-        suppress_observability_failure(
-            lambda: event_sink.run_completed(
-                run.pk,
-                message="run completed",
-                payload={"execution_path": "public_executable"},
-            ),
-            context={"component": "execution", "operation": "run_completed", "run_id": run.pk},
-        )
+        if not paused:
+            suppress_observability_failure(
+                lambda: event_sink.run_completed(
+                    run.pk,
+                    message="run completed",
+                    payload={"execution_path": "public_executable", "operation": operation},
+                ),
+                context={"component": "execution", "operation": "run_completed", "run_id": run.pk},
+            )
 
     return ControlPlaneExecutionResult(
-        status="succeeded",
+        status=RunStatus.WAITING if paused else RunStatus.SUCCEEDED,
         output_payload=result.output,
-        message="run completed",
+        message="run paused" if paused else "run completed",
         last_step_name=str(result.metadata.get("last_step_name", "")),
         details={
             "execution_path": "public_executable",
@@ -130,5 +171,7 @@ def dispatch_prepared_workflow_execution(
             "lifecycle_events_owner": prepared_workflow.lifecycle_events_owner,
             "engine_generation": prepared_workflow.engine_generation,
             "engine_signature": prepared_workflow.engine_signature,
+            "operation": operation,
+            "paused": paused,
         },
     )
