@@ -14,7 +14,7 @@ Foundation work is the execution substrate shared by multiple workflows.
 
 - workflow を catalog / registry に追加できる
 - workflow-specific graph / nodes / state を foundation から分離できる
-- GraphRuntime 経由で LLM / tool / artifact / checkpoint / observability を使える
+- WorkflowBuildContext / WorkflowExecutionContext 経由で LLM / tool / artifact / checkpoint / observability を使える
 - tool policy が workflow 単位で効く
 - raw input / secret / provider raw object / traceback が永続化されない
 - EventSink failure が primary failure を上書きしない
@@ -340,7 +340,7 @@ Persistence Orchestration Sufficiency Audit X1:
 Persistence Runtime Propagation Closure X1C:
 
 - complete
-- selected artifact/checkpoint stores now propagate into `GraphRuntime`: complete
+- selected artifact/checkpoint stores now propagate into `WorkflowBuildContext`: complete
 - direct concrete store construction in application runtime: removed
 - next block: Artifact Emission and Identity Contract X2
 

@@ -81,7 +81,7 @@ def test_dynamic_list_form_action_and_fragment_views_do_not_render_raw_payload_c
         name='wf-dynamic-safe-2',
         description='safe workflow',
         definition_payload={
-            'graph': {'kind': 'llm_echo_summary'},
+            'workflow': {'kind': 'reference.llm_echo_summary'},
             'llm': {'enabled': True, 'model': 'test-model'},
             'tools': {'allowed': ['echo']},
         },

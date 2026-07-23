@@ -79,7 +79,7 @@ Internal and hidden behind the facade:
 
 Internal foundation:
 
-- `langgraph_automation.graphs.*`
+- legacy `langgraph_automation.graphs.*` package: removed; no compatibility import is provided
 
 ## API Shape
 

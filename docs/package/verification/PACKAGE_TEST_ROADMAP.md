@@ -87,7 +87,7 @@ Forbidden changes:
 
 Target checks:
 
-- `EnginePreparedWorkflow.graph` stays opaque in the facade-level tests
+- `EnginePreparedWorkflow.executable` stays opaque in facade-level tests
 
 ### 5. Service Bridge Boundary Regression
 
@@ -127,7 +127,7 @@ Forbidden changes:
 Target checks:
 
 - exact allowlist remains limited to the current execution adapter modules
-- `workflow_config.py` stays graph-free
+- deleted graph/config adapters remain absent from the control-plane path
 
 ## P2 Closure Order
 

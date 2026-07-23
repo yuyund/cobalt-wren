@@ -21,6 +21,7 @@ def test_api_plugins_does_not_import_internal_plugin_mechanisms() -> None:
     modules = _imported_modules(Path('src/langgraph_automation/api/plugins.py'))
     allowed_prefixes = (
         'langgraph_automation.api.workflow',
+        'langgraph_automation.api.errors',
     )
     offenders = [
         module
@@ -36,6 +37,7 @@ def test_plugin_registry_only_depends_on_public_api_and_errors() -> None:
     allowed_prefixes = (
         'langgraph_automation.api.plugins',
         'langgraph_automation.api.workflow',
+        'langgraph_automation.api.errors',
         'langgraph_automation.api.errors',
     )
     forbidden_prefixes = (
@@ -55,5 +57,6 @@ def test_plugin_registry_only_depends_on_public_api_and_errors() -> None:
         'langgraph_automation.api.errors',
         'langgraph_automation.api.plugins',
         'langgraph_automation.api.workflow',
+        'langgraph_automation.api.errors',
     }
     assert forbidden == []

@@ -1,3 +1,23 @@
+---
+type: contract
+status: current
+authority: normative
+summary: Durability and metadata/body separation contract; retained as a historical execution-architecture snapshot.
+code_refs:
+  - src/langgraph_automation/integrations/artifact
+  - src/langgraph_automation/integrations/checkpoint
+test_refs:
+  - tests/unit/integrations
+  - tests/unit/architecture/test_persistence_orchestration_boundary.py
+verified:
+  date: 2026-07-23
+  commit: WORKTREE
+  base_commit: 8e2f19b9ed39bb3b5bf2ce07bbc31cbd58587e33
+  method:
+    - code-and-test-review
+---
+> **Historical snapshot:** This audit records an earlier GraphRuntime-based architecture. The production graph package and control-plane graph path have been removed. Current behavior is defined by `docs/architecture/design/EXECUTION_LIFECYCLE_CONVERGENCE.md`.
+
 # Persistence Durability Contract
 
 This document fixes the current and target contract for Artifact and Checkpoint persistence.

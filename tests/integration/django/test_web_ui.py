@@ -46,12 +46,18 @@ def test_dynamic_action_view_dispatches_registered_action(client, monkeypatch: p
 
     sink = RecordingEventSink()
     monkeypatch.setattr(runtime_module, 'build_event_sink', lambda _run: sink)
+    services = runtime_module.build_run_execution_services_from_mapping({
+        'version': 1,
+        'providers': {'default': {'provider': 'litellm', 'model': 'test-model'}},
+        'tools': {'allowlist': ['echo']},
+    })
+    monkeypatch.setattr(runtime_module, 'get_run_execution_services', lambda: services)
     monkeypatch.setattr('langgraph_automation.integrations.llm.litellm_client.litellm.completion', fake_completion)
 
     workflow = Workflow.objects.create(
         name='wf-action',
         definition_payload={
-            'graph': {'kind': 'llm_echo_summary'},
+            'workflow': {'kind': 'reference.llm_echo_summary'},
             'llm': {
                 'enabled': True,
                 'model': 'test-model',

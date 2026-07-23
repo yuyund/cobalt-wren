@@ -39,7 +39,7 @@ def test_prepare_workflow_returns_public_engine_handle(monkeypatch: pytest.Monke
 
     assert isinstance(prepared, EnginePreparedWorkflow)
     assert prepared.kind == "reference.llm_echo_summary"
-    assert prepared.graph is not None
+    assert prepared.executable is not None
     assert type(prepared).__name__ == "EnginePreparedWorkflow"
 
 
@@ -62,3 +62,13 @@ def test_prepare_workflow_missing_provider_requirement_raises_runtime_assembly_e
 
     assert excinfo.value.code == "WORKFLOW_REQUIREMENT_MISSING"
     assert excinfo.value.component == "workflow_requirements"
+
+
+def test_prepared_workflow_executable_is_primary_and_graph_is_compatibility_alias(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+    engine = create_engine(_reference_config())
+    prepared = engine.prepare_workflow("reference.llm_echo_summary")
+
+    assert prepared.executable is prepared.executable

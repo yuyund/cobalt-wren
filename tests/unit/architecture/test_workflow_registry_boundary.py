@@ -17,19 +17,7 @@ def _imported_modules(path: Path) -> list[str]:
     return modules
 
 
-def test_graph_registry_does_not_import_concrete_workflows() -> None:
-    modules = _imported_modules(Path('src/langgraph_automation/graphs/registry.py'))
-    offenders = [module for module in modules if module.startswith('langgraph_automation.workflows.')]
-    assert offenders == []
-
-
-def test_graph_builders_do_not_import_concrete_workflows() -> None:
-    modules = _imported_modules(Path('src/langgraph_automation/graphs/builders.py'))
-    offenders = [module for module in modules if module.startswith('langgraph_automation.workflows.')]
-    assert offenders == []
-
-
 def test_workflow_catalog_is_the_only_builtin_composition_entrypoint() -> None:
     modules = _imported_modules(Path('src/langgraph_automation/workflows/catalog.py'))
     assert 'langgraph_automation.workflows.reference.llm_echo_summary.definition' in modules
-    assert 'langgraph_automation.graphs.registry' in modules
+    assert not any(module.startswith('langgraph_automation.graphs') for module in modules)

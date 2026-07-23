@@ -52,5 +52,5 @@ def test_api_engine_headless_prepare_does_not_execute_provider_or_tool(monkeypat
 
     assert isinstance(prepared, EnginePreparedWorkflow)
     assert prepared.kind == "reference.llm_echo_summary"
-    assert prepared.graph is not None
+    assert prepared.executable is not None
     assert calls == {"provider": 0, "tool": 0}

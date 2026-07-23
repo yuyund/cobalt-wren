@@ -503,7 +503,7 @@ Package Complete may reject incompatible plugins and define deprecation / migrat
 3. Registry indexes plugin contributions by type and name.
 4. Config validation uses registry lookup and plugin-specific validation hooks.
 5. RuntimeAssembly uses registry lookup to build concrete runtime dependencies.
-6. Execution uses `RuntimeDependencies` and `GraphRuntimeConfig`.
+6. Preparation uses `RuntimeDependencies` to construct `WorkflowBuildContext`; execution uses the resulting `WorkflowExecutable`.
 
 ## Bootstrapping boundary
 

@@ -10,7 +10,7 @@ Start here when you are trying to understand the repository.
 ## Topic Maps
 - `./AGENTS.md`: docs subtree guidance and reading order.
 - `./agent/`: Codex and repo-operation guidance.
-- `./architecture/`: layer boundaries and dataflow rules.
+- `./architecture/`: design principles, layer boundaries, dataflow rules, and persistence convergence concerns.
 - `./architecture/audit/`: code-first sufficiency audits and closure follow-ups.
 - `./api/`: public facade surfaces and staged APIs.
 - `./configuration/`: config model, schema, and validation.

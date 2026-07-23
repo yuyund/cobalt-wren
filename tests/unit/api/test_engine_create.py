@@ -75,7 +75,7 @@ def test_create_engine_accepts_explicit_plugins() -> None:
     prepared = engine.prepare_workflow("custom.workflow")
 
     assert prepared.kind == "custom.workflow"
-    assert prepared.graph == {"graph": "custom"}
+    assert prepared.executable == {"graph": "custom"}
 
 
 def test_create_engine_raises_on_duplicate_plugin_names() -> None:

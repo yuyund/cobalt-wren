@@ -27,6 +27,7 @@ def test_docs_navigation_entries_exist_and_point_to_subsections() -> None:
     architecture_checkpoint_protocol_audit = root / 'architecture' / 'audit' / 'CHECKPOINT_STORE_PROTOCOL_SUFFICIENCY_AUDIT.md'
     architecture_persistence_orchestration_audit = root / 'architecture' / 'audit' / 'PERSISTENCE_ORCHESTRATION_SUFFICIENCY_AUDIT.md'
     architecture_design_index = root / 'architecture' / 'design' / 'index.md'
+    architecture_design_principles = root / 'architecture' / 'design' / 'DESIGN_PRINCIPLES.md'
     architecture_design_artifact = root / 'architecture' / 'design' / 'DURABLE_ARTIFACT_BACKEND_DESIGN.md'
     architecture_design_checkpoint = root / 'architecture' / 'design' / 'DURABLE_CHECKPOINT_BACKEND_DESIGN.md'
     api_index = root / 'api' / 'index.md'
@@ -77,6 +78,7 @@ def test_docs_navigation_entries_exist_and_point_to_subsections() -> None:
         architecture_checkpoint_protocol_audit,
         architecture_persistence_orchestration_audit,
         architecture_design_index,
+        architecture_design_principles,
         architecture_design_artifact,
         architecture_design_checkpoint,
         api_index,
@@ -155,6 +157,7 @@ def test_docs_navigation_entries_exist_and_point_to_subsections() -> None:
     assert 'ARTIFACT_STORE_PROTOCOL_SUFFICIENCY_AUDIT.md' in architecture_audit_index_text
     assert 'CHECKPOINT_STORE_PROTOCOL_SUFFICIENCY_AUDIT.md' in architecture_audit_index_text
     assert 'PERSISTENCE_ORCHESTRATION_SUFFICIENCY_AUDIT.md' in architecture_audit_index_text
+    assert 'DESIGN_PRINCIPLES.md' in architecture_design_index_text
     assert 'DURABLE_ARTIFACT_BACKEND_DESIGN.md' in architecture_design_index_text
     assert 'DURABLE_CHECKPOINT_BACKEND_DESIGN.md' in architecture_design_index_text
     assert 'surface/index.md' in api_index_text

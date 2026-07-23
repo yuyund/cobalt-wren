@@ -11,7 +11,7 @@ The supplemental report is hypothesis only.
 
 | Gap | Evidence | Why it matters | Risk |
 | --- | --- | --- | --- |
-| No open P0 gap remains after Block R | `src/langgraph_automation/apps/automation/services/runtime.py`, `execution.py`, and `runs.py` remain the exact control-plane execution adapters; `workflow_config.py` no longer imports graph internals; `tests/unit/architecture/test_apps_automation_package_boundary.py` enforces the exact allowlist; `../../api/surface/API_SURFACE.md` treats unknown workflow kinds as `PluginResolutionError` | The previous P0 items were removed, rerouted, or reclassified as an explicit execution-adapter boundary with exact guard coverage. | Low |
+| No open P0 gap remains after Block R | `src/langgraph_automation/apps/automation/services/runtime.py`, `execution.py`, and `runs.py` remain the exact control-plane execution adapters; the deleted workflow-config and graph adapters no longer form a control-plane dependency; `tests/unit/architecture/test_apps_automation_package_boundary.py` enforces a zero internal-import allowlist; `../../api/surface/API_SURFACE.md` treats unknown workflow kinds as `PluginResolutionError` | The previous P0 items were removed, rerouted, or reclassified as an explicit execution-adapter boundary with exact guard coverage. | Low |
 
 ## P1 Gaps
 
@@ -45,7 +45,7 @@ The supplemental report is hypothesis only.
 
 ## ASSUMED Behavior
 
-- `EnginePreparedWorkflow.graph` will remain opaque to callers.
+- `EnginePreparedWorkflow.executable` remains opaque to callers.
 - The service bridge will remain thin and facade-routed.
 - Existing safe-output and safe-error contracts will continue to hold when the control-plane evolves.
 

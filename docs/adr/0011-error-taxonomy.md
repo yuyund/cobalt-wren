@@ -24,7 +24,7 @@ Without a taxonomy, safe user-facing messages, internal diagnostics, plugin vali
 
 ## Consequences
 
-- `ConfigValidator`, `PluginRegistry`, `RuntimeAssembly`, `GraphRuntime`, and `EventSink` can evolve with separate error boundaries
+- `ConfigValidator`, `PluginRegistry`, `RuntimeAssembly`, `WorkflowExecutable`, and `EventSink` can evolve with separate error boundaries
 - UI/API safe messages remain decoupled from internal diagnostics
 - plugin author exceptions can be wrapped without leaking raw messages
 - later `api.errors` implementation can stay minimal and intentional

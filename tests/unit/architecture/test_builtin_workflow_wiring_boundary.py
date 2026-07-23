@@ -23,9 +23,9 @@ def test_workflow_catalog_uses_public_facades_and_internal_bridge_only() -> None
     assert 'langgraph_automation.api.plugins' in modules
     assert 'langgraph_automation.api.workflow' in modules
     assert 'langgraph_automation.plugins.registry' in modules
-    assert 'langgraph_automation.workflows.adapter' in modules
+    assert 'langgraph_automation.workflows.adapter' not in modules
     assert 'langgraph_automation.workflows.reference.llm_echo_summary.definition' in modules
-    assert 'langgraph_automation.graphs.registry' in modules
+    assert not any(module.startswith('langgraph_automation.graphs') for module in modules)
 
     offenders = [
         module
@@ -65,8 +65,7 @@ def test_reference_workflow_definition_stays_within_internal_graph_boundary() ->
     modules = _imported_modules(Path('src/langgraph_automation/workflows/reference/llm_echo_summary/definition.py'))
 
     assert 'langgraph_automation.api.workflow' in modules
-    assert 'langgraph_automation.graphs.constants' in modules
-    assert 'langgraph_automation.graphs.types' in modules
-    assert 'graph' in modules or 'langgraph_automation.workflows.reference.llm_echo_summary.graph' in modules
+    assert 'langgraph_automation.graphs' not in ' '.join(modules)
+    assert 'executable' in modules
     offenders = [module for module in modules if module.startswith('langgraph_automation.runtime')]
     assert offenders == []

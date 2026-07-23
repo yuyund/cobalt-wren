@@ -1,3 +1,5 @@
+> **Historical snapshot:** This audit records an earlier GraphRuntime-based architecture. The production graph package and control-plane graph path have been removed. Current behavior is defined by `docs/architecture/design/EXECUTION_LIFECYCLE_CONVERGENCE.md`.
+
 # Artifact Store Protocol Sufficiency Audit
 
 This audit determines whether the current `ArtifactStore` protocol can support the first durable artifact backend.

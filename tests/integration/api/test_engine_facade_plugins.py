@@ -78,7 +78,7 @@ def test_explicit_plugins_are_registered_and_auto_enabled_for_validation_and_ass
 
     assert isinstance(prepared, EnginePreparedWorkflow)
     assert prepared.kind == "integration.custom_workflow"
-    assert prepared.graph == {"graph": "custom"}
+    assert prepared.executable == {"graph": "custom"}
     assert provider_calls == [{"provider": "fake", "model": "test-model"}]
 
 
@@ -96,3 +96,19 @@ def test_duplicate_explicit_workflow_kind_raises_plugin_registration_error() -> 
     assert excinfo.value.component == "plugin_registry"
     assert excinfo.value.metadata["contribution_scope"] == "workflow"
     assert excinfo.value.metadata["contribution_name"] == "integration.duplicate_workflow"
+
+def test_optional_discovery_registers_installed_plugins(monkeypatch: pytest.MonkeyPatch) -> None:
+    discovered = _workflow_only_plugin("integration.discovered", "integration.discovered_workflow")
+    monkeypatch.setattr("langgraph_automation.api.engine.load_discovered_plugins", lambda: (discovered,))
+    prepared = create_engine({"version": 1, "environment": "test"}, discover_plugins=True).prepare_workflow("integration.discovered_workflow")
+    assert prepared.executable == {"graph": "integration.discovered_workflow"}
+
+def test_explicit_plugin_wins_over_discovered_plugin_with_same_name(monkeypatch: pytest.MonkeyPatch) -> None:
+    explicit = _workflow_only_plugin("integration.same", "integration.explicit_workflow")
+    discovered = _workflow_only_plugin("integration.same", "integration.discovered_workflow")
+    monkeypatch.setattr("langgraph_automation.api.engine.load_discovered_plugins", lambda: (discovered,))
+    engine = create_engine({"version": 1, "environment": "test"}, plugins=(explicit,), discover_plugins=True)
+    assert engine.prepare_workflow("integration.explicit_workflow").kind == "integration.explicit_workflow"
+    with pytest.raises(Exception) as excinfo:
+        engine.prepare_workflow("integration.discovered_workflow")
+    assert getattr(excinfo.value, "code", None) == "WORKFLOW_PREPARATION_WORKFLOW_NOT_FOUND"

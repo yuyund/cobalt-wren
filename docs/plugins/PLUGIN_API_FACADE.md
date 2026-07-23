@@ -8,7 +8,7 @@ Purpose:
 - stage `api.plugins`, `api.workflow`, `api.runtime`, and `api.errors`
 - classify public / provisional / future / deferred
 - avoid premature public API fixation
-- keep internal `GraphRuntime`, `GraphDefinition`, `RuntimeAssembly`, and `ConfigValidator` out of the public facade
+- keep internal `RuntimeAssembly` and `ConfigValidator` out of the public facade while exposing only framework-neutral workflow contracts
 - connect plugin shape docs with public API surface docs
 
 ## Current implemented public facade
@@ -137,7 +137,7 @@ Reasons for keeping workflow vocabulary in a dedicated facade:
 
 Reasons:
 
-- `GraphRuntime` remains provisional
+- the removed graph runtime is not a compatibility surface
 - `RuntimeDependencies` are internal runtime plumbing
 - `RuntimeAssembly` is already internal/provisional
 - `FactoryContext` is not a public facade type
@@ -145,8 +145,6 @@ Reasons:
 
 Still not exposed:
 
-- `GraphRuntime`
-- `GraphRuntimeConfig`
 - `RuntimeDependencies`
 - `RuntimeAssembly`
 - `FactoryContext`

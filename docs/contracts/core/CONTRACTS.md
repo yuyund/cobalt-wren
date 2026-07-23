@@ -1,3 +1,22 @@
+---
+type: contract
+status: current
+authority: normative
+summary: Current framework-neutral workflow, service, safety, and lifecycle contracts.
+code_refs:
+  - src/langgraph_automation/api/workflow.py
+  - src/langgraph_automation/workflows/adapter.py
+  - src/langgraph_automation/apps/automation/services
+test_refs:
+  - tests/unit/architecture/test_public_run_single_path.py
+  - tests/unit/architecture/test_execution_lifecycle_convergence_boundary.py
+verified:
+  date: 2026-07-23
+  commit: WORKTREE
+  base_commit: 8e2f19b9ed39bb3b5bf2ce07bbc31cbd58587e33
+  method:
+    - code-and-test-review
+---
 # Contracts
 
 This document fixes the boundaries between execution foundation, workflows, and services.
@@ -43,10 +62,8 @@ These contracts describe the current internal foundation surface. If parts of th
 - `EventSink` と `DjangoEventSink` は metadata only / bounded / redacted を守る
 - artifact body と checkpoint body は store 側に残し、DB には metadata だけを保存する
 
-## GraphExecutionInput Contract
 
 - raw `Run.input_payload` の transient boundary
-- `GraphRuntime.execution_input` として渡す
 - checkpointable state には入れない
 - state には `input_summary` のみ入れる
 - UI/admin/event に raw input を流用しない
@@ -78,7 +95,6 @@ These contracts describe the current internal foundation surface. If parts of th
 - `ResolvedWorkflowConfig` is workflow-specific resolved config and does not include `Run.input_payload`.
 - `Run.input_payload` is execution input, not config override.
 - `RuntimeAssembly` resolves names to concrete dependencies.
-- `GraphRuntimeConfig` contains only graph-local safe config.
 - artifact store config is typed and selected once during runtime assembly
 
 ## api.plugins Contract
@@ -121,7 +137,6 @@ These contracts describe the current internal foundation surface. If parts of th
 - `api.workflow` is the public workflow vocabulary facade
 - `WorkflowContribution` is declarative and does not execute workflows
 - `WorkflowDefinition.build` is retained on the definition shape, but `PluginRegistry` does not call it
-- `GraphDefinition` and `GraphRuntime` remain internal foundation vocabulary
 - `PluginRegistry` stores workflow contributions only
 - `PluginRegistry` does not build or execute workflows
 - built-in/reference workflows use the same `Plugin` / `WorkflowContribution` path as external workflows
@@ -135,7 +150,6 @@ These contracts describe the current internal foundation surface. If parts of th
 
 - implemented public facade remains `api.llm`, `api.tools`, `api.stores`, `api.events`, `api.errors`, `api.plugins`, and `api.workflow`
 - `api.runtime` remains deferred
-- `GraphRuntime` and `GraphDefinition` remain outside the public facade
 - PluginRegistry, ConfigValidator, and RuntimeAssembly are not public facade types in P3-D
 
 ## Error Taxonomy Contract
@@ -163,14 +177,12 @@ These contracts describe the current internal foundation surface. If parts of th
 - `metadata` must not contain raw config, secret, prompt, provider response, tool output, Django model object, or absolute local path
 - `cause` is not user-facing
 
-## GraphRuntimeConfig Contract
 
 - execution-plane config は graph-local
 - secret や raw input を入れない
 - API key / base URL / provider raw object を入れない
 - workflow config を runtime 用の安全な最小面へ変換する
 
-`GraphRuntime` is currently a public candidate but still provisional. `GraphDefinition` is also internal foundation vocabulary for now; a future public facade may expose `WorkflowDefinition` as an alias or wrapper.
 
 ## Tool Contract
 
@@ -331,7 +343,7 @@ These modules re-export selected foundation interfaces. They do not expose workf
 - `apps/automation/services/runtime.py`, `execution.py`, and `runs.py` are the current control-plane execution adapters.
 - These adapters may import `graphs.runtime`, `graphs.runner`, `graphs.registry`, `graphs.config`, and `workflows.catalog` for the current direct execution path.
 - The allowed direct imports should be exact and should not spread to new `apps/automation` modules.
-- `apps/automation/services/workflow_config.py` should remain graph-free after the P0 audit fix.
+- deleted graph/config adapters must not be reintroduced into the control-plane execution path.
 - This direct execution adapter boundary is temporary and should eventually route through a dedicated execution facade such as `api.runtime`.
 - The execution facade remains deferred; this contract only acknowledges the current adapter responsibility.
 
@@ -343,7 +355,7 @@ These modules re-export selected foundation interfaces. They do not expose workf
 - `create_engine` accepts raw package config plus explicit plugins
 - explicit plugins passed to `create_engine` are registered and auto-enabled for validation and runtime assembly
 - `AutomationEngine.prepare_workflow` returns a public-facing provisional `EnginePreparedWorkflow`
-- `EnginePreparedWorkflow.graph` is opaque and must not become a stable public contract
+- `EnginePreparedWorkflow.executable` is opaque; `execute(...)` is the normal execution surface
 - application/control-plane code should use the facade rather than package internals
 - the current service bridge is transitional and must not be treated as the final architecture
 - the facade should provide a small supported entrypoint for package context creation and workflow preparation
@@ -361,3 +373,42 @@ These modules re-export selected foundation interfaces. They do not expose workf
 - `apps/automation` must not grow new direct imports into `graphs.*`, `runtime.*`, `workflows.prepare`, `workflows.catalog`, `workflows.adapter`, `workflows.requirements`, `plugins.registry`, or `config.validator` outside the explicit execution adapters above
 - exact allowlists for the execution adapters are enforced by architecture guards
 - `workflows/applications` should treat `graphs.*` as provisional and not public API, only using it where required for `WorkflowDefinition.build`
+
+## Internal Loose Coupling Contract
+
+- Loose coupling applies to package internals and public consumers.
+- Public API, plugin-author SPI, internal orchestration, concrete adapters, control-plane composition, UI projection, and rendering are separate stability domains.
+- Config loading, structural parsing, normalization, semantic validation, plugin resolution, secret resolution, and runtime construction must remain separable.
+- External library models and raw objects must not become package-wide contracts unless intentionally mapped into package-owned vocabulary.
+- No-op forwarding and speculative abstractions without replacement or extension evidence are not required contracts.
+
+## Workflow Flexibility Contract
+
+- workflow state, topology, routing, subgraphs, LLM use, tool use, artifact use, checkpoint use, and workflow-specific config are workflow-owned choices.
+- adding a workflow must not require changes to existing workflow code, graph foundation, runtime assembly, or control-plane services unless a new package capability is required.
+- foundation contracts constrain safety and integration, not business topology.
+
+## Dynamic UI Projection Contract
+
+- renderer input is an explicit safe UI specification, not an unrestricted Django model.
+- field, relation, and action allowlists are mandatory.
+- raw payloads, private service maps, and renderer-side Django `_meta` introspection are forbidden.
+- reusable UI semantics, Django query/model adapters, control-plane registration, and renderer implementation must remain separable.
+
+## Persistence Convergence Contract
+
+- artifact identity, checkpoint version semantics, physical storage, execution persistence orchestration, LangGraph saver behavior, and control-plane metadata are distinct responsibilities.
+- PROCESS_DURABLE filesystem storage does not imply true execution resume.
+- package `CheckpointStore`, LangGraph `BaseCheckpointSaver`, pending writes, thread identity, checkpoint namespace, serializer, retry, time travel, and `CheckpointMetadata` require an explicit convergence design before resume implementation.
+
+## Internal Loose Coupling Contract
+
+The control plane, runtime assembler, workflow preparer, executable, persistence stores, observability decorators, and UI projection are separate responsibility boundaries. Workflow implementations may use any internal library without making that library part of the package contract.
+
+## Workflow Flexibility Contract
+
+A workflow is selected by `workflow.kind`, receives opaque workflow config, declares requirements, and builds an executable from `WorkflowBuildContext`. Adding a workflow must not require a graph registry, control-plane branch, or foundation-specific runtime bundle.
+
+## Dynamic UI Projection Contract
+
+Dynamic UI renders safe metadata projections only. It does not execute workflows, construct runtime capabilities, resolve secrets, or expose raw payloads.

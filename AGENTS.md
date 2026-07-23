@@ -57,12 +57,10 @@ Use it to find where code, docs, tests, and local-only artifacts live.
 - `src/langgraph_automation/apps/automation/selectors/checkpoints.py`: checkpoint selectors.
 - `src/langgraph_automation/apps/automation/services/`: service layer for workflow preparation, runtime assembly, execution, and configuration.
 - `src/langgraph_automation/apps/automation/services/workflows.py`: workflow service helpers.
-- `src/langgraph_automation/apps/automation/services/workflow_config.py`: workflow config parsing and normalization.
 - `src/langgraph_automation/apps/automation/services/workflow_preparation.py`: workflow preparation service.
 - `src/langgraph_automation/apps/automation/services/runtime.py`: runtime assembly bridge.
 - `src/langgraph_automation/apps/automation/services/execution.py`: execution orchestration helpers.
 - `src/langgraph_automation/apps/automation/services/runs.py`: run lifecycle orchestration.
-- `src/langgraph_automation/apps/automation/services/tool_config.py`: tool configuration helpers.
 - `src/langgraph_automation/apps/automation/services/errors.py`: service-layer errors.
 - `src/langgraph_automation/apps/automation/ui/`: presentation-only dynamic UI builders and safety helpers.
 - `src/langgraph_automation/apps/automation/ui/builders.py`: page-spec builders for lists, details, forms, and fragments.
@@ -126,21 +124,6 @@ Use it to find where code, docs, tests, and local-only artifacts live.
 - `src/langgraph_automation/entrypoints/`: explicit entrypoint namespace for future launch surfaces.
 - `src/langgraph_automation/entrypoints/__init__.py`: package marker.
 
-## Graphs
-- `src/langgraph_automation/graphs/`: graph registry, runtime, builder, runner, and graph-local contracts.
-- `src/langgraph_automation/graphs/__init__.py`: graphs package marker.
-- `src/langgraph_automation/graphs/builders.py`: graph construction helpers.
-- `src/langgraph_automation/graphs/config.py`: execution-plane graph config types.
-- `src/langgraph_automation/graphs/constants.py`: graph constants and defaults.
-- `src/langgraph_automation/graphs/inputs.py`: execution input models.
-- `src/langgraph_automation/graphs/instrumentation.py`: node instrumentation and span lifecycle helpers.
-- `src/langgraph_automation/graphs/registry.py`: graph registry and lookup logic.
-- `src/langgraph_automation/graphs/runtime.py`: graph runtime dependency bundle.
-- `src/langgraph_automation/graphs/runner.py`: graph execution runner.
-- `src/langgraph_automation/graphs/types.py`: graph typing helpers.
-- `src/langgraph_automation/graphs/nodes/`: shared graph node helpers.
-- `src/langgraph_automation/graphs/nodes/__init__.py`: node helper package marker.
-
 ## Integrations
 - `src/langgraph_automation/integrations/`: concrete adapters for artifact storage, checkpointing, LLMs, observability, and tools.
 - `src/langgraph_automation/integrations/artifact/`: artifact store interfaces and memory implementation.
@@ -197,9 +180,8 @@ Use it to find where code, docs, tests, and local-only artifacts live.
 - `src/langgraph_automation/workflows/reference/llm_echo_summary/`: current built-in reference workflow.
 - `src/langgraph_automation/workflows/reference/llm_echo_summary/__init__.py`: reference workflow package marker.
 - `src/langgraph_automation/workflows/reference/llm_echo_summary/definition.py`: workflow definition entry.
-- `src/langgraph_automation/workflows/reference/llm_echo_summary/graph.py`: graph assembly for the reference workflow.
-- `src/langgraph_automation/workflows/reference/llm_echo_summary/nodes.py`: node logic for the reference workflow.
-- `src/langgraph_automation/workflows/reference/llm_echo_summary/state.py`: graph state definition for the reference workflow.
+- `src/langgraph_automation/workflows/reference/llm_echo_summary/executable.py`: executable implementation and internal LangGraph assembly.
+- `src/langgraph_automation/workflows/reference/llm_echo_summary/state.py`: checkpoint-safe workflow state definition.
 
 ## Documentation
 - Start with `docs/index.md`.
@@ -295,8 +277,6 @@ Use it to find where code, docs, tests, and local-only artifacts live.
 - `tests/unit/automation/test_run_safety.py`: run safety tests.
 - `tests/unit/automation/test_runtime_context.py`: runtime context tests.
 - `tests/unit/automation/test_runtime_factory.py`: runtime factory tests.
-- `tests/unit/automation/test_tool_config.py`: tool config tests.
-- `tests/unit/automation/test_workflow_config.py`: workflow config tests.
 - `tests/unit/config/`: config loader, model, validator, security, and normalization tests.
 - `tests/unit/config/__init__.py`: config test package marker.
 - `tests/unit/config/test_config_loader.py`: config loader tests.

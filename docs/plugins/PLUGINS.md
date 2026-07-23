@@ -421,8 +421,6 @@ Forbidden internal dependencies:
 
 - `langgraph_automation.apps.automation.services.*`
 - `langgraph_automation.apps.automation.models`
-- `langgraph_automation.graphs.runner`
-- `langgraph_automation.graphs.builders`
 - `langgraph_automation.workflows.catalog`
 - `langgraph_automation.core.result_safety`
 - `langgraph_automation.core.redaction`

@@ -1,3 +1,20 @@
+---
+type: contract
+status: current
+authority: normative
+summary: Filesystem artifact store immutability, integrity, and durability contract.
+code_refs:
+  - src/langgraph_automation/integrations/artifact
+test_refs:
+  - tests/unit/integrations
+  - tests/unit/architecture/test_filesystem_artifact_store_boundary.py
+verified:
+  date: 2026-07-23
+  commit: WORKTREE
+  base_commit: 8e2f19b9ed39bb3b5bf2ce07bbc31cbd58587e33
+  method:
+    - code-and-test-review
+---
 # Filesystem Artifact Store Contract
 
 `FilesystemArtifactStore` is the first durable artifact backend.

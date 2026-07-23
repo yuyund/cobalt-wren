@@ -1,3 +1,5 @@
+> **Historical snapshot:** This audit records an earlier GraphRuntime-based architecture. The production graph package and control-plane graph path have been removed. Current behavior is defined by `docs/architecture/design/EXECUTION_LIFECYCLE_CONVERGENCE.md`.
+
 # System Boundary And Dataflow Audit
 
 This document records the code-first assurance matrix for the full system.

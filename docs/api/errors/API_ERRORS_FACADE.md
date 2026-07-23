@@ -136,7 +136,7 @@ Deferred or internal candidates:
 
 Reasons:
 
-- `ExecutionError` depends on `GraphRuntime` and workflow execution boundaries that are still evolving.
+- `ExecutionError` depends on workflow executable and control-plane execution boundaries that are still evolving.
 - `ToolPolicyError` depends on `ToolPolicy` semantics.
 - `ToolExecutionError` depends on the tool callable / adapter boundary.
 - `ToolOutputSafetyError` depends on tool result persistence safety.

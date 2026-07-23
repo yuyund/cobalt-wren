@@ -1,3 +1,20 @@
+---
+type: contract
+status: current
+authority: normative
+summary: Checkpoint store identity, append-only ordering, integrity, and durability contract.
+code_refs:
+  - src/langgraph_automation/integrations/checkpoint
+test_refs:
+  - tests/unit/integrations
+  - tests/unit/architecture/test_filesystem_checkpoint_store_boundary.py
+verified:
+  date: 2026-07-23
+  commit: WORKTREE
+  base_commit: 8e2f19b9ed39bb3b5bf2ce07bbc31cbd58587e33
+  method:
+    - code-and-test-review
+---
 # Checkpoint Store Contract
 
 `CheckpointStore` is the versioned execution-state repository contract for durable checkpoint work.

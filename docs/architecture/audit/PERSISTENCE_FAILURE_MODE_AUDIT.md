@@ -1,3 +1,5 @@
+> **Historical snapshot:** This audit records an earlier GraphRuntime-based architecture. The production graph package and control-plane graph path have been removed. Current behavior is defined by `docs/architecture/design/EXECUTION_LIFECYCLE_CONVERGENCE.md`.
+
 # Persistence Failure-Mode Audit
 
 This audit records the current persistence paths, failure behavior, and missing durability guarantees.

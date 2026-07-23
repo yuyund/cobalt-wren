@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-import json
 import logging
+
+import json
 
 import pytest
 
-from langgraph_automation.graphs.runtime import GraphRuntime
 from langgraph_automation.integrations.llm.base import LLMResult
 from langgraph_automation.integrations.llm.observed_client import ObservedLLMClient
 from langgraph_automation.integrations.observability.types import ObservabilityContext, SpanRef
@@ -125,30 +125,25 @@ def test_observed_llm_client_rebinds_context_without_mutating_original() -> None
     assert original.observability.node_name == 'planner'
 
 
-def test_observed_llm_client_rebinds_through_graph_runtime() -> None:
+def test_observed_llm_client_rebinds_to_parent_span_context() -> None:
     sink = RecordingEventSink()
     inner = RecordingLLMClient()
     observed = ObservedLLMClient(
         inner=inner,
         event_sink=sink,
-        observability=ObservabilityContext(run_id=19, thread_id='thread-4'),
+        observability=ObservabilityContext(run_id=19, thread_id="thread-4"),
     )
-    runtime = GraphRuntime(
-        logger=logging.getLogger('test.observed.llm.runtime'),
-        observability=ObservabilityContext(run_id=19, thread_id='thread-4'),
-        event_sink=sink,
-        llm_client=observed,
+    graph_span = sink.span_started(19, "graph", "graph", node_name="graph")
+    rebound_client = observed.with_observability_context(
+        observed.observability.with_parent_span(graph_span, "planner")
     )
-    graph_span = sink.span_started(19, 'graph', 'graph', node_name='graph')
 
-    rebound_runtime = runtime.with_parent_span(graph_span, node_name='planner')
-    rebound_client = rebound_runtime.require_llm_client()
-    result = rebound_client.complete([{'role': 'user', 'content': 'hello'}])
+    result = rebound_client.complete([{"role": "user", "content": "hello"}])
 
     assert result is inner.result
     assert rebound_client.observability.parent_span == graph_span
-    assert rebound_client.observability.node_name == 'planner'
-    assert runtime.require_llm_client().observability.parent_span is None
-    llm_span = sink.spans['span-2']
+    assert rebound_client.observability.node_name == "planner"
+    assert observed.observability.parent_span is None
+    llm_span = sink.spans["span-2"]
     assert llm_span.parent_id == graph_span.span_id
-    assert llm_span.node_name == 'planner'
+    assert llm_span.node_name == "planner"

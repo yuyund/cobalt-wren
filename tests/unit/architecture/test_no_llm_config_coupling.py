@@ -27,14 +27,6 @@ def _imported_modules(path: Path) -> list[str]:
     return modules
 
 
-def test_workflow_config_parser_is_pure_and_does_not_depend_on_django_or_graphs() -> None:
-    path = Path('src/langgraph_automation/apps/automation/services/workflow_config.py')
-    modules = _imported_modules(path)
-
-    offenders = [module for module in modules if module.startswith(BANNED_WORKFLOW_CONFIG_IMPORTS)]
-    assert offenders == []
-
-
 def test_litellm_client_does_not_import_django_or_graphs() -> None:
     path = Path('src/langgraph_automation/integrations/llm/litellm_client.py')
     modules = _imported_modules(path)

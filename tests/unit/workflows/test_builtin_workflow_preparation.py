@@ -24,4 +24,4 @@ def test_reference_llm_echo_summary_prepares_through_builtin_registry() -> None:
 
     assert prepared.kind == 'reference.llm_echo_summary'
     assert prepared.definition.kind == 'reference.llm_echo_summary'
-    assert prepared.graph is not None
+    assert prepared.executable is not None

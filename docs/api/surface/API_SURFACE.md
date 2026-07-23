@@ -14,6 +14,8 @@ The goal is to keep the package small on the outside, flexible on the inside, an
 
 ## Public API principles
 
+The package-wide design and review rules are defined in `../../architecture/design/DESIGN_PRINCIPLES.md`. Public API stability, plugin-author SPI, internal orchestration, concrete adapters, and control-plane rendering are separate stability domains.
+
 - Keep the public API narrow.
 - Expose public APIs through facades, not by encouraging deep imports.
 - Plugin authors should not import internal modules directly.
@@ -44,9 +46,6 @@ Package P0-B plus the package facade blocks implement the minimal facade describ
 
 Current internal foundation names remain graph-oriented:
 
-- `GraphDefinition`
-- `GraphRuntimeRequirements`
-- `UnknownGraphKindError`
 
 Implemented public workflow vocabulary:
 
@@ -55,21 +54,16 @@ Implemented public workflow vocabulary:
 
 Decisions:
 
-- Do not rename `GraphDefinition` now.
 - `api.workflow` exposes `WorkflowDefinition` directly.
 - `workflows/catalog.py` is package composition, not a public API surface.
 - Plugin authors should move toward a future registration API rather than editing catalog internals directly.
 
-`GraphDefinition` remains internal foundation vocabulary and is not exported from `api.workflow`.
 Unknown workflow kinds are surfaced through `PluginResolutionError`.
 
 ## Runtime API surface
 
 Current candidates:
 
-- `GraphRuntime`
-- `GraphExecutionInput`
-- `GraphRuntimeConfig`
 
 Internal composition helpers:
 
@@ -78,13 +72,9 @@ Internal composition helpers:
 
 Guidance:
 
-- `GraphRuntime` is not yet exposed through the public facade and remains provisional.
 - A future `WorkflowRuntime` protocol or facade may replace direct reliance on the concrete class.
-- `GraphExecutionInput` is the transient raw input boundary and may later be renamed toward `WorkflowExecutionInput`.
-- `GraphRuntimeConfig` is graph-local runtime configuration and must never carry secrets or raw input.
 - `ApplicationRuntimeFactory` and `RunExecutionServices` remain internal composition helpers and are not exported through the public facade.
 - deployment-owned startup config sources such as `LANGGRAPH_AUTOMATION` and `AutomationConfig.ready()` are configuration/bootstrap concerns, not public API surface.
-- Do not over-freeze the concrete `GraphRuntime` class before the package surface is designed.
 
 ## Tool API surface
 
@@ -192,13 +182,10 @@ Guidance:
 - accepted checkpoint metadata is preserved as a lossless logical JSON value and is not redacted on persistence
 - returned checkpoint metadata is defensively isolated from stored state
 - `CheckpointStore` is approved for durable backend implementation.
-- `CheckpointStore` is storage-only; execution persistence orchestration remains a future internal layer.
-- `FilesystemCheckpointStore` is implemented in `langgraph_automation.integrations.checkpoint`.
-- `FilesystemCheckpointStore` is implemented in `langgraph_automation.integrations.checkpoint` and remains outside `api.stores`.
-- `FilesystemCheckpointStore` is implemented in `langgraph_automation.integrations.checkpoint` and is not re-exported from `api.stores`.
+- `CheckpointStore` is storage-only; execution persistence orchestration and LangGraph saver integration remain future internal layers.
+- PROCESS_DURABLE checkpoint storage does not imply true resume. Package checkpoint semantics and LangGraph `BaseCheckpointSaver` semantics require an explicit convergence design before a public resume surface is added.
 - FilesystemCheckpointStore is implemented in `langgraph_automation.integrations.checkpoint`.
-- `FilesystemCheckpointStore` is implemented in `langgraph_automation.integrations.checkpoint` and is not re-exported from `api.stores`.
-- `FilesystemCheckpointStore` is implemented in `langgraph_automation.integrations.checkpoint` and is not re-exported from `api.stores`.
+- It remains internal/provisional and is not re-exported from `api.stores`.
 - checkpoint runtime selection is controlled by typed config under `stores.checkpoint` in trusted package settings.
 - `MemoryCheckpointStore` remains the default checkpoint backend when the section is absent.
 - `FilesystemCheckpointStore` is explicit opt-in and must fail startup on initialization errors.
@@ -257,7 +244,6 @@ Future public candidates may include:
 Current guidance:
 
 - Do not rename internal graph error classes now.
-- `UnknownGraphKindError` remains the internal graph vocabulary for this phase.
 - A future public facade may map graph vocabulary to workflow vocabulary.
 - No additional error classes are exported beyond the minimal facade.
 - The minimal public error facade is intentionally smaller than the full taxonomy.
@@ -324,8 +310,6 @@ The following should be treated as internal-only for plugin authors and external
 
 - `langgraph_automation.apps.automation.services.*`
 - `langgraph_automation.apps.automation.models`
-- `langgraph_automation.graphs.runner`
-- `langgraph_automation.graphs.builders`
 - `langgraph_automation.workflows.catalog`
 - `langgraph_automation.core.result_safety`
 - `langgraph_automation.core.redaction`
@@ -334,7 +318,6 @@ The following should be treated as internal-only for plugin authors and external
 
 Notes:
 
-- `graphs/registry.py` is the current foundation registry mechanism, but external consumers should not depend on it as a permanent public contract.
 - `workflows/catalog.py` is package composition internal / semi-internal.
 - Built-in reference workflows are composed through `workflows.catalog`, `workflows.adapter`, and `workflows.reference.*`.
 - A future registration API should become the supported path for extending workflows.
@@ -354,7 +337,6 @@ Notes:
 - `api.plugins` aggregates workflow contributions through `PluginContributions.workflows`.
 - `api.engine` is implemented as the public-facing provisional package facade.
 - Built-in workflow wiring uses `workflows.catalog` and `workflows.adapter` internally, not public graph internals.
-- `GraphDefinition`, `GraphRuntime`, and `GraphRuntimeConfig` remain outside the public facade.
 
 ## Plugin facade staging
 
@@ -364,7 +346,6 @@ Notes:
 - `api.engine` is implemented and remains provisional.
 - `api.runtime` remains deferred.
 - `api.errors` is implemented.
-- `GraphRuntime` and `GraphDefinition` remain outside the public facade.
 
 ## Config-facing concepts
 
@@ -397,8 +378,6 @@ Forbidden config behavior:
 
 - public / provisional / internal / config-facing / future are classified.
 - public vocabulary is workflow-oriented while internal vocabulary may remain graph-oriented.
-- `GraphDefinition` / `GraphRuntimeRequirements` have a future public facade strategy.
-- `GraphRuntime` / `GraphExecutionInput` / `GraphRuntimeConfig` have a documented public strategy.
 - Tool / LLM / Store / EventSink / Error candidates are summarized.
 - internal-only modules are listed.
 - `workflows/catalog.py` is treated as internal / semi-internal composition.
@@ -453,7 +432,7 @@ Internal / provisional APIs:
 
 Internal foundation:
 
-- `langgraph_automation.graphs.*`
+- legacy `langgraph_automation.graphs.*` package: removed; no compatibility import is provided
 
 Control plane:
 
@@ -488,3 +467,59 @@ The service-layer workflow preparation bridge is transitional and should eventua
 It hides `PluginRegistry`, `WorkflowPreparer`, `RuntimeAssembler`, `ConfigValidator`, `RuntimeDependencies`, `workflows.catalog`, `workflows.prepare`, `workflows.adapter`, and `workflows.requirements`.
 `run_workflow` and `api.runtime` remain deferred.
 `apps/automation/services/workflow_preparation.py` now routes through `api.engine`; the transitional exception has been removed.
+
+## Workflow Runtime Contract
+
+The public workflow surface now includes `WorkflowBuildContext`, `WorkflowExecutable`, and `WorkflowExecutionResult`. `AutomationEngine.prepare_workflow(..., config=...)` passes opaque workflow-specific config through the public build context. `EnginePreparedWorkflow.execute(...)` normalizes capability-based execution without requiring LangGraph types.
+
+The supported executable capabilities are, in order, `execute`, `invoke`, and callable. This is an adapter boundary rather than a promise that arbitrary return types are accepted: execution must return a mapping or `WorkflowExecutionResult`.
+
+## Optional Installed Plugin Discovery
+
+Installed distributions may publish a zero-argument plugin factory or a `Plugin` instance through the Python entry-point group `langgraph_automation.plugins`. Discovery is opt-in:
+
+```python
+engine = create_engine(config, discover_plugins=True)
+```
+
+Explicit `plugins=(...)` registration remains the primary deterministic path. An explicit plugin wins when a discovered entry point returns a plugin with the same plugin name. Contribution conflicts between differently named plugins continue to fail through `PluginRegistrationError`.
+
+`discover_plugins()` imports entry-point targets but does not execute contribution validation or provider/tool/store factories. Load failures and invalid results are normalized as safe `PluginResolutionError` values.
+
+## Prepared Workflow Handle
+
+`EnginePreparedWorkflow.executable` is the sole opaque implementation handle. Normal consumers should call `execute(...)`; framework-specific consumers may inspect `executable` without receiving guarantees beyond object identity.
+
+Workflow preparation order is now:
+
+1. resolve contribution
+2. validate a defensive copy of workflow-specific config
+3. validate runtime requirements
+4. construct `WorkflowBuildContext`
+5. call `build(context)`
+
+Validation failures use the safe code `WORKFLOW_CONFIG_INVALID` and do not execute requirements-dependent work or the workflow builder.
+
+## Control-plane Execution Integration
+
+The Django Run service resolves public workflows from `Workflow.definition_payload`, prepares them through the deployment engine owner, and executes them through the same persisted lifecycle used by the internal LangGraph path.
+
+## Django Workflow Reference
+
+The control plane selects an installed/public workflow when `Workflow.definition_payload` contains `{"workflow": {"kind": "...", "config": {...}}}`. Missing `workflow` preserves the legacy graph path; malformed references fail closed and do not fall back to a graph.
+
+`RunExecutionServices` owns a lazy, process-scoped deployment engine. The engine is assembled once on first public preparation and reused across runs. Both public and legacy execution adapters normalize into the framework-neutral `ControlPlaneExecutionResult` before Run persistence.
+
+Top-level public-path observability follows `EnginePreparedWorkflow.lifecycle_events_owner`. The default is `control_plane`; `workflow` suppresses control-plane lifecycle emission to avoid duplicate run events.
+
+## Deployment Engine Reload
+
+`RunExecutionServices.reconfigure_engine(...)` and `DeploymentEngineOwner.reconfigure(...)` provide an explicit single-process reload boundary. A candidate engine is fully constructed before atomic swap; failures retain the last-known-good generation. `force=True` rebuilds even when the deployment signature is unchanged.
+
+Prepared handles expose `engine_generation` and a hashed `engine_signature`. These values describe the engine snapshot used at preparation and do not change after a later reload. Reload is process-local and does not provide Python module hot replacement or cross-worker synchronization.
+
+## Current Execution Surface
+
+`EnginePreparedWorkflow.executable` is the sole opaque executable handle. `execute(..., context=WorkflowExecutionContext(...))` is the execution boundary. The Django control plane resolves only `WorkflowReference` values and has no graph-specific runtime or fallback contract. LangGraph may be used inside workflow implementations.
+
+`RunExecutionServices` and `DeploymentEngineOwner` are internal control-plane composition helpers. `api.runtime` remains deferred. True resume requires an explicit package checkpoint / LangGraph `BaseCheckpointSaver` convergence design.

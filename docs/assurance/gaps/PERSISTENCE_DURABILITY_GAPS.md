@@ -1,3 +1,5 @@
+> **Historical snapshot:** This audit records an earlier GraphRuntime-based architecture. The production graph package and control-plane graph path have been removed. Current behavior is defined by `docs/architecture/design/EXECUTION_LIFECYCLE_CONVERGENCE.md`.
+
 # Persistence Durability Gaps
 
 This document ranks the remaining persistence gaps after the current code-first audit.

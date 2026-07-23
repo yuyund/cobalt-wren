@@ -43,13 +43,10 @@ def test_reference_diagnostic_workflow_nodes_do_not_depend_on_concrete_persisten
 def test_reference_diagnostic_workflow_package_exists_and_graphs_nodes_are_empty() -> None:
     workflow_root = Path('src/langgraph_automation/workflows/reference/llm_echo_summary')
     assert workflow_root.is_dir()
-    assert (workflow_root / 'graph.py').exists()
-    assert (workflow_root / 'nodes.py').exists()
+    assert (workflow_root / 'executable.py').exists()
+    assert not (workflow_root / 'graph.py').exists()
+    assert not (workflow_root / 'nodes.py').exists()
     assert (workflow_root / 'state.py').exists()
     assert (workflow_root / 'definition.py').exists()
 
-    legacy_nodes_root = Path('src/langgraph_automation/graphs/nodes')
-    assert legacy_nodes_root.is_dir()
-    assert not (legacy_nodes_root / 'minimal.py').exists()
-    assert not (legacy_nodes_root / 'planner.py').exists()
-    assert not (legacy_nodes_root / 'summarizer.py').exists()
+    assert not Path("src/langgraph_automation/graphs").exists()

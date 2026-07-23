@@ -1,3 +1,21 @@
+---
+type: contract
+status: current
+authority: normative
+summary: Artifact emission identity and explicit persistence contract.
+code_refs:
+  - src/langgraph_automation/integrations/artifact/emission.py
+  - src/langgraph_automation/integrations/artifact/mapping.py
+test_refs:
+  - tests/unit/architecture/test_artifact_emission_boundary.py
+  - tests/unit/artifact/test_artifact_emission_contract.py
+verified:
+  date: 2026-07-23
+  commit: WORKTREE
+  base_commit: 8e2f19b9ed39bb3b5bf2ce07bbc31cbd58587e33
+  method:
+    - code-and-test-review
+---
 # Artifact Emission Contract
 
 This document fixes the logical artifact emission contract before any persistence wiring is added.

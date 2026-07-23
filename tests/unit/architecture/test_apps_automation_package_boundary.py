@@ -8,22 +8,7 @@ from tests.support.import_scan import collect_import_targets
 
 APPS_AUTOMATION_ROOT = Path("src/langgraph_automation/apps/automation")
 
-ALLOWED_FORBIDDEN_IMPORTS = {
-    Path("src/langgraph_automation/apps/automation/services/runtime.py"): {
-        "langgraph_automation.graphs.config",
-        "langgraph_automation.graphs.registry",
-        "langgraph_automation.graphs.runtime",
-        "langgraph_automation.workflows.catalog",
-    },
-    Path("src/langgraph_automation/apps/automation/services/execution.py"): {
-        "langgraph_automation.graphs.runner",
-        "langgraph_automation.graphs.runtime",
-    },
-    Path("src/langgraph_automation/apps/automation/services/runs.py"): {
-        "langgraph_automation.graphs.runner",
-        "langgraph_automation.graphs.runtime",
-    },
-}
+ALLOWED_FORBIDDEN_IMPORTS: dict[Path, set[str]] = {}
 
 FORBIDDEN_PREFIXES = (
     "langgraph_automation.graphs",
@@ -66,13 +51,5 @@ def test_workflow_preparation_bridge_imports_only_the_package_facing_engine_faca
         assert expected in modules
 
 
-def test_execution_adapters_have_exact_graph_runtime_allowlist() -> None:
-    for path, allowed in ALLOWED_FORBIDDEN_IMPORTS.items():
-        modules = collect_import_targets(path)
-        offenders = [
-            module
-            for module in modules
-            if module.startswith(FORBIDDEN_PREFIXES)
-            and not any(module == allowed_prefix or module.startswith(f"{allowed_prefix}.") for allowed_prefix in allowed)
-        ]
-        assert offenders == [], f"{path} imports forbidden modules outside its exact allowlist: {offenders}"
+def test_no_execution_adapter_requires_an_internal_import_allowlist() -> None:
+    assert ALLOWED_FORBIDDEN_IMPORTS == {}

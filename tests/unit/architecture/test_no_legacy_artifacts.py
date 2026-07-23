@@ -68,12 +68,6 @@ def test_tests_support_is_not_imported_from_src() -> None:
     assert offenders == []
 
 
-def test_graph_runtime_does_not_import_observed_wrappers() -> None:
-    text = Path('src/langgraph_automation/graphs/runtime.py').read_text()
-    assert 'ObservedLLMClient' not in text
-    assert 'ObservedToolRegistry' not in text
-
-
 def test_observed_tool_registry_does_not_import_django_orm() -> None:
     text = Path('src/langgraph_automation/integrations/tools/observed_registry.py').read_text()
     assert 'django.db' not in text
@@ -104,3 +98,7 @@ def test_reference_diagnostic_workflow_nodes_are_not_application_placeholders() 
     assert not Path('src/langgraph_automation/graphs/llm_echo_summary.py').exists()
     assert not Path('src/langgraph_automation/graphs/nodes/minimal.py').exists()
     assert not Path('src/langgraph_automation/graphs/states.py').exists()
+
+
+def test_graph_package_is_removed() -> None:
+    assert not Path("src/langgraph_automation/graphs").exists()

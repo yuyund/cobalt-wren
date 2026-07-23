@@ -103,9 +103,9 @@ Examples:
 - `CheckpointStore`
 - `EventSink`
 
-### GraphRuntimeConfig
+### Workflow build configuration
 
-`GraphRuntimeConfig` is the safe graph-local config that a runtime bundle can carry during execution.
+`WorkflowBuildContext.config` is the safe workflow-owned mapping supplied when the executable is built.
 
 It must not include:
 
@@ -460,7 +460,7 @@ ResolvedWorkflowConfig
   ↓
 RuntimeAssembly
   ↓
-RuntimeDependencies + GraphRuntimeConfig
+RuntimeDependencies + WorkflowBuildContext
 ```
 
 Runtime must not read raw config sources.
@@ -480,7 +480,7 @@ Do not mix these layers.
 ## P1-B done when
 
 - RawPackageConfig / ValidatedPackageConfig / ResolvedWorkflowConfig are defined.
-- RuntimeAssembly / RuntimeDependencies / GraphRuntimeConfig are related to the schema boundary.
+- RuntimeAssembly / RuntimeDependencies / WorkflowBuildContext are related to the schema boundary.
 - source precedence is fixed.
 - versioning is fixed.
 - unknown field policy is fixed.

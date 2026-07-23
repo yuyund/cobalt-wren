@@ -21,6 +21,10 @@ def test_public_workflow_api_all() -> None:
     import langgraph_automation.api.workflow as workflow_api
 
     assert set(workflow_api.__all__) == {
+        "WorkflowBuildContext",
+        "WorkflowExecutionContext",
+        "WorkflowExecutionResult",
+        "WorkflowExecutable",
         "WorkflowMetadata",
         "WorkflowRequirements",
         "WorkflowDefinition",

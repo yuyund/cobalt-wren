@@ -58,7 +58,7 @@ Plugin code owns:
 Foundation guarantees:
 
 - Run lifecycle
-- GraphRuntime
+- workflow executable
 - ToolPolicy enforcement
 - safety redaction
 - result safety

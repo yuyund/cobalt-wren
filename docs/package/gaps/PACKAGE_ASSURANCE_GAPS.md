@@ -6,14 +6,14 @@ This document records the mismatches found by the code-first audit.
 
 | Gap | Evidence | Why it matters | Risk |
 | --- | --- | --- | --- |
-| No open P0 gap remains after Block R | `src/langgraph_automation/apps/automation/services/runtime.py`, `execution.py`, and `runs.py` remain the exact control-plane execution adapters; `workflow_config.py` no longer imports graph internals; `tests/unit/architecture/test_apps_automation_package_boundary.py` now enforces the exact allowlist; `../../api/surface/API_SURFACE.md` now treats unknown workflow kinds as `PluginResolutionError` | The previous P0 items were either removed, rerouted, or reclassified as an explicit execution-adapter boundary with exact guard coverage. | Low |
+| No open P0 gap remains after Block R | `src/langgraph_automation/apps/automation/services/runtime.py`, `execution.py`, and `runs.py` remain the exact control-plane execution adapters; the deleted workflow-config and graph adapters no longer form a control-plane dependency; `tests/unit/architecture/test_apps_automation_package_boundary.py` enforces a zero internal-import allowlist; `../../api/surface/API_SURFACE.md` now treats unknown workflow kinds as `PluginResolutionError` | The previous P0 items were either removed, rerouted, or reclassified as an explicit execution-adapter boundary with exact guard coverage. | Low |
 
 ## P1 Gaps
 
 | Gap | Evidence | Why it matters | Risk |
 | --- | --- | --- | --- |
 | Explicit plugin auto-enable for validation is implied more than directly tested | `src/langgraph_automation/api/engine.py::create_engine` merges enabled plugins, but the tests currently prove runtime assembly for explicit plugins more clearly than validation-hook invocation | The intended contract is that explicit plugins are included in the effective plugin set, but there is no dedicated test that asserts a validation hook on an explicit plugin runs during `create_engine`. | P1 |
-| `EnginePreparedWorkflow.graph` opacity is an API intent, not a structural guarantee | `src/langgraph_automation/api/engine.py::EnginePreparedWorkflow` stores `graph: object` | The current tests verify non-null and type identity, but they do not enforce a stronger non-inspection contract. | P1 |
+| `EnginePreparedWorkflow.executable` opacity is an API intent, not a structural guarantee | `src/langgraph_automation/api/engine.py::EnginePreparedWorkflow` stores `executable: object` | Tests verify execution behavior and object identity, but do not enforce a stronger non-inspection contract. | P1 |
 | `workflows/applications` boundary is present but currently structural only | `tests/unit/architecture/test_application_workflow_public_api_boundary.py` | The directory is currently empty, so the guard has not yet been exercised against real application workflow files. | P1 |
 
 ## P2 Gaps
@@ -31,7 +31,7 @@ This document records the mismatches found by the code-first audit.
 
 ## ASSUMED Behavior
 
-- `EnginePreparedWorkflow.graph` should stay opaque to callers.
+- `EnginePreparedWorkflow.executable` should stay opaque to callers.
 - Explicit plugins should continue to be auto-enabled for validation and runtime assembly.
 - The current service bridge should remain thin until a later facade closure step.
 

@@ -1,3 +1,5 @@
+> **Historical snapshot:** This audit records an earlier GraphRuntime-based architecture. The production graph package and control-plane graph path have been removed. Current behavior is defined by `docs/architecture/design/EXECUTION_LIFECYCLE_CONVERGENCE.md`.
+
 # Persistence Test Traceability
 
 This traceability matrix links the durability contract to the current code and tests, and marks the missing coverage that must be closed later.

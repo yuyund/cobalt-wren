@@ -1,3 +1,21 @@
+---
+type: contract
+status: current
+authority: normative
+summary: Framework error categories and safe error propagation boundaries.
+code_refs:
+  - src/langgraph_automation/api/errors.py
+  - src/langgraph_automation/apps/automation/services/execution.py
+test_refs:
+  - tests/unit/api
+  - tests/unit/automation/test_run_execution_public_workflow.py
+verified:
+  date: 2026-07-23
+  commit: WORKTREE
+  base_commit: 8e2f19b9ed39bb3b5bf2ce07bbc31cbd58587e33
+  method:
+    - code-and-test-review
+---
 # Error Taxonomy
 
 This document defines the error taxonomy for `langgraph-automation`.
@@ -30,7 +48,7 @@ Coupling rules:
 - `ConfigValidator` may create validation errors, but not runtime assembly errors.
 - `PluginRegistry` may create registration and resolution errors, but not runtime dependency construction errors.
 - `RuntimeAssembly` may create dependency construction errors, but not raw schema errors.
-- `GraphRuntime` may create execution errors, but not plugin registration errors.
+- `WorkflowExecutable` execution may create execution errors, but not plugin registration errors.
 
 ## Error categories
 

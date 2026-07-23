@@ -36,4 +36,4 @@ Docs are supporting material only.
 - `run_workflow` is still deferred and not exported.
 - `api.runtime` does not exist yet.
 - Unknown workflow kinds are represented by `PluginResolutionError` in the implemented public surface.
-- `apps/automation/services/runtime.py`, `execution.py`, and `runs.py` remain the exact control-plane execution adapters; `workflow_config.py` is graph-free after the audit fix.
+- `apps/automation/services/runtime.py`, `execution.py`, and `runs.py` remain the exact control-plane execution adapters; deleted graph/config adapters no longer form a control-plane dependency.

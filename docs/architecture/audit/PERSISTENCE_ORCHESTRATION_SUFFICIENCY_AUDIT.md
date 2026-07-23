@@ -1,3 +1,5 @@
+> **Historical snapshot:** This audit records an earlier GraphRuntime-based architecture. The production graph package and control-plane graph path have been removed. Current behavior is defined by `docs/architecture/design/EXECUTION_LIFECYCLE_CONVERGENCE.md`.
+
 # Persistence Orchestration Sufficiency Audit
 
 This audit determines whether the current execution lifecycle is sufficient to orchestrate artifact and checkpoint persistence safely.

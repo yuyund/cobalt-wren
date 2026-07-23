@@ -1,3 +1,22 @@
+---
+type: contract
+status: current
+authority: normative
+summary: Safety boundaries for persisted and user-visible execution data.
+code_refs:
+  - src/langgraph_automation/core/result_safety.py
+  - src/langgraph_automation/core/redaction.py
+  - src/langgraph_automation/integrations/observability
+test_refs:
+  - tests/unit/automation/test_run_execution_public_workflow.py
+  - tests/unit/apps/web/test_dynamic_ui_safety.py
+verified:
+  date: 2026-07-23
+  commit: WORKTREE
+  base_commit: 8e2f19b9ed39bb3b5bf2ce07bbc31cbd58587e33
+  method:
+    - code-and-test-review
+---
 # System Safety Exposure Contract
 
 ## Purpose

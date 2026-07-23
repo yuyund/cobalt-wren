@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-import json
 import logging
+
+import json
 
 import pytest
 
-from langgraph_automation.graphs.runtime import GraphRuntime
 from langgraph_automation.integrations.observability.types import ObservabilityContext, SpanRef
 from langgraph_automation.integrations.tools.base import ToolResult
 from langgraph_automation.integrations.tools.observed_registry import ObservedToolRegistry
@@ -170,31 +170,26 @@ def test_observed_tool_registry_rebinds_context_without_mutating_original() -> N
     assert original.observability.node_name == 'executor'
 
 
-def test_observed_tool_registry_rebinds_through_graph_runtime() -> None:
+def test_observed_tool_registry_rebinds_to_parent_span_context() -> None:
     sink = RecordingEventSink()
     inner = InMemoryToolRegistry()
-    inner.register('echo', RecordingToolCallable(result=ToolResult(output='ok', exit_code=0)))
+    inner.register("echo", RecordingToolCallable(result=ToolResult(output="ok", exit_code=0)))
     observed = ObservedToolRegistry(
         inner=inner,
         event_sink=sink,
-        observability=ObservabilityContext(run_id=26, thread_id='thread-5'),
+        observability=ObservabilityContext(run_id=26, thread_id="thread-5"),
     )
-    runtime = GraphRuntime(
-        logger=logging.getLogger('test.observed.tool.runtime'),
-        observability=ObservabilityContext(run_id=26, thread_id='thread-5'),
-        event_sink=sink,
-        tool_registry=observed,
+    graph_span = sink.span_started(26, "graph", "graph", node_name="graph")
+    rebound_registry = observed.with_observability_context(
+        observed.observability.with_parent_span(graph_span, "executor")
     )
-    graph_span = sink.span_started(26, 'graph', 'graph', node_name='graph')
 
-    rebound_runtime = runtime.with_parent_span(graph_span, node_name='executor')
-    rebound_registry = rebound_runtime.require_tool_registry()
-    result = rebound_registry.run('echo', path='/tmp/secret.txt')
+    result = rebound_registry.run("echo", path="/tmp/secret.txt")
 
-    assert result.output == 'ok'
+    assert result.output == "ok"
     assert rebound_registry.observability.parent_span == graph_span
-    assert rebound_registry.observability.node_name == 'executor'
-    assert runtime.require_tool_registry().observability.parent_span is None
-    tool_span = sink.spans['span-2']
+    assert rebound_registry.observability.node_name == "executor"
+    assert observed.observability.parent_span is None
+    tool_span = sink.spans["span-2"]
     assert tool_span.parent_id == graph_span.span_id
-    assert tool_span.node_name == 'executor'
+    assert tool_span.node_name == "executor"

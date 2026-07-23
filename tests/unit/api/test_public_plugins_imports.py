@@ -30,6 +30,8 @@ def test_public_plugins_api_all() -> None:
     import langgraph_automation.api.plugins as plugins_api
 
     assert set(plugins_api.__all__) == {
+        'DEFAULT_PLUGIN_ENTRY_POINT_GROUP',
+        'discover_plugins',
         'Plugin',
         'PluginMetadata',
         'PluginContributions',
