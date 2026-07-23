@@ -8,3 +8,5 @@ venv/
 artifacts/
 db.sqlite3
 *.egg-info/
+# Local package build outputs
+/build/

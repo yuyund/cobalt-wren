@@ -1,1 +1,0 @@
-"""Automation control plane app."""
