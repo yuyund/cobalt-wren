@@ -1,0 +1,48 @@
+from __future__ import annotations
+
+from typing import cast
+
+from langgraph_automation.api.plugins import Plugin, PluginContributions, PluginMetadata
+from langgraph_automation.api.stores import ArtifactStore, CheckpointStore
+from langgraph_automation.api.workflow import WorkflowBuildContext, WorkflowContribution, WorkflowDefinition, WorkflowMetadata, WorkflowRequirements
+
+from .workflow import SagaExecutable
+
+WORKFLOW_KIND = "saga.order_fulfillment"
+
+
+def create_plugin() -> Plugin:
+    def build(context: WorkflowBuildContext) -> SagaExecutable:
+        return SagaExecutable(
+            artifact_store=cast(ArtifactStore, context.require_artifact_store()),
+            checkpoint_store=cast(CheckpointStore, context.require_checkpoint_store()),
+        )
+
+    contribution = WorkflowContribution(
+        kind=WORKFLOW_KIND,
+        definition=WorkflowDefinition(
+            kind=WORKFLOW_KIND,
+            metadata=WorkflowMetadata(
+                name="Order Fulfillment Saga",
+                description="Parallel partial-failure workflow with retry and compensation.",
+                tags=("saga", "parallel", "partial-failure", "compensation"),
+                metadata={"framework": "langgraph"},
+            ),
+            requirements=WorkflowRequirements(artifact_store=True, checkpoint_store=True),
+            build=build,
+            extra={
+                "lifecycle_events_owner": "control_plane",
+                "capabilities": ["parallel-branches", "partial-failure", "individual-retry", "compensation", "reconciliation"],
+            },
+        ),
+    )
+    return Plugin(
+        metadata=PluginMetadata(
+            name="saga-workflow",
+            version="0.1.0",
+            description="External Saga workflow distribution.",
+            plugin_types=("workflow",),
+            provides={"workflows": (WORKFLOW_KIND,)},
+        ),
+        contributions=PluginContributions(workflows=(contribution,)),
+    )
