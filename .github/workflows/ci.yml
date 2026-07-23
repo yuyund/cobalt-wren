@@ -17,5 +17,6 @@ jobs:
       - run: ruff check .
       - run: pytest -q
       - run: mypy src
+      - run: MYPYPATH=src:packages/opportunity_research_workflow/src mypy packages/opportunity_research_workflow/src/opportunity_research_workflow
       - run: python scripts/classify_mypy.py --check-baseline
       - run: python scripts/benchmark_runtime.py --iterations 5 --output /tmp/runtime-benchmark.json

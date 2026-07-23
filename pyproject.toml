@@ -43,6 +43,9 @@ package-dir = {"" = "src"}
 [tool.setuptools.packages.find]
 where = ["src"]
 
+[tool.setuptools.package-data]
+langgraph_automation = ["py.typed"]
+
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "langgraph_automation.config.settings"
 pythonpath = ["src"]
