@@ -121,7 +121,7 @@ class HumanApprovalExecutable:
                 )
             )
             _emit_checkpoint(context, checkpoint, checkpoint_namespace=_NAMESPACE)
-            return WorkflowExecutionResult(status="paused", output={"approval_request": request_value, "checkpoint_id": checkpoint.checkpoint_id}, metadata={"pause_reason": "human_approval"})
+            return WorkflowExecutionResult(status="paused", output={"approval_request": request_value, "checkpoint_id": checkpoint.checkpoint_id, "allowed_actions": ["approve", "reject", "revise"]}, metadata={"pause_reason": "human_approval"})
         return WorkflowExecutionResult(output={"decision": result.get("decision", ""), "proposal": result.get("proposal", ""), "reviewer_note": result.get("reviewer_note", ""), "revision_count": result.get("revision_count", 0), "artifact_key": result.get("artifact_key", "")}, metadata={"resumed": True})
 
     @staticmethod

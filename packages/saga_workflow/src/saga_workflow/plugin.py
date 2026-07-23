@@ -33,6 +33,10 @@ def create_plugin() -> Plugin:
             extra={
                 "lifecycle_events_owner": "control_plane",
                 "capabilities": ["parallel-branches", "partial-failure", "individual-retry", "compensation", "reconciliation"],
+                "resume_actions": {
+                    "retry_failed": {"title": "Retry failed branches", "payload": {"action": "retry_failed"}, "schema": {"type": "object", "properties": {}}},
+                    "compensate": {"title": "Compensate successful branches", "danger": True, "payload": {"action": "compensate"}, "schema": {"type": "object", "properties": {}}},
+                },
             },
         ),
     )

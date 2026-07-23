@@ -7,12 +7,14 @@ callers while still allowing workflow preparation through a small entrypoint.
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
-from dataclasses import dataclass, replace
+from dataclasses import dataclass, field, replace
 
 from langgraph_automation.api.errors import FrameworkError, RuntimeAssemblyError
+from langgraph_automation.api.stores import ArtifactReadResult
 from langgraph_automation.api.workflow import (
     WorkflowExecutionContext,
     WorkflowExecutionResult,
+    WorkflowMetadata,
     WorkflowResumeRequest,
 )
 from langgraph_automation.api.plugins import (
@@ -58,6 +60,10 @@ class EnginePreparedWorkflow:
     kind: str
     executable: object
     lifecycle_events_owner: str = "control_plane"
+    metadata: WorkflowMetadata | None = None
+    input_schema: Mapping[str, object] | None = None
+    output_schema: Mapping[str, object] | None = None
+    extra: Mapping[str, object] = field(default_factory=dict)
     engine_generation: int = 0
     engine_signature: str = ""
 
@@ -99,7 +105,34 @@ class AutomationEngine:
         lifecycle_owner = str(prepared.definition.extra.get("lifecycle_events_owner", "control_plane"))
         if lifecycle_owner not in {"control_plane", "workflow"}:
             lifecycle_owner = "control_plane"
-        return EnginePreparedWorkflow(kind=prepared.kind, executable=prepared.executable, lifecycle_events_owner=lifecycle_owner)
+        return EnginePreparedWorkflow(
+            kind=prepared.kind,
+            executable=prepared.executable,
+            lifecycle_events_owner=lifecycle_owner,
+            metadata=prepared.definition.metadata,
+            input_schema=prepared.definition.input_schema,
+            output_schema=prepared.definition.output_schema,
+            extra=dict(prepared.definition.extra),
+        )
+
+    def read_artifact(self, storage_key: str) -> ArtifactReadResult | None:
+        """Read an artifact body from the deployment-owned store."""
+        store = self._dependencies.artifact_store
+        getter = getattr(store, "get", None)
+        if not callable(getter):
+            raise RuntimeAssemblyError(
+                "Artifact store is unavailable.",
+                code="ARTIFACT_STORE_UNAVAILABLE",
+                component=_ENGINE_COMPONENT,
+            )
+        result = getter(storage_key)
+        if result is not None and not isinstance(result, ArtifactReadResult):
+            raise RuntimeAssemblyError(
+                "Artifact store returned an invalid result.",
+                code="ARTIFACT_STORE_INVALID_RESULT",
+                component=_ENGINE_COMPONENT,
+            )
+        return result
 
 
 def create_engine(config: Mapping[str, object], *, plugins: Sequence[Plugin] = (), discover_plugins: bool = False) -> AutomationEngine:

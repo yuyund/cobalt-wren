@@ -27,6 +27,7 @@ def test_public_workflow_api_all() -> None:
     assert set(workflow_api.__all__) == {
         "WorkflowBuildContext",
         "WorkflowExecutionContext",
+        "WorkflowExecutionControl",
         "WorkflowResumeRequest",
         "WorkflowExecutionResult",
         "WorkflowExecutable",

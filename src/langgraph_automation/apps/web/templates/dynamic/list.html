@@ -3,25 +3,9 @@
 {% block content %}
 <h1>{{ page.title }}</h1>
 {% if page.rows %}
-<table>
-  <thead>
-    <tr>
-      {% for column in page.columns %}
-      <th>{{ column.label }}</th>
-      {% endfor %}
-    </tr>
-  </thead>
-  <tbody>
-    {% for row in page.rows %}
-    <tr>
-      {% for field in row %}
-      <td>{{ field.display_value }}</td>
-      {% endfor %}
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
-{% else %}
-<p>{{ page.empty_message }}</p>
-{% endif %}
+<div class="table-wrap"><table>
+  <thead><tr>{% for column in page.columns %}<th>{{ column.label }}</th>{% endfor %}</tr></thead>
+  <tbody>{% for row in page.rows %}<tr>{% for field in row %}<td>{% if field.url %}<a href="{{ field.url }}">{{ field.display_value }}</a>{% else %}{% if field.name == "status" %}<span class="status">{{ field.display_value }}</span>{% else %}{{ field.display_value }}{% endif %}{% endif %}</td>{% endfor %}</tr>{% endfor %}</tbody>
+</table></div>
+{% else %}<p>{{ page.empty_message }}</p>{% endif %}
 {% endblock %}

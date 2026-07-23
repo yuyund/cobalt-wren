@@ -4,7 +4,7 @@ from __future__ import annotations
 from collections.abc import Callable
 
 from langgraph_automation.api.engine import EnginePreparedWorkflow
-from langgraph_automation.api.errors import ExecutionError, FrameworkError
+from langgraph_automation.api.errors import ExecutionError, FrameworkError, WorkflowCancelledError, WorkflowTimeoutError
 from langgraph_automation.api.workflow import (
     WorkflowExecutionContext,
     WorkflowExecutionResult,
@@ -12,6 +12,7 @@ from langgraph_automation.api.workflow import (
 )
 from langgraph_automation.apps.automation.models.run import Run, RunStatus
 from langgraph_automation.apps.automation.services.execution_result import ControlPlaneExecutionResult
+from langgraph_automation.apps.automation.services.execution_control import begin_execution_control, finish_execution_control
 from langgraph_automation.core.result_safety import safe_run_error_message
 from langgraph_automation.integrations.observability.base import EventSink
 from langgraph_automation.integrations.observability.failure_policy import suppress_observability_failure
@@ -59,6 +60,9 @@ def _dispatch(
 ) -> ControlPlaneExecutionResult:
     control_plane_owns_lifecycle = prepared_workflow.lifecycle_events_owner == "control_plane"
     graph_span: SpanRef | None = None
+    raw_timeout = prepared_workflow.extra.get("timeout_seconds")
+    timeout_seconds = float(raw_timeout) if isinstance(raw_timeout, (int, float)) and not isinstance(raw_timeout, bool) and raw_timeout > 0 else None
+    control = begin_execution_control(run.pk, timeout_seconds=timeout_seconds)
     try:
         if event_sink is not None and control_plane_owns_lifecycle:
             suppress_observability_failure(
@@ -86,6 +90,7 @@ def _dispatch(
                 thread_id=run.thread_id,
                 event_sink=event_sink,
                 parent_span=graph_span,
+                control=control,
             )
         )
     except Exception as exc:
@@ -101,6 +106,8 @@ def _dispatch(
             )
         )
         safe_message = normalized_error.safe_message
+        cancelled = isinstance(normalized_error, WorkflowCancelledError)
+        timed_out = isinstance(normalized_error, WorkflowTimeoutError)
         if event_sink is not None and control_plane_owns_lifecycle:
             if graph_span is not None:
                 suppress_observability_failure(
@@ -111,16 +118,23 @@ def _dispatch(
                     ),
                     context={"component": "execution", "operation": "span_failed", "run_id": run.pk},
                 )
-            suppress_observability_failure(
-                lambda: event_sink.run_failed(
-                    run.pk,
-                    error_message=safe_message,
-                    payload={"execution_path": "public_executable", "operation": operation},
-                ),
-                context={"component": "execution", "operation": "run_failed", "run_id": run.pk},
-            )
+            if cancelled:
+                suppress_observability_failure(
+                    lambda: event_sink.run_cancelled(run.pk, message=safe_message, payload={"execution_path": "public_executable", "operation": operation}),
+                    context={"component": "execution", "operation": "run_cancelled", "run_id": run.pk},
+                )
+            else:
+                suppress_observability_failure(
+                    lambda: event_sink.run_failed(
+                        run.pk,
+                        error_message=safe_message,
+                        payload={"execution_path": "public_executable", "operation": operation},
+                    ),
+                    context={"component": "execution", "operation": "run_failed", "run_id": run.pk},
+                )
+        finish_execution_control(run.pk)
         return ControlPlaneExecutionResult(
-            status=RunStatus.FAILED,
+            status=RunStatus.CANCELLED if cancelled else (RunStatus.TIMED_OUT if timed_out else RunStatus.FAILED),
             error_message=safe_message,
             message="run failed",
             details={
@@ -137,6 +151,7 @@ def _dispatch(
             },
         )
 
+    finish_execution_control(run.pk)
     paused = result.status == "paused"
     if event_sink is not None and control_plane_owns_lifecycle:
         if graph_span is not None:

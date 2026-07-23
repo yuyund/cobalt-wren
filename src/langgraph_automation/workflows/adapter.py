@@ -6,7 +6,7 @@ from collections.abc import Mapping
 import inspect
 from typing import Any, Protocol, cast
 
-from langgraph_automation.api.errors import RuntimeAssemblyError
+from langgraph_automation.api.errors import FrameworkError, RuntimeAssemblyError
 from langgraph_automation.api.workflow import (
     WorkflowBuildContext,
     WorkflowDefinition,
@@ -89,7 +89,7 @@ def execute_workflow(
             result = cast(Any, executable)(payload)
         else:
             raise TypeError("workflow object exposes no execute, invoke, or callable capability")
-    except RuntimeAssemblyError:
+    except FrameworkError:
         raise
     except Exception as exc:
         raise RuntimeAssemblyError(
@@ -121,7 +121,7 @@ def resume_workflow(
             request,
             context=context or WorkflowExecutionContext(),
         ) if "context" in parameters else cast(_ResumeCapable, executable).resume(request)
-    except RuntimeAssemblyError:
+    except FrameworkError:
         raise
     except Exception as exc:
         raise RuntimeAssemblyError(

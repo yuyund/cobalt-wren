@@ -24,6 +24,9 @@ __all__ = [
     'RuntimeAssemblyError',
     'WorkflowPreparationError',
     'ExecutionError',
+    'WorkflowCancelledError',
+    'WorkflowTimeoutError',
+    'WorkflowCheckpointCompatibilityError',
     'SafetyBoundaryError',
 ]
 
@@ -392,6 +395,21 @@ class ExecutionError(FrameworkError):
             retryable=retryable,
             metadata=metadata,
         )
+
+
+class WorkflowCancelledError(ExecutionError):
+    def __init__(self, safe_message: str = "Workflow execution was cancelled.") -> None:
+        super().__init__(safe_message, code="WORKFLOW_CANCELLED", component="execution_control", retryable=False)
+
+
+class WorkflowTimeoutError(ExecutionError):
+    def __init__(self, safe_message: str = "Workflow execution timed out.") -> None:
+        super().__init__(safe_message, code="WORKFLOW_TIMED_OUT", component="execution_control", retryable=True)
+
+
+class WorkflowCheckpointCompatibilityError(ExecutionError):
+    def __init__(self, safe_message: str = "Workflow checkpoint version is incompatible.") -> None:
+        super().__init__(safe_message, code="WORKFLOW_CHECKPOINT_INCOMPATIBLE", component="workflow_checkpoint", retryable=False)
 
 
 class SafetyBoundaryError(FrameworkError):

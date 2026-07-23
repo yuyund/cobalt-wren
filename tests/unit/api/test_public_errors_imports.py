@@ -65,5 +65,8 @@ def test_public_errors_api_all() -> None:
         'RuntimeAssemblyError',
         'WorkflowPreparationError',
         'ExecutionError',
+        'WorkflowCancelledError',
+        'WorkflowTimeoutError',
+        'WorkflowCheckpointCompatibilityError',
         'SafetyBoundaryError',
     }

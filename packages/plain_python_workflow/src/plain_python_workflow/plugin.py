@@ -27,7 +27,7 @@ def create_plugin() -> Plugin:
                 description="Framework-free JSON state machine with durable resume.",
                 version="0.1.0",
                 tags=("plain-python", "pause", "resume"),
-                metadata={"framework": "none", "state_schema_version": 1},
+                metadata={"framework": "none", "state_schema_version": 1, "supported_state_schema_versions": [0, 1]},
             ),
             requirements=WorkflowRequirements(artifact_store=True, checkpoint_store=True),
             build=build,
@@ -49,9 +49,11 @@ def create_plugin() -> Plugin:
             extra={
                 "lifecycle_events_owner": "control_plane",
                 "capabilities": ["pause", "resume", "framework-free", "versioned-state"],
+                "state_schema": {"current": 1, "supported": [0, 1], "migration": "0-to-1"},
                 "resume_actions": {
                     "confirm": {
                         "title": "Confirm",
+                        "payload": {"action": "confirm"},
                         "schema": {
                             "type": "object",
                             "properties": {"note": {"type": "string", "title": "Note"}},
@@ -59,6 +61,8 @@ def create_plugin() -> Plugin:
                     },
                     "cancel": {
                         "title": "Cancel",
+                        "danger": True,
+                        "payload": {"action": "cancel"},
                         "schema": {
                             "type": "object",
                             "properties": {"reason": {"type": "string", "title": "Reason"}},

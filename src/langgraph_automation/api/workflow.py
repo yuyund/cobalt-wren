@@ -5,10 +5,14 @@ from __future__ import annotations
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass, field
 from typing import Any, Protocol, runtime_checkable
+import time
+
+from .errors import WorkflowCancelledError, WorkflowTimeoutError
 
 __all__ = [
     "WorkflowBuildContext",
     "WorkflowExecutionContext",
+    "WorkflowExecutionControl",
     "WorkflowResumeRequest",
     "WorkflowExecutionResult",
     "WorkflowExecutable",
@@ -78,6 +82,30 @@ class WorkflowBuildContext:
 
 
 @dataclass(frozen=True, slots=True)
+class WorkflowExecutionControl:
+    """Framework-neutral cooperative cancellation and deadline token."""
+
+    cancellation_requested: Callable[[], bool]
+    deadline_monotonic: float | None = None
+
+    @property
+    def is_cancelled(self) -> bool:
+        return bool(self.cancellation_requested())
+
+    @property
+    def remaining_seconds(self) -> float | None:
+        if self.deadline_monotonic is None:
+            return None
+        return max(0.0, self.deadline_monotonic - time.monotonic())
+
+    def check(self) -> None:
+        if self.is_cancelled:
+            raise WorkflowCancelledError()
+        if self.deadline_monotonic is not None and time.monotonic() >= self.deadline_monotonic:
+            raise WorkflowTimeoutError()
+
+
+@dataclass(frozen=True, slots=True)
 class WorkflowExecutionContext:
     """Per-run context supplied when a workflow executes or resumes."""
 
@@ -85,6 +113,7 @@ class WorkflowExecutionContext:
     thread_id: str = ""
     event_sink: object | None = None
     parent_span: object | None = None
+    control: WorkflowExecutionControl | None = None
 
 
 @dataclass(frozen=True, slots=True)

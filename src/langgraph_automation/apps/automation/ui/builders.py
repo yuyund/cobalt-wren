@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterable, Mapping, Sequence
+from dataclasses import replace
 
 from django.db.models import Model
 
@@ -100,8 +101,15 @@ def _build_fields(obj: object | None, field_names: list[str], *, readonly: bool)
     return fields
 
 
-def _build_rows(items: Iterable[object], field_names: list[str], *, readonly: bool) -> list[list[FieldSpec]]:
-    return [_build_fields(item, field_names, readonly=readonly) for item in items]
+def _build_rows(items: Iterable[object], field_names: list[str], *, readonly: bool, model_key: str) -> list[list[FieldSpec]]:
+    rows: list[list[FieldSpec]] = []
+    for item in items:
+        fields = _build_fields(item, field_names, readonly=readonly)
+        object_id = getattr(item, "pk", None)
+        if fields and isinstance(object_id, int):
+            fields[0] = replace(fields[0], url=f"/ui/{model_key}/{object_id}/")
+        rows.append(fields)
+    return rows
 
 
 def build_list_page_spec(model_key: str, actor: object | None = None) -> ListPageSpec:
@@ -110,7 +118,7 @@ def build_list_page_spec(model_key: str, actor: object | None = None) -> ListPag
         raise LookupError(f'Model {model_key!r} is not registered for UI rendering')
     items = list(config.list_selector(None, actor))
     columns = _build_fields(items[0], config.list_fields, readonly=True) if items else _build_placeholder_fields(config.list_fields, readonly=True)
-    rows = _build_rows(items, config.list_fields, readonly=True) if items else []
+    rows = _build_rows(items, config.list_fields, readonly=True, model_key=model_key) if items else []
     return ListPageSpec(model_key=model_key, title=config.title, columns=columns, rows=rows, actions=[])
 
 
@@ -124,7 +132,7 @@ def build_detail_page_spec(model_key: str, obj_or_id: object, *, actor: object |
     related_sections: list[RelatedSectionSpec] = []
     for section_config in config.related_sections:
         rows = list(section_config.selector(obj, actor))
-        table_rows = _build_rows(rows, section_config.columns, readonly=True)
+        table_rows = _build_rows(rows, section_config.columns, readonly=True, model_key=section_config.model_key)
         columns = _build_fields(rows[0], section_config.columns, readonly=True) if rows else _build_placeholder_fields(section_config.columns, readonly=True)
         related_sections.append(
             RelatedSectionSpec(
@@ -162,7 +170,7 @@ def build_fragment_spec(model_key: str, object_id: int, fragment_name: str, *, a
     if section_config is None:
         raise LookupError(f'Fragment {fragment_name!r} is not registered for {model_key!r}')
     rows = list(section_config.selector(obj, actor))
-    table_rows = _build_rows(rows, section_config.columns, readonly=True)
+    table_rows = _build_rows(rows, section_config.columns, readonly=True, model_key=section_config.model_key)
     columns = _build_fields(rows[0], section_config.columns, readonly=True) if rows else _build_placeholder_fields(section_config.columns, readonly=True)
     return FragmentSpec(
         model_key=model_key,

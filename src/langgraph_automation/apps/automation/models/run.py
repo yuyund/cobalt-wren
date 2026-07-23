@@ -15,6 +15,7 @@ class RunStatus(models.TextChoices):
     WAITING = 'waiting', 'Waiting'
     SUCCEEDED = 'succeeded', 'Succeeded'
     FAILED = 'failed', 'Failed'
+    TIMED_OUT = 'timed_out', 'Timed out'
     CANCELLED = 'cancelled', 'Cancelled'
 
 
@@ -51,7 +52,7 @@ class Run(models.Model):
 
     @property
     def is_terminal_state(self) -> bool:
-        return self.status in {RunStatus.SUCCEEDED, RunStatus.FAILED, RunStatus.CANCELLED}
+        return self.status in {RunStatus.SUCCEEDED, RunStatus.FAILED, RunStatus.TIMED_OUT, RunStatus.CANCELLED}
 
     @property
     def input_payload_summary(self) -> object:

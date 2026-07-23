@@ -9,6 +9,8 @@ code_refs:
   - src/langgraph_automation/integrations/observability/django_event_sink.py
   - packages/human_approval_workflow/src/human_approval_workflow/workflow.py
   - packages/saga_workflow/src/saga_workflow/workflow.py
+  - packages/plain_python_workflow/src/plain_python_workflow/workflow.py
+  - src/langgraph_automation/apps/automation/services/execution_control.py
 test_refs:
   - tests/integration/django/test_ui_demo_seed.py
   - tests/integration/django/test_event_sink.py
@@ -26,8 +28,8 @@ verified:
 
 Run `venv/bin/python scripts/seed_ui_demo.py` from the repository root. The script applies pending migrations, replaces only records whose names start with `[demo]`, and recreates its filesystem artifact and checkpoint bodies under `/tmp/langgraph-automation-ui-demo`.
 
-The script does not insert fabricated span, event, artifact, or checkpoint rows. It creates Workflow and Run inputs, then uses `start_run()`, `resume_run()`, and `cancel_run()` with the external Human Approval and Saga plugins. Observability metadata is projected through `DjangoEventSink`, while bodies are written through the configured filesystem stores.
+The script does not insert fabricated span, event, artifact, or checkpoint rows. It creates Workflow and Run inputs, then uses `start_run()`, `resume_run()`, and `cancel_run()` with the external Human Approval, Saga, and framework-free plain Python plugins, plus a local cooperative timeout demonstration plugin. Observability metadata is projected through `DjangoEventSink`, while bodies are written through the configured filesystem stores.
 
-The generated states include pending, waiting, succeeded, failed, and cancelled runs; approval and revision pauses; Saga success, retryable partial failure, and compensation; graph spans and run events; artifact metadata with content type and size; and checkpoint metadata with namespace.
+The generated states include pending, waiting, succeeded, failed, timed-out, and cancelled runs; approval, revision, and plain Python confirmation pauses; Saga success, retryable partial failure, and compensation; graph spans and run events; artifact metadata with content type and size; and checkpoint metadata with namespace.
 
 Re-running the script is deterministic at the demo namespace boundary: prior `[demo]` database records and `/tmp/langgraph-automation-ui-demo` bodies are removed, while non-demo records are retained.

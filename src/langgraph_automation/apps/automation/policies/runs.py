@@ -32,4 +32,4 @@ def can_resume_run(actor: object | None, run: Run) -> PolicyResult:
 
 
 def can_retry_run(actor: object | None, run: Run) -> PolicyResult:
-    return _result(run.status in {RunStatus.FAILED, RunStatus.CANCELLED}, f'Run cannot be retried from {run.status}')
+    return _result(run.status in {RunStatus.FAILED, RunStatus.TIMED_OUT, RunStatus.CANCELLED}, f'Run cannot be retried from {run.status}')

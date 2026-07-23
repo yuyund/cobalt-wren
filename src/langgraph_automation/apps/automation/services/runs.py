@@ -21,6 +21,7 @@ from langgraph_automation.apps.automation.policies.runs import (
 )
 from langgraph_automation.apps.automation.services import runtime as runtime_module
 from langgraph_automation.apps.automation.services.errors import WorkflowConfigurationError
+from langgraph_automation.apps.automation.services.execution_control import request_cancellation
 from langgraph_automation.apps.automation.services.execution import (
     dispatch_prepared_workflow_execution,
     dispatch_prepared_workflow_resume,
@@ -68,7 +69,7 @@ def _transition_run(
     if status == RunStatus.RUNNING and run.started_at is None:
         run.started_at = now
         updates.append('started_at')
-    if status in {RunStatus.SUCCEEDED, RunStatus.FAILED, RunStatus.CANCELLED}:
+    if status in {RunStatus.SUCCEEDED, RunStatus.FAILED, RunStatus.TIMED_OUT, RunStatus.CANCELLED}:
         run.finished_at = now
         updates.append('finished_at')
     if message:
@@ -80,7 +81,7 @@ def _transition_run(
 
 def _finalize_from_execution(run: Run, execution_result: ControlPlaneExecutionResult) -> Run:
     status = execution_result.status or RunStatus.FAILED
-    message = safe_run_error_message(execution_result.error_message) if status == RunStatus.FAILED else ''
+    message = safe_run_error_message(execution_result.error_message) if status in {RunStatus.FAILED, RunStatus.TIMED_OUT} else ''
     return _transition_run(
         run,
         status=status,
@@ -200,6 +201,7 @@ def cancel_run(
     with transaction.atomic():
         locked_run = _locked_run(run)
         _policy_or_raise(can_cancel_run(actor, locked_run))
+        request_cancellation(locked_run.pk)
         _transition_run(locked_run, status=RunStatus.CANCELLED)
     sink = _event_sink(locked_run)
     if sink is not None:

@@ -39,3 +39,10 @@ def test_failed_run_can_retry_but_not_resume() -> None:
     run = Run.objects.create(workflow=workflow, name='run-retry', status=RunStatus.FAILED)
     assert can_resume_run(None, run).allowed is False
     assert can_retry_run(None, run).allowed is True
+
+
+@pytest.mark.django_db
+def test_timed_out_run_can_retry() -> None:
+    workflow = Workflow.objects.create(name='wf-timeout-retry')
+    run = Run.objects.create(workflow=workflow, name='run-timeout-retry', status=RunStatus.TIMED_OUT)
+    assert can_retry_run(None, run).allowed is True

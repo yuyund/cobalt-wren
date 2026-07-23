@@ -18,6 +18,8 @@ class FieldSpec:
     visible: bool = True
     help_text: str | None = None
     redacted: bool = False
+    choices: tuple[str, ...] = ()
+    url: str | None = None
 
 
 @dataclass(frozen=True)
@@ -32,6 +34,8 @@ class ActionSpec:
     confirm: str | None = None
     hx_target: str | None = None
     disabled_reason: str | None = None
+    input_fields: list[FieldSpec] = field(default_factory=list)
+    hidden_fields: dict[str, str] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)

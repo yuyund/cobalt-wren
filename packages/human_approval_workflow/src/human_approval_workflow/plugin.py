@@ -56,6 +56,31 @@ def create_plugin() -> Plugin:
             extra={
                 "lifecycle_events_owner": "control_plane",
                 "capabilities": ["pause", "resume", "human-input", "revision-loop"],
+                "resume_actions": {
+                    "approve": {
+                        "title": "Approve",
+                        "payload": {"decision": "approve"},
+                        "schema": {"type": "object", "properties": {"note": {"type": "string", "title": "Reviewer note"}}},
+                    },
+                    "reject": {
+                        "title": "Reject",
+                        "danger": True,
+                        "payload": {"decision": "reject"},
+                        "schema": {"type": "object", "properties": {"note": {"type": "string", "title": "Reason"}}},
+                    },
+                    "revise": {
+                        "title": "Request revision",
+                        "payload": {"decision": "revise"},
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "proposal": {"type": "string", "title": "Revised proposal", "format": "textarea"},
+                                "note": {"type": "string", "title": "Reviewer note"},
+                            },
+                            "required": ["proposal"],
+                        },
+                    },
+                },
             },
         ),
     )

@@ -20,6 +20,7 @@ from django.conf import settings as django_settings
 from langgraph_automation.api.engine import AutomationEngine, EnginePreparedWorkflow, create_engine
 from langgraph_automation.api.errors import ConfigError
 from langgraph_automation.api.plugins import Plugin
+from langgraph_automation.api.stores import ArtifactReadResult
 from langgraph_automation.apps.automation.models.run import Run
 from langgraph_automation.apps.automation.services.workflow_reference import WorkflowReference
 from langgraph_automation.config.artifact_store import normalize_artifact_store_settings
@@ -192,6 +193,9 @@ class RunExecutionServices:
 
     def prepare_workflow(self, reference: WorkflowReference) -> EnginePreparedWorkflow:
         return self.engine_owner.prepare(reference)
+
+    def read_artifact(self, storage_key: str) -> ArtifactReadResult | None:
+        return self.engine_owner.get_engine().read_artifact(storage_key)
 
     def reconfigure_engine(
         self,
