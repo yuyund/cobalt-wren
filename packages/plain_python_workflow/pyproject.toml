@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "plain-python-workflow"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = ["langgraph-automation>=0.1.0"]
+
+[project.entry-points."langgraph_automation.plugins"]
+plain-python = "plain_python_workflow:create_plugin"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
