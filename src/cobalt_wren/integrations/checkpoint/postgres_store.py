@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 from hashlib import sha256
+from importlib import import_module
 import json
 from typing import Any, cast
 
@@ -42,14 +43,14 @@ class PostgresCheckpointStore(CheckpointStore):
         self.table_name = table_name
         if connection_factory is None:
             try:
-                import psycopg
+                psycopg = import_module("psycopg")
             except ImportError as exc:
                 raise CheckpointPersistenceError(
                     "PostgreSQL checkpoint backend requires psycopg.",
                     code="CHECKPOINT_STORE_DEPENDENCY_MISSING",
                     component=_COMPONENT,
                 ) from exc
-            connection_factory = psycopg.connect
+            connection_factory = getattr(psycopg, "connect")
         self._connect = connection_factory
         self.ensure_schema()
 
