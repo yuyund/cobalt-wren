@@ -1,21 +1,32 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-PYTHON_BIN="${PYTHON_BIN:-python}"
-VENV_BIN="${VENV_BIN:-./venv/bin}"
+if [[ -x ./venv/bin/python ]]; then
+  PYTHON_BIN="${PYTHON_BIN:-./venv/bin/python}"
+  RUFF_BIN="${RUFF_BIN:-./venv/bin/ruff}"
+  MYPY_BIN="${MYPY_BIN:-./venv/bin/mypy}"
+  PYTEST_BIN="${PYTEST_BIN:-./venv/bin/pytest}"
+  CHECK_WHEEL_BIN="${CHECK_WHEEL_BIN:-./venv/bin/check-wheel-contents}"
+else
+  PYTHON_BIN="${PYTHON_BIN:-python}"
+  RUFF_BIN="${RUFF_BIN:-ruff}"
+  MYPY_BIN="${MYPY_BIN:-mypy}"
+  PYTEST_BIN="${PYTEST_BIN:-pytest}"
+  CHECK_WHEEL_BIN="${CHECK_WHEEL_BIN:-check-wheel-contents}"
+fi
 
 rm -rf build dist src/cobalt_wren.egg-info
 
-"${VENV_BIN}/ruff" check .
-"${VENV_BIN}/mypy" src
-"${VENV_BIN}/pytest" -q
+"${RUFF_BIN}" check .
+"${MYPY_BIN}" src
+"${PYTEST_BIN}" -q
 
 rm -rf build dist src/cobalt_wren.egg-info
-"${VENV_BIN}/python" -m build
-"${VENV_BIN}/python" -m twine check dist/*
-"${VENV_BIN}/check-wheel-contents" --ignore W004 dist/*.whl
+"${PYTHON_BIN}" -m build
+"${PYTHON_BIN}" -m twine check dist/*
+"${CHECK_WHEEL_BIN}" --ignore W004 dist/*.whl
 
-"${VENV_BIN}/python" - <<'PY'
+"${PYTHON_BIN}" - <<'PYCODE'
 from pathlib import Path
 import tarfile
 import zipfile
@@ -35,7 +46,7 @@ with tarfile.open(sdist) as archive:
     names = set(archive.getnames())
     assert any(name.endswith("/CHANGELOG.md") for name in names)
     assert not any(name.endswith(("/db.sqlite3", "/.env")) for name in names)
-PY
+PYCODE
 
 clean_root="$(mktemp -d)"
 trap 'rm -rf "${clean_root}"' EXIT
