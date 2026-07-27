@@ -26,7 +26,6 @@ def test_separate_distribution_installs_and_executes_via_entry_point(
                 "-m",
                 "pip",
                 "install",
-                "--no-build-isolation",
                 "--no-deps",
                 str(package),
             ],
