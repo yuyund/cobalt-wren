@@ -1,0 +1,71 @@
+name: Compatibility
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  django-python-matrix:
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.12", "3.13"]
+        django: ["5.2", "6.0"]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+      - run: |
+          python -m pip install -e .
+          python -m pip install 'pytest>=9,<10' pytest-django 'litellm>=1,<2' "django~=${{ matrix.django }}.0"
+      - run: python manage.py check
+      - run: >-
+          pytest -q
+          tests/unit/api/test_public_api_imports.py
+          tests/unit/architecture/test_public_api_surface.py
+          tests/unit/architecture/test_optional_postgres_dependency.py
+          tests/integration/django/test_web_ui.py
+
+  base-wheel-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install 'build>=1.2,<2'
+      - run: python -m build
+      - run: |
+          python -m venv /tmp/cobalt-wren-smoke
+          /tmp/cobalt-wren-smoke/bin/pip install dist/*.whl
+          /tmp/cobalt-wren-smoke/bin/python - <<'PY'
+          import importlib.metadata as metadata
+          from cobalt_wren.api.engine import create_engine
+          from cobalt_wren.native import workflow
+          installed = {dist.metadata['Name'].lower() for dist in metadata.distributions()}
+          assert 'psycopg' not in installed
+          assert 'litellm' not in installed
+          assert 'langgraph' not in installed
+          assert 'llama-index-workflows' not in installed
+          assert create_engine({'version': 1}) is not None
+          assert workflow is not None
+          PY
+          /tmp/cobalt-wren-smoke/bin/cobalt-wren --help >/dev/null
+
+  quickstart-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install -e .
+      - run: python -m cobalt_wren native-inspect examples.quickstart.workflow:greeting
+      - run: python -m cobalt_wren native-validate examples.quickstart.workflow:greeting
+      - run: >-
+          python -m cobalt_wren native-run examples.quickstart.workflow:greeting
+          --input '{"name":"Compatibility"}'

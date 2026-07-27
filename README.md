@@ -17,6 +17,12 @@ Cobalt Wren requires Python 3.12 or newer.
 pip install cobalt-wren
 ```
 
+PostgreSQL support is optional:
+
+```bash
+pip install "cobalt-wren[postgres]"
+```
+
 Install workflow frameworks and LLM provider SDKs directly in the consuming
 application. Cobalt Wren supplies adapter contracts and helpers but does not own
 their installation or version policy. For example:
@@ -30,13 +36,15 @@ pip install cobalt-wren litellm
 ## Write a Native workflow
 
 ```python
+from collections.abc import Mapping
+
 from cobalt_wren.native import NativeWorkflowContext, workflow
 
 
 @workflow("example.greeting")
 async def greeting(
     ctx: NativeWorkflowContext,
-    request: dict[str, object],
+    request: Mapping[str, object],
 ) -> dict[str, object]:
     name = str(request.get("name", "world"))
 
@@ -50,6 +58,7 @@ async def greeting(
     return {"message": message}
 ```
 
+The executable source is maintained at `examples/quickstart/workflow.py`.
 Save it as `workflow.py`, then inspect, validate, and run it locally:
 
 ```bash

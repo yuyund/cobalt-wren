@@ -13,6 +13,9 @@ changes increment the minor version and include migration notes.
 - Architecture decisions for canonical, semantic, and integration-native observations.
 - Manual TestPyPI Trusted Publishing workflow and release validation script.
 - Consumer-owned installation policy for LLM and workflow framework distributions.
+- Machine-enforced public API inventory and stability policy.
+- Optional PostgreSQL dependency boundary and compatibility test matrix.
+- Executable README quickstart and base-wheel consumer smoke tests.
 - Apache-2.0 project license and third-party attribution notice.
 - Native workflow authoring, local execution, schema validation, telemetry,
   requirements declarations, scaffold generation, and clean-room tests.
@@ -29,6 +32,12 @@ changes increment the minor version and include migration notes.
   metadata keys remain stable.
 - Legacy `LANGGRAPH_AUTOMATION_*` environment variables remain fallback
   aliases when the corresponding `COBALT_WREN_*` variable is absent.
+
+## [0.1.0rc3] - 2026-07-27
+
+- Locked the public and provisional API inventory with architecture tests.
+- Moved PostgreSQL support entirely behind the `postgres` extra.
+- Added Python/Django compatibility, base-wheel, README, and TestPyPI consumer smoke gates.
 
 ## [0.1.0rc2] - 2026-07-27
 

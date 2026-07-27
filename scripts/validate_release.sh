@@ -52,7 +52,14 @@ clean_root="$(mktemp -d)"
 trap 'rm -rf "${clean_root}"' EXIT
 "${PYTHON_BIN}" -m venv "${clean_root}/venv"
 "${clean_root}/venv/bin/pip" install dist/*.whl
-"${clean_root}/venv/bin/python" -c 'import cobalt_wren'
+"${clean_root}/venv/bin/python" - <<'PYCODE'
+import importlib.metadata as metadata
+import cobalt_wren
+installed = {dist.metadata["Name"].lower() for dist in metadata.distributions()}
+assert cobalt_wren.__name__ == "cobalt_wren"
+for excluded in ("psycopg", "litellm", "langgraph", "llama-index-workflows"):
+    assert excluded not in installed
+PYCODE
 "${clean_root}/venv/bin/cobalt-wren" --help >/dev/null
 
 echo "Release validation passed."

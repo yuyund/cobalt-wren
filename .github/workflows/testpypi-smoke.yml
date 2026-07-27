@@ -1,0 +1,58 @@
+name: TestPyPI Smoke
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Cobalt Wren version already published to TestPyPI
+        required: true
+        default: 0.1.0rc3
+
+jobs:
+  consumer-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: |
+          python -m venv /tmp/cobalt-wren-testpypi
+          /tmp/cobalt-wren-testpypi/bin/pip install \
+            --index-url https://test.pypi.org/simple/ \
+            --extra-index-url https://pypi.org/simple/ \
+            "cobalt-wren==${{ inputs.version }}"
+      - run: |
+          /tmp/cobalt-wren-testpypi/bin/python - <<'PY'
+          import importlib.metadata as metadata
+          import cobalt_wren
+          installed = {dist.metadata['Name'].lower() for dist in metadata.distributions()}
+          assert metadata.version('cobalt-wren') == '${{ inputs.version }}'
+          assert cobalt_wren.__name__ == 'cobalt_wren'
+          for excluded in ('psycopg', 'litellm', 'langgraph', 'llama-index-workflows'):
+              assert excluded not in installed
+          PY
+      - run: /tmp/cobalt-wren-testpypi/bin/cobalt-wren --help >/dev/null
+      - run: |
+          mkdir -p /tmp/cobalt-wren-consumer
+          cd /tmp/cobalt-wren-consumer
+          cat > workflow.py <<'PY'
+          from collections.abc import Mapping
+          from cobalt_wren.native import NativeWorkflowContext, workflow
+
+          @workflow('smoke.echo')
+          async def echo(
+              ctx: NativeWorkflowContext,
+              request: Mapping[str, object],
+          ) -> dict[str, object]:
+              value = str(request.get('message', ''))
+              result = await ctx.step('echo', lambda text: text.strip(), value)
+              return {'message': result}
+          PY
+          /tmp/cobalt-wren-testpypi/bin/cobalt-wren native-inspect workflow:echo
+          /tmp/cobalt-wren-testpypi/bin/cobalt-wren native-validate workflow:echo
+          /tmp/cobalt-wren-testpypi/bin/cobalt-wren native-run \
+            workflow:echo --input '{"message":" testpypi "}'
+          /tmp/cobalt-wren-testpypi/bin/cobalt-wren init-workflow \
+            --name smoke-package --kind smoke.package --framework native --output .
+          test -f smoke-package/pyproject.toml
+          grep -q 'cobalt-wren>=0.1.0rc1' smoke-package/pyproject.toml
