@@ -8,7 +8,7 @@ import sys
 import zipfile
 
 
-def test_plain_python_installs_without_langgraph_dependency(tmp_path: Path) -> None:
+def test_plain_python_installs_without_framework_or_llm_dependencies(tmp_path: Path) -> None:
     repo = Path(__file__).resolve().parents[3]
     external = repo / "packages" / "plain_python_workflow"
     wheelhouse = tmp_path / "wheels"
@@ -23,6 +23,8 @@ def test_plain_python_installs_without_langgraph_dependency(tmp_path: Path) -> N
     requirements = [line.removeprefix("Requires-Dist: ") for line in metadata_text.splitlines() if line.startswith("Requires-Dist: ")]
     assert any(item.startswith("cobalt-wren") for item in requirements)
     assert not any(item == "langgraph" or item.startswith("langgraph ") for item in requirements)
+    assert not any(item.startswith("llama-index-workflows") for item in requirements)
+    assert not any(item == "litellm" or item.startswith("litellm ") for item in requirements)
 
     python = venv / "bin" / "python"
     for wheel in sorted(wheelhouse.glob("*.whl")):

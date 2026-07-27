@@ -237,7 +237,7 @@ def build_workflow(context):
     )
 ```
 
-The LangGraph scaffold generates this helper path. LangGraph is now declared only in the `langgraph` optional extra; `llama-index-workflows` remains in the `llamaindex` optional extra, and `oss-integrations` installs both. Provider implementations remain lazy so foundation imports, the empty built-in catalog, and Native examples work when neither target OSS is installed.
+The LangGraph scaffold generates this helper path. Target workflow frameworks are dependencies of the consuming workflow distribution, not Cobalt Wren extras. Provider implementations remain lazy so foundation imports, the empty built-in catalog, and Native examples work when neither target OSS is installed.
 
 ## Implemented Integration Projection Persistence And UI Composition
 
@@ -325,7 +325,7 @@ The control plane now exposes `/ui/integrations/` and per-integration detail pag
 
 Health inspection separates target availability from provider loading. Missing and incompatible targets are reported without importing provider modules. Available targets are resolved to verify provider loadability and definition compatibility. Provider failures are converted to fixed safe diagnostics; exception text, traceback, provider paths, and causes are not rendered. The UI uses a combined health status such as `ready`, `not_installed`, `version_incompatible`, `load_failed`, `invalid`, or `definition_mismatch`.
 
-The UI is definition-driven and contains no LangGraph or LlamaIndex condition. Installation commands are derived from opaque `install_extra` metadata declared by each central definition.
+The UI is definition-driven and contains no LangGraph or LlamaIndex condition. Installation commands are derived from opaque `install_requirement` or `required_distribution` metadata declared by each central definition. Cobalt Wren does not synthesize package extras.
 
 ## Decisions And Open Questions
 

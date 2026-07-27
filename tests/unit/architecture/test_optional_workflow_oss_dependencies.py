@@ -11,15 +11,20 @@ import sys
 ROOT = Path(__file__).resolve().parents[3]
 
 
-def test_langgraph_is_not_a_mandatory_project_dependency() -> None:
-    text = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
-    project_dependencies = text.split("[project.optional-dependencies]", 1)[0]
+def test_framework_distributions_are_owned_by_consuming_packages() -> None:
+    import tomllib
 
-    assert '  "langgraph",' not in project_dependencies
-    assert "langgraph = [" in text
-    assert '  "langgraph>=1.0,<2",' in text
-    assert "llamaindex = [" in text
-    assert "oss-integrations = [" in text
+    data = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
+    project_dependencies = data["project"]["dependencies"]
+    optional_dependencies = data["project"]["optional-dependencies"]
+
+    assert not any(item.startswith("langgraph") for item in project_dependencies)
+    assert not any(item.startswith("llama-index-workflows") for item in project_dependencies)
+    assert "langgraph" not in optional_dependencies
+    assert "llamaindex" not in optional_dependencies
+    assert "oss-integrations" not in optional_dependencies
+    assert any(item.startswith("langgraph") for item in optional_dependencies["dev"])
+    assert any(item.startswith("llama-index-workflows") for item in optional_dependencies["dev"])
 
 
 def test_foundation_and_native_reference_import_without_langgraph() -> None:

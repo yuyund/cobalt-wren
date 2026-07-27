@@ -33,7 +33,7 @@ class IntegrationHealthSpec:
     supported_versions: str
     provider_status: str
     diagnostic: str
-    install_extra: str
+    install_requirement: str
     install_command: str
     auto_detection: bool
     documentation_ref: str
@@ -100,10 +100,12 @@ def _build_health(
             diagnostic = _provider_diagnostic(exc.code)
         else:
             provider_status = "loaded"
-    extra = str(definition.metadata.get("install_extra", "")).strip()
-    install_command = (
-        f'pip install "cobalt-wren[{extra}]"' if extra else ""
-    )
+    requirement = str(
+        definition.metadata.get("install_requirement")
+        or definition.metadata.get("required_distribution")
+        or ""
+    ).strip()
+    install_command = f'pip install "{requirement}"' if requirement else ""
     return IntegrationHealthSpec(
         integration_id=definition.integration_id,
         distribution=definition.distribution,
@@ -114,7 +116,7 @@ def _build_health(
         supported_versions=availability.supported_versions,
         provider_status=provider_status,
         diagnostic=diagnostic,
-        install_extra=extra,
+        install_requirement=requirement,
         install_command=install_command,
         auto_detection=definition.auto_detection,
         documentation_ref=definition.documentation_ref,

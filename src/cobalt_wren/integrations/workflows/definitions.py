@@ -100,7 +100,7 @@ LANGGRAPH_INTEGRATION = IntegrationDefinition(
     ),
     documentation_ref="docs/architecture/design/OSS_NEUTRAL_WORKFLOW_INTEGRATION.md",
     auto_detection=True,
-    metadata={"install_extra": "langgraph"},
+    metadata={"required_distribution": "langgraph"},
 )
 
 LLAMAINDEX_WORKFLOWS_INTEGRATION = IntegrationDefinition(
@@ -142,7 +142,7 @@ LLAMAINDEX_WORKFLOWS_INTEGRATION = IntegrationDefinition(
     ),
     documentation_ref="docs/architecture/design/OSS_NEUTRAL_WORKFLOW_INTEGRATION.md",
     auto_detection=True,
-    metadata={"install_extra": "llamaindex"},
+    metadata={"required_distribution": "llama-index-workflows"},
 )
 
 SUPPORTED_WORKFLOW_INTEGRATIONS = (

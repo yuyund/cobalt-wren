@@ -283,7 +283,7 @@ provider exception text、traceback、private path は UI に出さない。
 
 ## 10. LangGraph integration の現状
 
-LangGraph は optional extra であり、base dependency ではない。provider は public stream API と `Command(resume=...)` を利用し、compiled graph private attribute を解析しない。
+LangGraph は利用側packageが直接管理するdependencyであり、Cobalt Wrenのbase dependencyでもextraでもない。provider は public stream API と `Command(resume=...)` を利用し、compiled graph private attribute を解析しない。
 
 現在の主な projection は次の通りである。
 
@@ -311,7 +311,7 @@ foundation は checkpoint body を複製せず、安全な reference と action 
 
 ## 11. LlamaIndex Workflows integration の現状
 
-LlamaIndex Workflows は optional extra であり、public `Workflow.run()`、`WorkflowHandler`、`stream_events(expose_internal=True)`、`StepStateChanged` を利用する。
+LlamaIndex Workflows は利用側packageが直接管理するdependencyであり、public `Workflow.run()`、`WorkflowHandler`、`stream_events(expose_internal=True)`、`StepStateChanged` を利用する。
 
 現在の projection は次の通りである。
 

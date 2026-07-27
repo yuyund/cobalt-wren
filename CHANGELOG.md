@@ -12,6 +12,7 @@ changes increment the minor version and include migration notes.
 - PyPI release metadata and artifact-validation automation.
 - Architecture decisions for canonical, semantic, and integration-native observations.
 - Manual TestPyPI Trusted Publishing workflow and release validation script.
+- Consumer-owned installation policy for LLM and workflow framework distributions.
 - Apache-2.0 project license and third-party attribution notice.
 - Native workflow authoring, local execution, schema validation, telemetry,
   requirements declarations, scaffold generation, and clean-room tests.
@@ -28,6 +29,12 @@ changes increment the minor version and include migration notes.
   metadata keys remain stable.
 - Legacy `LANGGRAPH_AUTOMATION_*` environment variables remain fallback
   aliases when the corresponding `COBALT_WREN_*` variable is absent.
+
+## [0.1.0rc2] - 2026-07-27
+
+- Removed LiteLLM, LangGraph, and LlamaIndex Workflows from runtime and installation extras.
+- Made provider and framework SDK installation the consuming application's responsibility.
+- Generalized integration health installation guidance to package requirements.
 
 ## [0.1.0rc1] - 2026-07-27
 

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "cobalt-wren"
-version = "0.1.0rc1"
+version = "0.1.0rc2"
 description = "Python-first workflows with explicit contracts, observable execution, and a Django control plane"
 readme = "README.md"
 authors = [{name = "Yudai Maruyama"}]
@@ -28,7 +28,6 @@ classifiers = [
 dependencies = [
   "django>=5.2,<6.1",
   "psycopg>=3.2,<4",
-  "litellm>=1,<2",
   "django-environ>=0.11,<1",
   "packaging>=24,<27",
 ]
@@ -52,19 +51,10 @@ dev = [
   "django-stubs-ext>=5.2,<6",
   "langgraph>=1.0,<2",
   "llama-index-workflows>=2.22,<3",
+  "litellm>=1,<2",
   "build>=1.2,<2",
   "twine>=6,<7",
   "check-wheel-contents>=0.6,<1",
-]
-langgraph = [
-  "langgraph>=1.0,<2",
-]
-llamaindex = [
-  "llama-index-workflows>=2.22,<3",
-]
-oss-integrations = [
-  "langgraph>=1.0,<2",
-  "llama-index-workflows>=2.22,<3",
 ]
 postgres = [
   "psycopg[binary]>=3.2",
@@ -83,6 +73,7 @@ dev = [
   "django-stubs-ext>=5.2,<6",
   "langgraph>=1.0,<2",
   "llama-index-workflows>=2.22,<3",
+  "litellm>=1,<2",
   "build>=1.2,<2",
   "twine>=6,<7",
   "check-wheel-contents>=0.6,<1",

@@ -32,11 +32,11 @@ AVAILABLE = IntegrationDefinition(
     import_name="pytest",
     provider_path="unused:provider",
     supported_versions=">=1",
-    metadata={"install_extra": "pytest-health"},
+    metadata={"install_requirement": "pytest-health>=1"},
 )
 
 
-def test_health_list_reports_available_provider_and_install_extra() -> None:
+def test_health_list_reports_available_provider_and_install_requirement() -> None:
     registry = WorkflowIntegrationRegistry(
         (AVAILABLE,), providers=(_Provider(AVAILABLE),)
     )
@@ -48,8 +48,8 @@ def test_health_list_reports_available_provider_and_install_extra() -> None:
     assert item.status == "available"
     assert item.provider_status == "loaded"
     assert item.health_status == "ready"
-    assert item.install_extra == "pytest-health"
-    assert item.install_command == 'pip install "cobalt-wren[pytest-health]"'
+    assert item.install_requirement == "pytest-health>=1"
+    assert item.install_command == 'pip install "pytest-health>=1"'
 
 
 def test_health_reports_missing_and_incompatible_without_loading_provider() -> None:
@@ -58,7 +58,7 @@ def test_health_reports_missing_and_incompatible_without_loading_provider() -> N
         distribution="missing-health-distribution",
         import_name="missing_health_import",
         provider_path="private.failure:SECRET_VALUE",
-        metadata={"install_extra": "missing-health"},
+        metadata={"install_requirement": "missing-health"},
     )
     incompatible = IntegrationDefinition(
         integration_id="incompatible-health",

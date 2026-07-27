@@ -33,3 +33,17 @@ def test_litellm_client_does_not_import_django_or_graphs() -> None:
 
     offenders = [module for module in modules if module.startswith(('django.db', 'cobalt_wren.apps.automation', 'cobalt_wren.graphs'))]
     assert offenders == []
+
+
+def test_litellm_is_not_a_runtime_dependency() -> None:
+    import tomllib
+
+    data = tomllib.loads(Path("pyproject.toml").read_text())
+    assert not any(
+        dependency.startswith("litellm")
+        for dependency in data["project"]["dependencies"]
+    )
+    assert any(
+        dependency.startswith("litellm")
+        for dependency in data["project"]["optional-dependencies"]["dev"]
+    )

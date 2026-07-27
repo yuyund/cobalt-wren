@@ -478,7 +478,7 @@ Dynamic UI renders safe metadata projections only. It does not execute workflows
 ## Optional Workflow OSS Dependency Contract
 
 - the foundation project dependencies do not include LangGraph or LlamaIndex Workflows.
-- `langgraph`, `llamaindex`, and `oss-integrations` are explicit optional extras.
+- target workflow and provider distributions are installed and versioned by the consuming application; Cobalt Wren exposes helpers without installation extras.
 - importing the engine facade, empty built-in workflow catalog, public integration helpers, and Native examples must not import a target workflow OSS.
 - concrete integration provider modules may import their target OSS because they are loaded lazily after availability and version resolution.
 - plain Python executable compatibility is a separate lower-level SPI and is verified independently from Native examples.

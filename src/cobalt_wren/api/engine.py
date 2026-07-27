@@ -34,7 +34,6 @@ from cobalt_wren.config.models import (
 )
 from cobalt_wren.config.normalizer import normalize_package_config
 from cobalt_wren.config.validator import ConfigValidator
-from cobalt_wren.integrations.llm.litellm_client import LiteLLMClient
 from cobalt_wren.integrations.tools.safe_tools import EchoTool
 from cobalt_wren.plugins.registry import PluginRegistry
 from cobalt_wren.runtime.assembly import RuntimeAssembler
@@ -181,11 +180,68 @@ def _merge_unique_plugins(*plugin_groups: tuple[str, ...] | Sequence[str]) -> tu
 
 
 def _build_runtime_defaults_plugin() -> Plugin:
-    return Plugin(metadata=PluginMetadata(name=_INTERNAL_RUNTIME_PLUGIN_NAME, version=_INTERNAL_RUNTIME_PLUGIN_VERSION, description="Internal runtime defaults for package engine facade.", plugin_types=("provider", "tool"), provides={"providers": (_DEFAULT_PROVIDER_NAME,), "tools": (_DEFAULT_TOOL_NAME,)}, metadata={"visibility": "internal", "scope": "engine"}), contributions=PluginContributions(providers=(ProviderContribution(name=_DEFAULT_PROVIDER_NAME, provider_type="llm", description="Default LiteLLM provider used by the package engine.", supported_parameters=("model", "base_url", "temperature", "max_tokens"), create_client=_create_default_llm_client),), tools=(ToolContribution(name=_DEFAULT_TOOL_NAME, description="Safe echo tool used by the reference workflow.", capabilities=("echo",), create_tool=_create_default_echo_tool),)))
+    providers: tuple[ProviderContribution, ...] = ()
+    provider_names: tuple[str, ...] = ()
+    if _litellm_is_available():
+        providers = (
+            ProviderContribution(
+                name=_DEFAULT_PROVIDER_NAME,
+                provider_type="llm",
+                description="Optional LiteLLM provider adapter.",
+                supported_parameters=("model", "base_url", "temperature", "max_tokens"),
+                create_client=_create_default_llm_client,
+            ),
+        )
+        provider_names = (_DEFAULT_PROVIDER_NAME,)
+    return Plugin(
+        metadata=PluginMetadata(
+            name=_INTERNAL_RUNTIME_PLUGIN_NAME,
+            version=_INTERNAL_RUNTIME_PLUGIN_VERSION,
+            description="Internal runtime defaults for package engine facade.",
+            plugin_types=("provider", "tool") if providers else ("tool",),
+            provides={"providers": provider_names, "tools": (_DEFAULT_TOOL_NAME,)},
+            metadata={"visibility": "internal", "scope": "engine"},
+        ),
+        contributions=PluginContributions(
+            providers=providers,
+            tools=(
+                ToolContribution(
+                    name=_DEFAULT_TOOL_NAME,
+                    description="Safe echo tool used by the reference workflow.",
+                    capabilities=("echo",),
+                    create_tool=_create_default_echo_tool,
+                ),
+            ),
+        ),
+    )
+
+
+def _litellm_is_available() -> bool:
+    from importlib.util import find_spec
+
+    return find_spec("litellm") is not None
 
 
 def _create_default_llm_client(*, config: ProviderProfileConfig, context: object) -> object:
-    return LiteLLMClient(model=_resolve_model_name(config), api_key=_resolve_optional_secret(config, context, "api_key"), base_url=_optional_str(config.parameters.get("base_url")), temperature=_optional_float(config.parameters.get("temperature")), max_tokens=_optional_int(config.parameters.get("max_tokens")))
+    try:
+        from cobalt_wren.integrations.llm.litellm_client import LiteLLMClient
+    except ModuleNotFoundError as exc:
+        if exc.name == "litellm":
+            raise RuntimeAssemblyError(
+                "Runtime assembly failed: provider 'litellm' is not installed. "
+                "Install LiteLLM in the consuming application.",
+                code="RUNTIME_ASSEMBLY_PROVIDER_NOT_INSTALLED",
+                component=_ENGINE_COMPONENT,
+                metadata={"provider": _DEFAULT_PROVIDER_NAME, "distribution": "litellm"},
+            ) from exc
+        raise
+    return LiteLLMClient(
+        model=_resolve_model_name(config),
+        api_key=_resolve_optional_secret(config, context, "api_key"),
+        base_url=_optional_str(config.parameters.get("base_url")),
+        temperature=_optional_float(config.parameters.get("temperature")),
+        max_tokens=_optional_int(config.parameters.get("max_tokens")),
+    )
 
 
 def _create_default_echo_tool(*, config: object, context: object) -> object:

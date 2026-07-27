@@ -17,12 +17,14 @@ Cobalt Wren requires Python 3.12 or newer.
 pip install cobalt-wren
 ```
 
-Install optional workflow integrations only when needed:
+Install workflow frameworks and LLM provider SDKs directly in the consuming
+application. Cobalt Wren supplies adapter contracts and helpers but does not own
+their installation or version policy. For example:
 
 ```bash
-pip install "cobalt-wren[langgraph]"
-pip install "cobalt-wren[llamaindex]"
-pip install "cobalt-wren[oss-integrations]"
+pip install cobalt-wren langgraph
+pip install cobalt-wren llama-index-workflows
+pip install cobalt-wren litellm
 ```
 
 ## Write a Native workflow
