@@ -2,12 +2,58 @@ from __future__ import annotations
 
 import argparse
 import json
+from collections.abc import Mapping
+from dataclasses import dataclass
 from pathlib import Path
 from statistics import median
 from time import perf_counter_ns
 
 from cobalt_wren.api.engine import create_engine
-from tests.external_packages.acme_workflows.plugin import EXTERNAL_WORKFLOW_KIND, create_plugin
+from cobalt_wren.api.plugins import Plugin, PluginContributions, PluginMetadata
+from cobalt_wren.api.workflow import (
+    WorkflowBuildContext,
+    WorkflowContribution,
+    WorkflowDefinition,
+    WorkflowMetadata,
+    WorkflowRequirements,
+)
+
+EXTERNAL_WORKFLOW_KIND = "benchmark.review_request"
+
+
+@dataclass(frozen=True, slots=True)
+class _BenchmarkWorkflow:
+    prefix: str
+
+    def execute(self, input_payload: Mapping[str, object]) -> Mapping[str, object]:
+        return {
+            "status": "accepted",
+            "message": f"{self.prefix}:{input_payload.get('request_id', '')}",
+        }
+
+
+def create_plugin() -> Plugin:
+    def build(context: WorkflowBuildContext) -> _BenchmarkWorkflow:
+        return _BenchmarkWorkflow(prefix=str(context.config.get("prefix", "review")))
+
+    contribution = WorkflowContribution(
+        kind=EXTERNAL_WORKFLOW_KIND,
+        definition=WorkflowDefinition(
+            kind=EXTERNAL_WORKFLOW_KIND,
+            metadata=WorkflowMetadata(name="Benchmark workflow", version="1.0.0"),
+            requirements=WorkflowRequirements(),
+            build=build,
+        ),
+    )
+    return Plugin(
+        metadata=PluginMetadata(
+            name="benchmark.workflow",
+            version="1.0.0",
+            plugin_types=("workflow",),
+            provides={"workflows": (EXTERNAL_WORKFLOW_KIND,)},
+        ),
+        contributions=PluginContributions(workflows=(contribution,)),
+    )
 
 
 def _measure(operation, iterations: int) -> dict[str, float | int]:
