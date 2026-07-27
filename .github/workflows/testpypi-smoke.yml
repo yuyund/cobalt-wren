@@ -17,10 +17,19 @@ jobs:
           python-version: "3.12"
       - run: |
           python -m venv /tmp/cobalt-wren-testpypi
-          /tmp/cobalt-wren-testpypi/bin/pip install \
-            --index-url https://test.pypi.org/simple/ \
-            --extra-index-url https://pypi.org/simple/ \
-            "cobalt-wren==${{ inputs.version }}"
+          installed=0
+          for attempt in 1 2 3 4 5 6; do
+            if /tmp/cobalt-wren-testpypi/bin/pip install \
+              --index-url https://test.pypi.org/simple/ \
+              --extra-index-url https://pypi.org/simple/ \
+              "cobalt-wren==${{ inputs.version }}"; then
+              installed=1
+              break
+            fi
+            echo "TestPyPI index has not exposed ${{ inputs.version }} yet (attempt ${attempt}/6)."
+            sleep 20
+          done
+          test "$installed" = 1
       - run: |
           /tmp/cobalt-wren-testpypi/bin/python - <<'PY'
           import importlib.metadata as metadata
