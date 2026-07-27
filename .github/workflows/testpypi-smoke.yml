@@ -57,11 +57,11 @@ jobs:
               result = await ctx.step('echo', lambda text: text.strip(), value)
               return {'message': result}
           PY
-          /tmp/cobalt-wren-testpypi/bin/cobalt-wren native-inspect workflow:echo
-          /tmp/cobalt-wren-testpypi/bin/cobalt-wren native-validate workflow:echo
-          /tmp/cobalt-wren-testpypi/bin/cobalt-wren native-run \
+          /tmp/cobalt-wren-testpypi/bin/python -m cobalt_wren native-inspect workflow:echo
+          /tmp/cobalt-wren-testpypi/bin/python -m cobalt_wren native-validate workflow:echo
+          /tmp/cobalt-wren-testpypi/bin/python -m cobalt_wren native-run \
             workflow:echo --input '{"message":" testpypi "}'
-          /tmp/cobalt-wren-testpypi/bin/cobalt-wren init-workflow \
+          /tmp/cobalt-wren-testpypi/bin/python -m cobalt_wren init-workflow \
             --name smoke-package --kind smoke.package --framework native --output .
           test -f smoke-package/pyproject.toml
           grep -q 'cobalt-wren>=0.1.0rc1' smoke-package/pyproject.toml
