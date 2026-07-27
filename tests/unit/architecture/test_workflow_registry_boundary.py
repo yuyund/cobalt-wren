@@ -17,7 +17,12 @@ def _imported_modules(path: Path) -> list[str]:
     return modules
 
 
-def test_workflow_catalog_is_the_only_builtin_composition_entrypoint() -> None:
-    modules = _imported_modules(Path('src/langgraph_automation/workflows/catalog.py'))
-    assert 'langgraph_automation.workflows.reference.llm_echo_summary.definition' in modules
-    assert not any(module.startswith('langgraph_automation.graphs') for module in modules)
+def test_workflow_catalog_does_not_import_examples_or_implementations() -> None:
+    modules = _imported_modules(Path("src/cobalt_wren/workflows/catalog.py"))
+
+    assert "cobalt_wren.api.plugins" in modules
+    assert "cobalt_wren.plugins.registry" in modules
+    assert not any("reference" in module for module in modules)
+    assert not any("examples" in module for module in modules)
+    assert not any(module.startswith("cobalt_wren.graphs") for module in modules)
+    assert not any(module.startswith("cobalt_wren.native") for module in modules)

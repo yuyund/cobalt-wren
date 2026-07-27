@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from langgraph_automation.api.plugins import (
+from cobalt_wren.api.plugins import (
     EventSinkContribution,
     Plugin,
     PluginContributions,
@@ -11,7 +11,7 @@ from langgraph_automation.api.plugins import (
     StoreContribution,
     ToolContribution,
 )
-from langgraph_automation.api.workflow import WorkflowContribution, WorkflowDefinition, WorkflowMetadata, WorkflowRequirements
+from cobalt_wren.api.workflow import WorkflowContribution, WorkflowDefinition, WorkflowMetadata, WorkflowRequirements
 
 
 def test_plugin_metadata_normalizes_and_copies_mappings() -> None:

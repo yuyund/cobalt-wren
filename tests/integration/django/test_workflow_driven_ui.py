@@ -13,9 +13,9 @@ for package in ("human_approval_workflow", "saga_workflow", "plain_python_workfl
 from human_approval_workflow import create_plugin as create_approval_plugin  # noqa: E402
 from saga_workflow import create_plugin as create_saga_plugin  # noqa: E402
 from plain_python_workflow import create_plugin as create_plain_plugin  # noqa: E402
-from langgraph_automation.apps.automation.models import Run, RunStatus, Workflow  # noqa: E402
-from langgraph_automation.apps.automation.services import runtime as runtime_module  # noqa: E402
-from langgraph_automation.apps.automation.services.runs import start_run  # noqa: E402
+from cobalt_wren.apps.automation.models import Run, RunStatus, Workflow  # noqa: E402
+from cobalt_wren.apps.automation.services import runtime as runtime_module  # noqa: E402
+from cobalt_wren.apps.automation.services.runs import start_run  # noqa: E402
 
 
 def _services(tmp_path: Path):

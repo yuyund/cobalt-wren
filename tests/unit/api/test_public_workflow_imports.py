@@ -4,7 +4,7 @@ from __future__ import annotations
 
 
 def test_public_workflow_api_exports() -> None:
-    from langgraph_automation.api.workflow import (
+    from cobalt_wren.api.workflow import (
         WorkflowContribution,
         WorkflowDefinition,
         WorkflowMetadata,
@@ -22,7 +22,7 @@ def test_public_workflow_api_exports() -> None:
 
 
 def test_public_workflow_api_all() -> None:
-    import langgraph_automation.api.workflow as workflow_api
+    import cobalt_wren.api.workflow as workflow_api
 
     assert set(workflow_api.__all__) == {
         "WorkflowBuildContext",
@@ -40,7 +40,7 @@ def test_public_workflow_api_all() -> None:
 
 
 def test_public_workflow_api_does_not_export_graph_runtime_names() -> None:
-    import langgraph_automation.api.workflow as workflow_api
+    import cobalt_wren.api.workflow as workflow_api
 
     assert not hasattr(workflow_api, "GraphDefinition")
     assert not hasattr(workflow_api, "GraphRuntime")

@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import json
 
-from langgraph_automation.core.redaction import REDACTED_VALUE
-from langgraph_automation.integrations.checkpoint import CheckpointWriteRequest, MemoryCheckpointStore, summarize_state
+from cobalt_wren.core.redaction import REDACTED_VALUE
+from cobalt_wren.integrations.checkpoint import CheckpointWriteRequest, MemoryCheckpointStore, summarize_state
 
 
 def test_summarize_state_redacts_sensitive_keys_and_bounded_values() -> None:

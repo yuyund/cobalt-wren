@@ -18,35 +18,35 @@ def _imported_modules(path: Path) -> list[str]:
 
 
 def test_api_plugins_does_not_import_internal_plugin_mechanisms() -> None:
-    modules = _imported_modules(Path('src/langgraph_automation/api/plugins.py'))
+    modules = _imported_modules(Path('src/cobalt_wren/api/plugins.py'))
     allowed_prefixes = (
-        'langgraph_automation.api.workflow',
-        'langgraph_automation.api.errors',
+        'cobalt_wren.api.workflow',
+        'cobalt_wren.api.errors',
     )
     offenders = [
         module
         for module in modules
-        if module.startswith('langgraph_automation.') and not module.startswith(allowed_prefixes)
+        if module.startswith('cobalt_wren.') and not module.startswith(allowed_prefixes)
     ]
     assert offenders == []
 
 
 def test_plugin_registry_only_depends_on_public_api_and_errors() -> None:
-    modules = _imported_modules(Path('src/langgraph_automation/plugins/registry.py'))
+    modules = _imported_modules(Path('src/cobalt_wren/plugins/registry.py'))
 
     allowed_prefixes = (
-        'langgraph_automation.api.plugins',
-        'langgraph_automation.api.workflow',
-        'langgraph_automation.api.errors',
-        'langgraph_automation.api.errors',
+        'cobalt_wren.api.plugins',
+        'cobalt_wren.api.workflow',
+        'cobalt_wren.api.errors',
+        'cobalt_wren.api.errors',
     )
     forbidden_prefixes = (
-        'langgraph_automation.apps.automation',
-        'langgraph_automation.graphs.runner',
-        'langgraph_automation.graphs.builders',
-        'langgraph_automation.workflows.catalog',
-        'langgraph_automation.config',
-        'langgraph_automation.integrations',
+        'cobalt_wren.apps.automation',
+        'cobalt_wren.graphs.runner',
+        'cobalt_wren.graphs.builders',
+        'cobalt_wren.workflows.catalog',
+        'cobalt_wren.config',
+        'cobalt_wren.integrations',
         'django.',
     )
 
@@ -54,9 +54,9 @@ def test_plugin_registry_only_depends_on_public_api_and_errors() -> None:
     forbidden = [module for module in modules if module.startswith(forbidden_prefixes)]
 
     assert set(allowed) == {
-        'langgraph_automation.api.errors',
-        'langgraph_automation.api.plugins',
-        'langgraph_automation.api.workflow',
-        'langgraph_automation.api.errors',
+        'cobalt_wren.api.errors',
+        'cobalt_wren.api.plugins',
+        'cobalt_wren.api.workflow',
+        'cobalt_wren.api.errors',
     }
     assert forbidden == []

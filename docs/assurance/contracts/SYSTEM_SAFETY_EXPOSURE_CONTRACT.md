@@ -4,9 +4,9 @@ status: current
 authority: normative
 summary: Safety boundaries for persisted and user-visible execution data.
 code_refs:
-  - src/langgraph_automation/core/result_safety.py
-  - src/langgraph_automation/core/redaction.py
-  - src/langgraph_automation/integrations/observability
+  - src/cobalt_wren/core/result_safety.py
+  - src/cobalt_wren/core/redaction.py
+  - src/cobalt_wren/integrations/observability
 test_refs:
   - tests/unit/automation/test_run_execution_public_workflow.py
   - tests/unit/apps/web/test_dynamic_ui_safety.py

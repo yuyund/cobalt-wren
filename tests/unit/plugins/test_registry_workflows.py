@@ -4,10 +4,10 @@ from __future__ import annotations
 
 import pytest
 
-from langgraph_automation.api.errors import PluginRegistrationError, PluginResolutionError
-from langgraph_automation.api.plugins import Plugin, PluginContributions, PluginMetadata
-from langgraph_automation.api.workflow import WorkflowContribution, WorkflowDefinition, WorkflowMetadata, WorkflowRequirements
-from langgraph_automation.plugins.registry import PluginRegistry
+from cobalt_wren.api.errors import PluginRegistrationError, PluginResolutionError
+from cobalt_wren.api.plugins import Plugin, PluginContributions, PluginMetadata
+from cobalt_wren.api.workflow import WorkflowContribution, WorkflowDefinition, WorkflowMetadata, WorkflowRequirements
+from cobalt_wren.plugins.registry import PluginRegistry
 
 
 def _build_workflow_plugin(

@@ -61,6 +61,14 @@ The package must allow workflows to choose:
 Adding a workflow must not require changes to the graph foundation, runtime assembly, control-plane services, or existing workflow implementations unless the workflow introduces a genuinely new package capability.
 The package constrains safety and integration boundaries, not business topology.
 
+## OSS-Neutral Integration
+
+Framework neutrality is not achieved by flattening every workflow implementation to a minimal Run result. The generic execution adapter remains capability-based and does not identify or inspect a specific workflow OSS. Framework-specific integration helpers sit outside that adapter and use stable public hooks to preserve useful execution, observability, action, checkpoint, and presentation semantics.
+
+The foundation understands canonical operational records, opaque integration identifiers, registered schemas, action descriptors, and renderer-neutral view specifications. It must not contain framework-name conditionals. Common control-plane semantics provide cross-framework search, correlation, policy, audit, and operations; versioned integration projections preserve details that do not belong in the canonical schema.
+
+Integration code may ship with the package while target OSS distributions remain optional and are detected in the user environment. Supported integration metadata, compatibility ranges, maturity, capabilities, and limitations must be centrally declared. Explicit integration selection is a foundation concern; automatic inference and low-configuration authoring are convenience concerns.
+
 ## Dynamic UI
 
 Backend and control-plane state must be projected through a safe UI specification before rendering.

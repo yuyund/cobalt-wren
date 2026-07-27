@@ -1,7 +1,7 @@
 from io import BytesIO
 
-from langgraph_automation.api.stores import ArtifactWriteRequest
-from langgraph_automation.integrations.artifact import S3ArtifactStore
+from cobalt_wren.api.stores import ArtifactWriteRequest
+from cobalt_wren.integrations.artifact import S3ArtifactStore
 
 
 class FakeS3:

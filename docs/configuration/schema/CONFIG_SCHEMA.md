@@ -1,6 +1,6 @@
 # Configuration Schema Boundaries
 
-This document defines the configuration schema boundaries for `langgraph-automation`.
+This document defines the configuration schema boundaries for `cobalt-wren`.
 
 Purpose:
 
@@ -227,7 +227,7 @@ Bad example:
 providers:
   llm:
     default:
-      class: langgraph_automation.integrations.llm.litellm_client.LiteLLMClient
+      class: cobalt_wren.integrations.llm.litellm_client.LiteLLMClient
 ```
 
 Good example:
@@ -248,7 +248,7 @@ stores:
     # explicit filesystem selection:
     # backend: filesystem
     # config:
-    #   root: /srv/langgraph-automation/artifacts
+    #   root: /srv/cobalt-wren/artifacts
 observability:
   backend: none
 worker:
@@ -280,7 +280,7 @@ stores:
   artifact:
     backend: filesystem
     config:
-      root: /srv/langgraph-automation/artifacts
+      root: /srv/cobalt-wren/artifacts
 ```
 
 Rules:
@@ -313,7 +313,7 @@ stores:
   checkpoint:
     backend: filesystem
     config:
-      root: /srv/langgraph-automation/checkpoints
+      root: /srv/cobalt-wren/checkpoints
 ```
 
 Rules:

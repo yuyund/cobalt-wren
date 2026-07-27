@@ -19,23 +19,23 @@ def _imported_modules(path: Path) -> list[str]:
 
 def test_api_workflow_does_not_import_runtime_or_registry_boundaries() -> None:
     forbidden_prefixes = (
-        "langgraph_automation.runtime",
-        "langgraph_automation.plugins.registry",
-        "langgraph_automation.config.validator",
-        "langgraph_automation.graphs.runner",
-        "langgraph_automation.graphs.builders",
-        "langgraph_automation.apps.automation",
-        "langgraph_automation.workflows.catalog",
+        "cobalt_wren.runtime",
+        "cobalt_wren.plugins.registry",
+        "cobalt_wren.config.validator",
+        "cobalt_wren.graphs.runner",
+        "cobalt_wren.graphs.builders",
+        "cobalt_wren.apps.automation",
+        "cobalt_wren.workflows.catalog",
         "django",
     )
 
-    modules = _imported_modules(Path("src/langgraph_automation/api/workflow.py"))
+    modules = _imported_modules(Path("src/cobalt_wren/api/workflow.py"))
     offenders = [module for module in modules if module.startswith(forbidden_prefixes)]
     assert offenders == []
 
 
 def test_plugin_registry_may_import_workflow_facade_but_not_runtime() -> None:
-    modules = _imported_modules(Path("src/langgraph_automation/plugins/registry.py"))
+    modules = _imported_modules(Path("src/cobalt_wren/plugins/registry.py"))
 
-    assert any(module.startswith("langgraph_automation.api.workflow") for module in modules)
-    assert not any(module.startswith("langgraph_automation.runtime") for module in modules)
+    assert any(module.startswith("cobalt_wren.api.workflow") for module in modules)
+    assert not any(module.startswith("cobalt_wren.runtime") for module in modules)

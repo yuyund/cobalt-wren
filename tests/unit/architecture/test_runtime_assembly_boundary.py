@@ -19,15 +19,15 @@ def _imported_modules(path: Path) -> list[str]:
 
 def test_config_modules_do_not_import_runtime() -> None:
     forbidden_prefixes = (
-        'langgraph_automation.runtime',
+        'cobalt_wren.runtime',
     )
     for relative in (
-        Path('src/langgraph_automation/config/__init__.py'),
-        Path('src/langgraph_automation/config/loader.py'),
-        Path('src/langgraph_automation/config/models.py'),
-        Path('src/langgraph_automation/config/normalizer.py'),
-        Path('src/langgraph_automation/config/security.py'),
-        Path('src/langgraph_automation/config/validator.py'),
+        Path('src/cobalt_wren/config/__init__.py'),
+        Path('src/cobalt_wren/config/loader.py'),
+        Path('src/cobalt_wren/config/models.py'),
+        Path('src/cobalt_wren/config/normalizer.py'),
+        Path('src/cobalt_wren/config/security.py'),
+        Path('src/cobalt_wren/config/validator.py'),
     ):
         modules = _imported_modules(relative)
         offenders = [module for module in modules if module.startswith(forbidden_prefixes)]
@@ -36,19 +36,19 @@ def test_config_modules_do_not_import_runtime() -> None:
 
 def test_runtime_modules_do_not_import_registry_or_django_boundaries() -> None:
     forbidden_prefixes = (
-        'langgraph_automation.plugins.registry',
-        'langgraph_automation.apps.automation',
-        'langgraph_automation.graphs.runner',
-        'langgraph_automation.graphs.builders',
-        'langgraph_automation.workflows.catalog',
+        'cobalt_wren.plugins.registry',
+        'cobalt_wren.apps.automation',
+        'cobalt_wren.graphs.runner',
+        'cobalt_wren.graphs.builders',
+        'cobalt_wren.workflows.catalog',
         'django',
     )
     for relative in (
-        Path('src/langgraph_automation/runtime/__init__.py'),
-        Path('src/langgraph_automation/runtime/dependencies.py'),
-        Path('src/langgraph_automation/runtime/context.py'),
-        Path('src/langgraph_automation/runtime/secrets.py'),
-        Path('src/langgraph_automation/runtime/assembly.py'),
+        Path('src/cobalt_wren/runtime/__init__.py'),
+        Path('src/cobalt_wren/runtime/dependencies.py'),
+        Path('src/cobalt_wren/runtime/context.py'),
+        Path('src/cobalt_wren/runtime/secrets.py'),
+        Path('src/cobalt_wren/runtime/assembly.py'),
     ):
         modules = _imported_modules(relative)
         offenders = [module for module in modules if module.startswith(forbidden_prefixes)]

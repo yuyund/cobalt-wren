@@ -10,10 +10,10 @@ ROOT = Path(__file__).parents[3]
 sys.path.insert(0, str(ROOT / "packages" / "plain_python_workflow" / "src"))
 
 from plain_python_workflow import create_plugin  # noqa: E402
-from langgraph_automation.apps.automation.models import ExecutionJobStatus, Run, RunStatus, Workflow  # noqa: E402
-from langgraph_automation.apps.automation.services import runtime as runtime_module  # noqa: E402
-from langgraph_automation.apps.automation.services.dispatch import dispatch_start  # noqa: E402
-from langgraph_automation.apps.automation.services.jobs import claim_next_job, execute_job  # noqa: E402
+from cobalt_wren.apps.automation.models import ExecutionJobStatus, Run, RunStatus, Workflow  # noqa: E402
+from cobalt_wren.apps.automation.services import runtime as runtime_module  # noqa: E402
+from cobalt_wren.apps.automation.services.dispatch import dispatch_start  # noqa: E402
+from cobalt_wren.apps.automation.services.jobs import claim_next_job, execute_job  # noqa: E402
 
 
 @pytest.mark.django_db(transaction=True)
@@ -22,7 +22,7 @@ def test_worker_mode_executes_run_outside_dispatch_request(monkeypatch: pytest.M
     monkeypatch.setattr(runtime_module, "get_run_execution_services", lambda: services)
     workflow = Workflow.objects.create(name="worker-plain", definition_payload={"workflow": {"kind": "plain.confirmation", "config": {}}})
     run = Run.objects.create(workflow=workflow, name="worker-run", input_payload={"subject": "Worker", "message": "Separate process boundary"})
-    with override_settings(LANGGRAPH_AUTOMATION_EXECUTION_MODE="worker"):
+    with override_settings(COBALT_WREN_EXECUTION_MODE="worker"):
         dispatched = dispatch_start(run=run)
     run.refresh_from_db()
     assert run.status == RunStatus.PENDING

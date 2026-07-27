@@ -4,9 +4,9 @@ from __future__ import annotations
 
 
 def test_public_engine_api_exports() -> None:
-    import langgraph_automation.api.engine as engine_api
+    import cobalt_wren.api.engine as engine_api
 
-    from langgraph_automation.api.engine import AutomationEngine, EnginePreparedWorkflow, create_engine
+    from cobalt_wren.api.engine import AutomationEngine, EnginePreparedWorkflow, create_engine
 
     assert create_engine is not None
     assert AutomationEngine is not None
@@ -16,7 +16,7 @@ def test_public_engine_api_exports() -> None:
 
 
 def test_public_api_package_does_not_re_export_engine_symbols() -> None:
-    import langgraph_automation.api as api_package
+    import cobalt_wren.api as api_package
 
     assert not hasattr(api_package, "create_engine")
     assert not hasattr(api_package, "AutomationEngine")

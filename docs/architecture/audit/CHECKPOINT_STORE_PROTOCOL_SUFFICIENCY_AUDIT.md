@@ -14,7 +14,7 @@ Docs record the current decision and the target boundary.
 
 ## Current Protocol Surface
 
-The current public store facade re-exports the checkpoint protocol from `src/langgraph_automation/api/stores.py`.
+The current public store facade re-exports the checkpoint protocol from `src/cobalt_wren/api/stores.py`.
 
 The current protocol surface is:
 
@@ -49,14 +49,14 @@ The current protocol does not expose destructive delete, latest-state replacemen
 
 Current code-first evidence shows:
 
-- `src/langgraph_automation/apps/automation/services/runtime.py` binds normalized deployment configuration and delegates checkpoint store construction to runtime assembly
-- `src/langgraph_automation/runtime/assembly.py` threads the checkpoint store through `RuntimeDependencies`
-- `src/langgraph_automation/graphs/runtime.py` carries the checkpoint store on `GraphRuntime`
-- `src/langgraph_automation/integrations/checkpoint/filesystem_store.py` implements the durable filesystem backend
-- `src/langgraph_automation/integrations/observability/django_event_sink.py` persists `CheckpointMetadata` rows only
-- `src/langgraph_automation/apps/automation/services/execution.py` does not write checkpoint bodies
-- `src/langgraph_automation/apps/automation/services/runs.py` does not write checkpoint bodies
-- `src/langgraph_automation/graphs/runner.py` does not call the checkpoint store
+- `src/cobalt_wren/apps/automation/services/runtime.py` binds normalized deployment configuration and delegates checkpoint store construction to runtime assembly
+- `src/cobalt_wren/runtime/assembly.py` threads the checkpoint store through `RuntimeDependencies`
+- `src/cobalt_wren/graphs/runtime.py` carries the checkpoint store on `GraphRuntime`
+- `src/cobalt_wren/integrations/checkpoint/filesystem_store.py` implements the durable filesystem backend
+- `src/cobalt_wren/integrations/observability/django_event_sink.py` persists `CheckpointMetadata` rows only
+- `src/cobalt_wren/apps/automation/services/execution.py` does not write checkpoint bodies
+- `src/cobalt_wren/apps/automation/services/runs.py` does not write checkpoint bodies
+- `src/cobalt_wren/graphs/runner.py` does not call the checkpoint store
 
 No current production execution path in `src/` calls checkpoint persistence from the graph execution path.
 

@@ -17,25 +17,26 @@ def _imported_modules(path: Path) -> list[str]:
     return modules
 
 
-def test_workflow_catalog_uses_public_facades_and_internal_bridge_only() -> None:
-    modules = _imported_modules(Path('src/langgraph_automation/workflows/catalog.py'))
+def test_workflow_catalog_uses_registry_boundary_only() -> None:
+    modules = _imported_modules(Path("src/cobalt_wren/workflows/catalog.py"))
 
-    assert 'langgraph_automation.api.plugins' in modules
-    assert 'langgraph_automation.api.workflow' in modules
-    assert 'langgraph_automation.plugins.registry' in modules
-    assert 'langgraph_automation.workflows.adapter' not in modules
-    assert 'langgraph_automation.workflows.reference.llm_echo_summary.definition' in modules
-    assert not any(module.startswith('langgraph_automation.graphs') for module in modules)
+    assert "cobalt_wren.api.plugins" in modules
+    assert "cobalt_wren.plugins.registry" in modules
+    assert "cobalt_wren.workflows.adapter" not in modules
+    assert not any("reference" in module for module in modules)
+    assert not any("examples" in module for module in modules)
+    assert not any(module.startswith("cobalt_wren.native") for module in modules)
+    assert not any(module.startswith("cobalt_wren.graphs") for module in modules)
 
     offenders = [
         module
         for module in modules
         if module.startswith(
             (
-                'langgraph_automation.runtime',
-                'langgraph_automation.config.validator',
-                'langgraph_automation.apps.automation',
-                'django',
+                "cobalt_wren.runtime",
+                "cobalt_wren.config.validator",
+                "cobalt_wren.apps.automation",
+                "django",
             )
         )
     ]
@@ -43,29 +44,19 @@ def test_workflow_catalog_uses_public_facades_and_internal_bridge_only() -> None
 
 
 def test_workflow_adapter_stays_inside_workflow_and_error_facades() -> None:
-    modules = _imported_modules(Path('src/langgraph_automation/workflows/adapter.py'))
+    modules = _imported_modules(Path('src/cobalt_wren/workflows/adapter.py'))
 
-    assert 'langgraph_automation.api.errors' in modules
-    assert 'langgraph_automation.api.workflow' in modules
-    offenders = [module for module in modules if module.startswith('langgraph_automation.runtime')]
+    assert 'cobalt_wren.api.errors' in modules
+    assert 'cobalt_wren.api.workflow' in modules
+    offenders = [module for module in modules if module.startswith('cobalt_wren.runtime')]
     assert offenders == []
 
 
 def test_workflow_requirements_checker_depends_on_runtime_dependencies_only() -> None:
-    modules = _imported_modules(Path('src/langgraph_automation/workflows/requirements.py'))
+    modules = _imported_modules(Path('src/cobalt_wren/workflows/requirements.py'))
 
-    assert 'langgraph_automation.api.errors' in modules
-    assert 'langgraph_automation.api.workflow' in modules
-    assert 'langgraph_automation.runtime.dependencies' in modules
-    offenders = [module for module in modules if module.startswith('langgraph_automation.apps.automation')]
-    assert offenders == []
-
-
-def test_reference_workflow_definition_stays_within_internal_graph_boundary() -> None:
-    modules = _imported_modules(Path('src/langgraph_automation/workflows/reference/llm_echo_summary/definition.py'))
-
-    assert 'langgraph_automation.api.workflow' in modules
-    assert 'langgraph_automation.graphs' not in ' '.join(modules)
-    assert 'executable' in modules
-    offenders = [module for module in modules if module.startswith('langgraph_automation.runtime')]
+    assert 'cobalt_wren.api.errors' in modules
+    assert 'cobalt_wren.api.workflow' in modules
+    assert 'cobalt_wren.runtime.dependencies' in modules
+    offenders = [module for module in modules if module.startswith('cobalt_wren.apps.automation')]
     assert offenders == []

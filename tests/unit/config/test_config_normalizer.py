@@ -2,10 +2,10 @@ from __future__ import annotations
 
 import pytest
 
-from langgraph_automation.api.errors import ConfigError
-from langgraph_automation.config.loader import load_package_config_from_mapping
-from langgraph_automation.config.models import RawPackageConfig, SecretRef
-from langgraph_automation.config.normalizer import (
+from cobalt_wren.api.errors import ConfigError
+from cobalt_wren.config.loader import load_package_config_from_mapping
+from cobalt_wren.config.models import RawPackageConfig, SecretRef
+from cobalt_wren.config.normalizer import (
     load_normalized_package_config_from_mapping,
     normalize_package_config,
 )
@@ -37,7 +37,7 @@ def test_normalize_package_config_normalizes_nested_sections() -> None:
                 }
             },
             "tools": {"allowlist": ["echo"], "configs": {"echo": {"mode": "safe"}}},
-            "stores": {"artifact": {"backend": "filesystem", "config": {"root": "/srv/langgraph-automation/artifacts"}}},
+            "stores": {"artifact": {"backend": "filesystem", "config": {"root": "/srv/cobalt-wren/artifacts"}}},
             "event_sinks": {"stdout": {"backend": "stdout", "config": {"format": "json"}}},
             "limits": {"max_steps": 5},
             "observability": {"capture": {"input_summary": True}},
@@ -55,7 +55,7 @@ def test_normalize_package_config_normalizes_nested_sections() -> None:
     assert normalized.providers["default"].parameters == {"temperature": 0.2}
     assert normalized.providers["default"].secrets == {"api_key": SecretRef(source="env", name="LLM_API_KEY")}
     assert normalized.stores["artifact"].backend == "filesystem"
-    assert normalized.stores["artifact"].config == {"root": "/srv/langgraph-automation/artifacts"}
+    assert normalized.stores["artifact"].config == {"root": "/srv/cobalt-wren/artifacts"}
     assert normalized.event_sinks["stdout"].backend == "stdout"
     assert normalized.event_sinks["stdout"].config == {"format": "json"}
     assert normalized.limits.values == {"max_steps": 5}
@@ -70,7 +70,7 @@ def test_load_normalized_package_config_from_mapping_validates_artifact_store_se
             "stores": {
                 "artifact": {
                     "backend": "filesystem",
-                    "config": {"root": "/srv/langgraph-automation/artifacts"},
+                    "config": {"root": "/srv/cobalt-wren/artifacts"},
                 }
             },
         }

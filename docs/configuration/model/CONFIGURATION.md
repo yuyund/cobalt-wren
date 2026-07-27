@@ -1,6 +1,6 @@
 # Configuration Taxonomy
 
-This document defines the configuration taxonomy for `langgraph-automation`.
+This document defines the configuration taxonomy for `cobalt-wren`.
 
 The goal is to make clear:
 
@@ -107,7 +107,7 @@ deployment:
 
 Deployment-owned startup package config:
 
-- the production startup source may provide a single trusted package config mapping such as `LANGGRAPH_AUTOMATION`
+- the production startup source may provide a single trusted package config mapping such as `COBALT_WREN`
 - this mapping is consumed by application composition, then normalized once into `NormalizedPackageConfig`
 - it is not read from workflow payload, run payload, or user input
 - it is not recomputed per run

@@ -1,6 +1,6 @@
 # Manual Plugin Registration
 
-This document defines the manual plugin registration boundary for `langgraph-automation`.
+This document defines the manual plugin registration boundary for `cobalt-wren`.
 
 Purpose:
 
@@ -192,12 +192,12 @@ Metadata must not include:
 
 Short-term compatibility may keep existing names such as:
 
-- `llm_echo_summary`
+- `document_summary`
 - `company_agent`
 
 Namespace style is recommended long term:
 
-- `reference.llm_echo_summary`
+- `acme.document_summary`
 - `company.agent`
 
 ### Tool name

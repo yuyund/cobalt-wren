@@ -1,6 +1,6 @@
 # Plugin Taxonomy
 
-This document defines the plugin taxonomy for `langgraph-automation`.
+This document defines the plugin taxonomy for `cobalt-wren`.
 
 Purpose:
 
@@ -46,8 +46,8 @@ Provides:
 
 Public API dependency:
 
-- implemented public facade: `langgraph_automation.api.workflow`
-- current public surfaces that a workflow plugin may depend on: `langgraph_automation.api.llm`, `langgraph_automation.api.tools`, `langgraph_automation.api.stores`, `langgraph_automation.api.events`
+- implemented public facade: `cobalt_wren.api.workflow`
+- current public surfaces that a workflow plugin may depend on: `cobalt_wren.api.llm`, `cobalt_wren.api.tools`, `cobalt_wren.api.stores`, `cobalt_wren.api.events`
 
 Config relation:
 
@@ -94,7 +94,7 @@ Provides:
 
 Public API dependency:
 
-- `langgraph_automation.api.tools`
+- `cobalt_wren.api.tools`
 
 Config relation:
 
@@ -138,7 +138,7 @@ Provides:
 
 Public API dependency:
 
-- `langgraph_automation.api.llm`
+- `cobalt_wren.api.llm`
 
 Config relation:
 
@@ -180,7 +180,7 @@ Provides:
 
 Public API dependency:
 
-- `langgraph_automation.api.stores`
+- `cobalt_wren.api.stores`
 
 Config relation:
 
@@ -221,7 +221,7 @@ Provides:
 
 Public API dependency:
 
-- `langgraph_automation.api.events`
+- `cobalt_wren.api.events`
 
 Config relation:
 
@@ -262,7 +262,7 @@ Provides:
 Public API dependency:
 
 - no dedicated public facade exists yet
-- future surface may grow from `langgraph_automation.api.runtime`
+- future surface may grow from `cobalt_wren.api.runtime`
 
 Config relation:
 
@@ -406,24 +406,24 @@ Arbitrary imports and pip-install-by-config are forbidden.
 
 Allowed public facade today:
 
-- `langgraph_automation.api.llm`
-- `langgraph_automation.api.tools`
-- `langgraph_automation.api.stores`
-- `langgraph_automation.api.events`
+- `cobalt_wren.api.llm`
+- `cobalt_wren.api.tools`
+- `cobalt_wren.api.stores`
+- `cobalt_wren.api.events`
 
 Future public facade candidates:
 
-- `langgraph_automation.api.workflow`
-- `langgraph_automation.api.runtime`
-- `langgraph_automation.api.errors`
+- `cobalt_wren.api.workflow`
+- `cobalt_wren.api.runtime`
+- `cobalt_wren.api.errors`
 
 Forbidden internal dependencies:
 
-- `langgraph_automation.apps.automation.services.*`
-- `langgraph_automation.apps.automation.models`
-- `langgraph_automation.workflows.catalog`
-- `langgraph_automation.core.result_safety`
-- `langgraph_automation.core.redaction`
+- `cobalt_wren.apps.automation.services.*`
+- `cobalt_wren.apps.automation.models`
+- `cobalt_wren.workflows.catalog`
+- `cobalt_wren.core.result_safety`
+- `cobalt_wren.core.redaction`
 - concrete integrations
 - Django settings and model internals
 

@@ -20,7 +20,7 @@ def test_saga_installs_as_separate_distribution(tmp_path: Path) -> None:
     code = """
 import json
 from importlib import metadata
-entry = next(x for x in metadata.entry_points().select(group='langgraph_automation.plugins') if x.name == 'saga')
+entry = next(x for x in metadata.entry_points().select(group='cobalt_wren.plugins') if x.name == 'saga')
 plugin = entry.load()()
 w = plugin.contributions.workflows[0]
 print(json.dumps({'entry': entry.name, 'kind': w.kind, 'capabilities': w.definition.extra['capabilities']}))

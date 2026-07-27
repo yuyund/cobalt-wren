@@ -4,15 +4,15 @@ from __future__ import annotations
 
 import pytest
 
-from langgraph_automation.apps.automation.models.artifact import Artifact
-from langgraph_automation.apps.automation.models.checkpoint import CheckpointMetadata
-from langgraph_automation.apps.automation.models.event import RunEvent
-from langgraph_automation.apps.automation.models.execution import ExecutionSpan, ExecutionSpanType
-from langgraph_automation.apps.automation.models.run import Run
-from langgraph_automation.apps.automation.models.workflow import Workflow
-from langgraph_automation.apps.automation.ui.builders import build_detail_page_spec
-from langgraph_automation.apps.automation.ui.registry import get_model_ui_config
-from langgraph_automation.integrations.observability import DjangoEventSink
+from cobalt_wren.apps.automation.models.artifact import Artifact
+from cobalt_wren.apps.automation.models.checkpoint import CheckpointMetadata
+from cobalt_wren.apps.automation.models.event import RunEvent
+from cobalt_wren.apps.automation.models.execution import ExecutionSpan, ExecutionSpanType
+from cobalt_wren.apps.automation.models.run import Run
+from cobalt_wren.apps.automation.models.workflow import Workflow
+from cobalt_wren.apps.automation.ui.builders import build_detail_page_spec
+from cobalt_wren.apps.automation.ui.registry import get_model_ui_config
+from cobalt_wren.integrations.observability import DjangoEventSink
 
 
 def test_ui_registry_visible_fields_use_safe_summary_names() -> None:

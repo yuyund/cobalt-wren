@@ -1,0 +1,4 @@
+<section class="card mb-4 semantic-detail-section" data-component="{{ section.key }}">
+  <div class="card-header"><div><h2 class="card-title mb-1">{{ section.title }}</h2><div class="text-secondary">{{ section.description }}</div></div></div>
+  <div class="card-body">{% for field in section.fields %}<div class="semantic-detail-field{% if not forloop.last %} mb-4{% endif %}">{% if section.fields|length > 1 %}<div class="text-secondary fw-semibold mb-1">{{ field.label }}</div>{% endif %}<div class="detail-value">{% include 'dynamic/components/field_value.html' with field=field compact=False only %}</div></div>{% endfor %}</div>
+</section>

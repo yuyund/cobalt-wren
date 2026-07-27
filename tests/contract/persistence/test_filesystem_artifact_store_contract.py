@@ -12,9 +12,9 @@ from pathlib import Path
 
 import pytest
 
-from langgraph_automation.api.errors import ArtifactConflictError, ArtifactIntegrityError, ArtifactPersistenceError
-from langgraph_automation.integrations.artifact.base import ArtifactReadResult, ArtifactWriteRequest
-from langgraph_automation.integrations.artifact.filesystem_store import FilesystemArtifactStore
+from cobalt_wren.api.errors import ArtifactConflictError, ArtifactIntegrityError, ArtifactPersistenceError
+from cobalt_wren.integrations.artifact.base import ArtifactReadResult, ArtifactWriteRequest
+from cobalt_wren.integrations.artifact.filesystem_store import FilesystemArtifactStore
 
 
 def _request(
@@ -421,14 +421,14 @@ def test_filesystem_artifact_store_retries_after_body_then_manifest_failure(tmp_
             raise OSError('unsupported')
         return original_link(src, dst, *args, **kwargs)
 
-    monkeypatch.setattr('langgraph_automation.integrations.artifact.filesystem_store.os.link', flaky_link)
+    monkeypatch.setattr('cobalt_wren.integrations.artifact.filesystem_store.os.link', flaky_link)
     with pytest.raises(ArtifactPersistenceError):
         store.put(request)
 
     assert _body_path(root, request.body).exists()
     assert _manifest_path(root, request.storage_key).exists() is False
 
-    monkeypatch.setattr('langgraph_automation.integrations.artifact.filesystem_store.os.link', original_link)
+    monkeypatch.setattr('cobalt_wren.integrations.artifact.filesystem_store.os.link', original_link)
     written = store.put(request)
     fetched = store.get(request.storage_key)
     assert fetched is not None
@@ -446,7 +446,7 @@ def test_filesystem_artifact_store_cleanup_failure_does_not_override_success(tmp
             raise OSError('cleanup failed')
         return original_unlink(path, *args, **kwargs)
 
-    monkeypatch.setattr('langgraph_automation.integrations.artifact.filesystem_store.os.unlink', flaky_unlink)
+    monkeypatch.setattr('cobalt_wren.integrations.artifact.filesystem_store.os.unlink', flaky_unlink)
     written = store.put(request)
     assert written.storage_key == request.storage_key
     assert store.get(request.storage_key) is not None

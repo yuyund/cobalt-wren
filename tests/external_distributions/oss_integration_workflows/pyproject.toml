@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "oss-integration-workflows"
+version = "1.0.0"
+requires-python = ">=3.12"
+dependencies = [
+  "cobalt-wren>=0.1.0rc1",
+  "langgraph>=1.0,<2",
+  "llama-index-workflows>=2.22,<3",
+]
+
+[project.entry-points."cobalt_wren.plugins"]
+oss-integrations = "oss_integration_workflows:create_plugin"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]

@@ -6,7 +6,7 @@ from pathlib import Path
 from statistics import median
 from time import perf_counter_ns
 
-from langgraph_automation.api.engine import create_engine
+from cobalt_wren.api.engine import create_engine
 from tests.external_packages.acme_workflows.plugin import EXTERNAL_WORKFLOW_KIND, create_plugin
 
 

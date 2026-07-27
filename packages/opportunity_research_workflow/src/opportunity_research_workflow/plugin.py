@@ -4,22 +4,22 @@ from __future__ import annotations
 from collections.abc import Callable, Mapping
 from typing import cast
 
-from langgraph_automation.api.plugins import (
+from cobalt_wren.api.plugins import (
     Plugin,
     PluginContributions,
     PluginMetadata,
     ToolContribution,
 )
-from langgraph_automation.api.stores import ArtifactStore, CheckpointStore
-from langgraph_automation.api.workflow import (
+from cobalt_wren.api.stores import ArtifactStore, CheckpointStore
+from cobalt_wren.api.workflow import (
     WorkflowBuildContext,
     WorkflowContribution,
     WorkflowDefinition,
     WorkflowMetadata,
     WorkflowRequirements,
 )
-from langgraph_automation.integrations.llm.base import LLMClient
-from langgraph_automation.integrations.tools.base import ToolCallable
+from cobalt_wren.integrations.llm.base import LLMClient
+from cobalt_wren.integrations.tools.base import ToolCallable
 
 from .search import SearXNGSearchTool
 from .workflow import OpportunityResearchExecutable

@@ -3,12 +3,12 @@ from __future__ import annotations
 
 import pytest
 
-from langgraph_automation.api.engine import EnginePreparedWorkflow
-from langgraph_automation.apps.automation.models.run import Run, RunStatus
-from langgraph_automation.apps.automation.models.workflow import Workflow
-from langgraph_automation.apps.automation.services import runs as run_services
-from langgraph_automation.core.redaction import REDACTED_VALUE
-from langgraph_automation.core.result_safety import safe_run_output_payload
+from cobalt_wren.api.engine import EnginePreparedWorkflow
+from cobalt_wren.apps.automation.models.run import Run, RunStatus
+from cobalt_wren.apps.automation.models.workflow import Workflow
+from cobalt_wren.apps.automation.services import runs as run_services
+from cobalt_wren.core.redaction import REDACTED_VALUE
+from cobalt_wren.core.result_safety import safe_run_output_payload
 from tests.support.recording_event_sink import RecordingEventSink
 
 
@@ -122,7 +122,7 @@ def test_retry_run_reuses_public_prepared_workflow_path() -> None:
 
 @pytest.mark.django_db
 def test_start_run_auto_prepares_public_workflow_from_definition_payload() -> None:
-    from langgraph_automation.apps.automation.services import runtime as runtime_module
+    from cobalt_wren.apps.automation.services import runtime as runtime_module
     from tests.external_packages.acme_workflows.plugin import EXTERNAL_WORKFLOW_KIND, create_plugin
 
     raw_config = {"version": 1, "environment": "test"}

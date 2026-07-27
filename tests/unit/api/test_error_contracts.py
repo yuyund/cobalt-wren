@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from langgraph_automation.api.errors import ExecutionError, WorkflowPreparationError
+from cobalt_wren.api.errors import ExecutionError, WorkflowPreparationError
 
 
 def test_workflow_preparation_error_has_stable_safe_shape() -> None:

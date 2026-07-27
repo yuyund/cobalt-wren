@@ -9,14 +9,14 @@ from tests.support.import_scan import collect_import_targets
 
 _EXTERNAL_PACKAGE_ROOT = Path("tests/external_packages/acme_workflows")
 _ALLOWED_PACKAGE_IMPORTS = (
-    "langgraph_automation.api.plugins",
-    "langgraph_automation.api.workflow",
-    "langgraph_automation.api.stores",
+    "cobalt_wren.api.plugins",
+    "cobalt_wren.api.workflow",
+    "cobalt_wren.api.stores",
 )
 
 
 def test_external_workflow_fixture_is_outside_the_foundation_source_tree() -> None:
-    source_root = Path("src/langgraph_automation").resolve()
+    source_root = Path("src/cobalt_wren").resolve()
 
     for path in _EXTERNAL_PACKAGE_ROOT.rglob("*.py"):
         assert not path.resolve().is_relative_to(source_root)
@@ -27,7 +27,7 @@ def test_external_workflow_package_imports_only_public_plugin_spi() -> None:
 
     for path in _EXTERNAL_PACKAGE_ROOT.rglob("*.py"):
         for module in collect_import_targets(path):
-            if not module.startswith("langgraph_automation"):
+            if not module.startswith("cobalt_wren"):
                 continue
             if not module.startswith(_ALLOWED_PACKAGE_IMPORTS):
                 offenders.append(f"{path}:{module}")
@@ -37,14 +37,14 @@ def test_external_workflow_package_imports_only_public_plugin_spi() -> None:
 
 def test_external_workflow_package_does_not_import_engine_or_control_plane() -> None:
     forbidden_prefixes = (
-        "langgraph_automation.api.engine",
-        "langgraph_automation.apps",
-        "langgraph_automation.config",
-        "langgraph_automation.graphs",
-        "langgraph_automation.integrations",
-        "langgraph_automation.plugins",
-        "langgraph_automation.runtime",
-        "langgraph_automation.workflows",
+        "cobalt_wren.api.engine",
+        "cobalt_wren.apps",
+        "cobalt_wren.config",
+        "cobalt_wren.graphs",
+        "cobalt_wren.integrations",
+        "cobalt_wren.plugins",
+        "cobalt_wren.runtime",
+        "cobalt_wren.workflows",
         "django",
     )
     offenders: list[str] = []

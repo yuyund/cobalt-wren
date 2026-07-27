@@ -3,19 +3,44 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "langgraph-automation"
-version = "0.1.0"
+name = "cobalt-wren"
+version = "0.1.0rc1"
+description = "Python-first workflows with explicit contracts, observable execution, and a Django control plane"
+readme = "README.md"
+authors = [{name = "Yudai Maruyama"}]
+license = {file = "LICENSE"}
 requires-python = ">=3.12"
+keywords = ["workflow", "automation", "django", "langgraph", "llamaindex", "llm"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Environment :: Web Environment",
+  "Framework :: Django",
+  "Framework :: Django :: 5.2",
+  "Framework :: Django :: 6.0",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: Apache Software License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Software Development :: Libraries :: Application Frameworks",
+]
 dependencies = [
-  "django",
-  "psycopg",
-  "langgraph",
-  "litellm",
-  "django-environ",
+  "django>=5.2,<6.1",
+  "psycopg>=3.2,<4",
+  "litellm>=1,<2",
+  "django-environ>=0.11,<1",
+  "packaging>=24,<27",
 ]
 
+[project.urls]
+Homepage = "https://github.com/yuyund/cobalt-wren"
+Repository = "https://github.com/yuyund/cobalt-wren"
+Issues = "https://github.com/yuyund/cobalt-wren/issues"
+Changelog = "https://github.com/yuyund/cobalt-wren/blob/main/CHANGELOG.md"
+
 [project.scripts]
-langgraph-automation = "langgraph_automation.cli.main:main"
+cobalt-wren = "cobalt_wren.cli.main:main"
 
 [project.optional-dependencies]
 dev = [
@@ -25,6 +50,19 @@ dev = [
   "mypy",
   "django-stubs>=5.2,<6",
   "django-stubs-ext>=5.2,<6",
+  "build>=1.2,<2",
+  "twine>=6,<7",
+  "check-wheel-contents>=0.6,<1",
+]
+langgraph = [
+  "langgraph>=1.0,<2",
+]
+llamaindex = [
+  "llama-index-workflows>=2.22,<3",
+]
+oss-integrations = [
+  "langgraph>=1.0,<2",
+  "llama-index-workflows>=2.22,<3",
 ]
 postgres = [
   "psycopg[binary]>=3.2",
@@ -41,26 +79,39 @@ dev = [
   "mypy",
   "django-stubs>=5.2,<6",
   "django-stubs-ext>=5.2,<6",
+  "langgraph>=1.0,<2",
+  "llama-index-workflows>=2.22,<3",
+  "build>=1.2,<2",
+  "twine>=6,<7",
+  "check-wheel-contents>=0.6,<1",
 ]
 
 [tool.setuptools]
 package-dir = {"" = "src"}
+license-files = ["LICENSE", "NOTICE"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
 
 [tool.setuptools.package-data]
-langgraph_automation = ["py.typed"]
+cobalt_wren = [
+  "py.typed",
+  "apps/web/templates/**/*.html",
+  "apps/web/static/cobalt_wren/*.css",
+  "apps/web/static/cobalt_wren/*.js",
+  "apps/web/static/cobalt_wren/vendor/tabler/*",
+  "apps/web/static/cobalt_wren/vendor/htmx/*",
+]
 
 [tool.pytest.ini_options]
-DJANGO_SETTINGS_MODULE = "langgraph_automation.config.settings"
+DJANGO_SETTINGS_MODULE = "cobalt_wren.config.settings"
 pythonpath = ["src"]
 
 [tool.mypy]
 plugins = ["mypy_django_plugin.main"]
 
 [tool.django-stubs]
-django_settings_module = "langgraph_automation.config.settings"
+django_settings_module = "cobalt_wren.config.settings"
 strict_settings = true
 
 [[tool.mypy.overrides]]

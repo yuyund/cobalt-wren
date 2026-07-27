@@ -13,175 +13,165 @@ Use it to find where code, docs, tests, and local-only artifacts live.
 - `db.sqlite3`: local SQLite database snapshot for development work.
 
 ## Source Package
-- `src/langgraph_automation/`: the installable Python package.
-- `src/langgraph_automation/__init__.py`: top-level package marker.
-- `src/langgraph_automation.egg-info/`: generated packaging metadata from editable installs or builds.
-- Package markers: `src/langgraph_automation/api/__init__.py`, `src/langgraph_automation/apps/__init__.py`, `src/langgraph_automation/apps/automation/__init__.py`, `src/langgraph_automation/apps/automation/migrations/__init__.py`, `src/langgraph_automation/apps/automation/models/__init__.py`, `src/langgraph_automation/apps/automation/policies/__init__.py`, `src/langgraph_automation/apps/automation/selectors/__init__.py`, `src/langgraph_automation/apps/automation/services/__init__.py`, `src/langgraph_automation/apps/automation/ui/__init__.py`, `src/langgraph_automation/apps/web/__init__.py`, `src/langgraph_automation/apps/web/templatetags/__init__.py`, `src/langgraph_automation/apps/web/views/__init__.py`, `src/langgraph_automation/config/__init__.py`, `src/langgraph_automation/core/__init__.py`, `src/langgraph_automation/entrypoints/__init__.py`, `src/langgraph_automation/graphs/__init__.py`, `src/langgraph_automation/graphs/nodes/__init__.py`, `src/langgraph_automation/integrations/__init__.py`, `src/langgraph_automation/integrations/artifact/__init__.py`, `src/langgraph_automation/integrations/checkpoint/__init__.py`, `src/langgraph_automation/integrations/llm/__init__.py`, `src/langgraph_automation/integrations/observability/__init__.py`, `src/langgraph_automation/integrations/tools/__init__.py`, `src/langgraph_automation/plugins/__init__.py`, `src/langgraph_automation/runtime/__init__.py`, `src/langgraph_automation/workflows/__init__.py`, `src/langgraph_automation/workflows/applications/__init__.py`, `src/langgraph_automation/workflows/reference/__init__.py`, and `src/langgraph_automation/workflows/reference/llm_echo_summary/__init__.py`.
+- `src/cobalt_wren/`: the installable Python package.
+- `src/cobalt_wren/__init__.py`: top-level package marker.
+- `src/cobalt_wren.egg-info/`: generated packaging metadata from editable installs or builds.
+- Package markers: `src/cobalt_wren/api/__init__.py`, `src/cobalt_wren/apps/__init__.py`, `src/cobalt_wren/apps/automation/__init__.py`, `src/cobalt_wren/apps/automation/migrations/__init__.py`, `src/cobalt_wren/apps/automation/models/__init__.py`, `src/cobalt_wren/apps/automation/policies/__init__.py`, `src/cobalt_wren/apps/automation/selectors/__init__.py`, `src/cobalt_wren/apps/automation/services/__init__.py`, `src/cobalt_wren/apps/automation/ui/__init__.py`, `src/cobalt_wren/apps/web/__init__.py`, `src/cobalt_wren/apps/web/templatetags/__init__.py`, `src/cobalt_wren/apps/web/views/__init__.py`, `src/cobalt_wren/config/__init__.py`, `src/cobalt_wren/core/__init__.py`, `src/cobalt_wren/entrypoints/__init__.py`, `src/cobalt_wren/graphs/__init__.py`, `src/cobalt_wren/graphs/nodes/__init__.py`, `src/cobalt_wren/integrations/__init__.py`, `src/cobalt_wren/integrations/artifact/__init__.py`, `src/cobalt_wren/integrations/checkpoint/__init__.py`, `src/cobalt_wren/integrations/llm/__init__.py`, `src/cobalt_wren/integrations/observability/__init__.py`, `src/cobalt_wren/integrations/tools/__init__.py`, `src/cobalt_wren/plugins/__init__.py`, `src/cobalt_wren/runtime/__init__.py`, `src/cobalt_wren/workflows/__init__.py`, `src/cobalt_wren/workflows/applications/__init__.py`, `src/cobalt_wren/workflows/reference/__init__.py`, and `src/cobalt_wren/workflows/reference/llm_echo_summary/__init__.py`.
 
 ## Public Facade
-- `src/langgraph_automation/api/__init__.py`: public API package marker.
-- `src/langgraph_automation/api/engine.py`: package facade for engine creation and workflow preparation.
-- `src/langgraph_automation/api/errors.py`: public error types and error mapping surface.
-- `src/langgraph_automation/api/events.py`: public event-facing helpers and types.
-- `src/langgraph_automation/api/llm.py`: public LLM-facing facade.
-- `src/langgraph_automation/api/plugins.py`: public plugin-facing facade.
-- `src/langgraph_automation/api/stores.py`: public artifact and checkpoint store facade.
-- `src/langgraph_automation/api/tools.py`: public tool-facing facade.
-- `src/langgraph_automation/api/workflow.py`: public workflow-facing facade.
+- `src/cobalt_wren/api/__init__.py`: public API package marker.
+- `src/cobalt_wren/api/engine.py`: package facade for engine creation and workflow preparation.
+- `src/cobalt_wren/api/errors.py`: public error types and error mapping surface.
+- `src/cobalt_wren/api/events.py`: public event-facing helpers and types.
+- `src/cobalt_wren/api/llm.py`: public LLM-facing facade.
+- `src/cobalt_wren/api/plugins.py`: public plugin-facing facade.
+- `src/cobalt_wren/api/stores.py`: public artifact and checkpoint store facade.
+- `src/cobalt_wren/api/tools.py`: public tool-facing facade.
+- `src/cobalt_wren/api/workflow.py`: public workflow-facing facade.
 
 ## Django Apps
-- `src/langgraph_automation/apps/`: Django application namespace.
-- `src/langgraph_automation/apps/__init__.py`: app namespace marker.
+- `src/cobalt_wren/apps/`: Django application namespace.
+- `src/cobalt_wren/apps/__init__.py`: app namespace marker.
 
 ### Automation App
-- `src/langgraph_automation/apps/automation/`: control-plane app for workflows, runs, spans, events, artifacts, and checkpoints.
-- `src/langgraph_automation/apps/automation/apps.py`: Django app configuration.
-- `src/langgraph_automation/apps/automation/admin.py`: Django admin registrations and safe display helpers.
-- `src/langgraph_automation/apps/automation/migrations/`: database migrations.
-- `src/langgraph_automation/apps/automation/migrations/0001_initial.py`: initial schema migration.
-- `src/langgraph_automation/apps/automation/models/`: Django model definitions.
-- `src/langgraph_automation/apps/automation/models/workflow.py`: workflow definition model.
-- `src/langgraph_automation/apps/automation/models/run.py`: run lifecycle model.
-- `src/langgraph_automation/apps/automation/models/execution.py`: execution span model.
-- `src/langgraph_automation/apps/automation/models/event.py`: run event model.
-- `src/langgraph_automation/apps/automation/models/artifact.py`: artifact model.
-- `src/langgraph_automation/apps/automation/models/checkpoint.py`: checkpoint metadata model.
-- `src/langgraph_automation/apps/automation/policies/`: application policies for runs and related control-plane rules.
-- `src/langgraph_automation/apps/automation/policies/runs.py`: run policy logic.
-- `src/langgraph_automation/apps/automation/selectors/`: query helpers for app data.
-- `src/langgraph_automation/apps/automation/selectors/workflows.py`: workflow selectors.
-- `src/langgraph_automation/apps/automation/selectors/runs.py`: run selectors.
-- `src/langgraph_automation/apps/automation/selectors/events.py`: event selectors.
-- `src/langgraph_automation/apps/automation/selectors/spans.py`: span selectors.
-- `src/langgraph_automation/apps/automation/selectors/artifacts.py`: artifact selectors.
-- `src/langgraph_automation/apps/automation/selectors/checkpoints.py`: checkpoint selectors.
-- `src/langgraph_automation/apps/automation/services/`: service layer for workflow preparation, runtime assembly, execution, and configuration.
-- `src/langgraph_automation/apps/automation/services/workflows.py`: workflow service helpers.
-- `src/langgraph_automation/apps/automation/services/workflow_preparation.py`: workflow preparation service.
-- `src/langgraph_automation/apps/automation/services/runtime.py`: runtime assembly bridge.
-- `src/langgraph_automation/apps/automation/services/execution.py`: execution orchestration helpers.
-- `src/langgraph_automation/apps/automation/services/runs.py`: run lifecycle orchestration.
-- `src/langgraph_automation/apps/automation/services/errors.py`: service-layer errors.
-- `src/langgraph_automation/apps/automation/ui/`: presentation-only dynamic UI builders and safety helpers.
-- `src/langgraph_automation/apps/automation/ui/builders.py`: page-spec builders for lists, details, forms, and fragments.
-- `src/langgraph_automation/apps/automation/ui/registry.py`: UI model registry.
-- `src/langgraph_automation/apps/automation/ui/specs.py`: typed page-spec and field-spec structures.
-- `src/langgraph_automation/apps/automation/ui/formatters.py`: display formatting helpers.
-- `src/langgraph_automation/apps/automation/ui/redaction.py`: UI redaction helpers.
-- `src/langgraph_automation/apps/automation/ui/actions.py`: declarative UI actions.
+- `src/cobalt_wren/apps/automation/`: control-plane app for workflows, runs, spans, events, artifacts, and checkpoints.
+- `src/cobalt_wren/apps/automation/apps.py`: Django app configuration.
+- `src/cobalt_wren/apps/automation/admin.py`: Django admin registrations and safe display helpers.
+- `src/cobalt_wren/apps/automation/migrations/`: database migrations.
+- `src/cobalt_wren/apps/automation/migrations/0001_initial.py`: initial schema migration.
+- `src/cobalt_wren/apps/automation/models/`: Django model definitions.
+- `src/cobalt_wren/apps/automation/models/workflow.py`: workflow definition model.
+- `src/cobalt_wren/apps/automation/models/run.py`: run lifecycle model.
+- `src/cobalt_wren/apps/automation/models/execution.py`: execution span model.
+- `src/cobalt_wren/apps/automation/models/event.py`: run event model.
+- `src/cobalt_wren/apps/automation/models/artifact.py`: artifact model.
+- `src/cobalt_wren/apps/automation/models/checkpoint.py`: checkpoint metadata model.
+- `src/cobalt_wren/apps/automation/policies/`: application policies for runs and related control-plane rules.
+- `src/cobalt_wren/apps/automation/policies/runs.py`: run policy logic.
+- `src/cobalt_wren/apps/automation/selectors/`: query helpers for app data.
+- `src/cobalt_wren/apps/automation/selectors/workflows.py`: workflow selectors.
+- `src/cobalt_wren/apps/automation/selectors/runs.py`: run selectors.
+- `src/cobalt_wren/apps/automation/selectors/events.py`: event selectors.
+- `src/cobalt_wren/apps/automation/selectors/spans.py`: span selectors.
+- `src/cobalt_wren/apps/automation/selectors/artifacts.py`: artifact selectors.
+- `src/cobalt_wren/apps/automation/selectors/checkpoints.py`: checkpoint selectors.
+- `src/cobalt_wren/apps/automation/services/`: service layer for workflow preparation, runtime assembly, execution, and configuration.
+- `src/cobalt_wren/apps/automation/services/workflows.py`: workflow service helpers.
+- `src/cobalt_wren/apps/automation/services/workflow_preparation.py`: workflow preparation service.
+- `src/cobalt_wren/apps/automation/services/runtime.py`: runtime assembly bridge.
+- `src/cobalt_wren/apps/automation/services/execution.py`: execution orchestration helpers.
+- `src/cobalt_wren/apps/automation/services/runs.py`: run lifecycle orchestration.
+- `src/cobalt_wren/apps/automation/services/errors.py`: service-layer errors.
+- `src/cobalt_wren/apps/automation/ui/`: presentation-only dynamic UI builders and safety helpers.
+- `src/cobalt_wren/apps/automation/ui/builders.py`: page-spec builders for lists, details, forms, and fragments.
+- `src/cobalt_wren/apps/automation/ui/registry.py`: UI model registry.
+- `src/cobalt_wren/apps/automation/ui/specs.py`: typed page-spec and field-spec structures.
+- `src/cobalt_wren/apps/automation/ui/formatters.py`: display formatting helpers.
+- `src/cobalt_wren/apps/automation/ui/redaction.py`: UI redaction helpers.
+- `src/cobalt_wren/apps/automation/ui/actions.py`: declarative UI actions.
 
 ### Web App
-- `src/langgraph_automation/apps/web/`: Django web presentation app for dynamic pages and fragments.
-- `src/langgraph_automation/apps/web/apps.py`: Django app configuration.
-- `src/langgraph_automation/apps/web/urls.py`: URL routing for dynamic pages and fragments.
-- `src/langgraph_automation/apps/web/views/`: view functions for dynamic pages, actions, and fragments.
-- `src/langgraph_automation/apps/web/views/dynamic_pages.py`: dynamic list/detail/form views.
-- `src/langgraph_automation/apps/web/views/dynamic_actions.py`: action handlers for dynamic pages.
-- `src/langgraph_automation/apps/web/views/fragments.py`: fragment rendering views.
-- `src/langgraph_automation/apps/web/templatetags/`: template tags for UI rendering.
-- `src/langgraph_automation/apps/web/templatetags/ui_render.py`: helper tags and filters for dynamic UI templates.
-- `src/langgraph_automation/apps/web/templates/base.html`: shared HTML base template.
-- `src/langgraph_automation/apps/web/templates/dynamic/`: dynamic list/detail/form/fragment templates, partials, and field renderers.
-- `src/langgraph_automation/apps/web/templates/dynamic/list.html`: list page template.
-- `src/langgraph_automation/apps/web/templates/dynamic/detail.html`: detail page template.
-- `src/langgraph_automation/apps/web/templates/dynamic/form.html`: form page template.
-- `src/langgraph_automation/apps/web/templates/dynamic/fragment.html`: fragment page template.
-- `src/langgraph_automation/apps/web/templates/dynamic/partials/`: reusable table, action, and status partials.
-- `src/langgraph_automation/apps/web/templates/dynamic/partials/table.html`: table partial.
-- `src/langgraph_automation/apps/web/templates/dynamic/partials/actions.html`: action partial.
-- `src/langgraph_automation/apps/web/templates/dynamic/partials/status.html`: status partial.
-- `src/langgraph_automation/apps/web/templates/dynamic/fields/`: field renderers for different display types.
-- `src/langgraph_automation/apps/web/templates/dynamic/fields/text.html`: plain text field renderer.
-- `src/langgraph_automation/apps/web/templates/dynamic/fields/multiline.html`: multiline field renderer.
-- `src/langgraph_automation/apps/web/templates/dynamic/fields/link.html`: link field renderer.
-- `src/langgraph_automation/apps/web/templates/dynamic/fields/status_badge.html`: status badge renderer.
-- `src/langgraph_automation/apps/web/templates/dynamic/fields/json.html`: JSON field renderer.
+- `src/cobalt_wren/apps/web/`: Django web presentation app for dynamic pages and fragments.
+- `src/cobalt_wren/apps/web/apps.py`: Django app configuration.
+- `src/cobalt_wren/apps/web/urls.py`: URL routing for dynamic pages and fragments.
+- `src/cobalt_wren/apps/web/views/`: view functions for dynamic pages, actions, and fragments.
+- `src/cobalt_wren/apps/web/views/dynamic_pages.py`: dynamic list/detail/form views.
+- `src/cobalt_wren/apps/web/views/dynamic_actions.py`: action handlers for dynamic pages.
+- `src/cobalt_wren/apps/web/views/fragments.py`: fragment rendering views.
+- `src/cobalt_wren/apps/web/templatetags/`: template tags for UI rendering.
+- `src/cobalt_wren/apps/web/templatetags/ui_render.py`: helper tags and filters for dynamic UI templates.
+- `src/cobalt_wren/apps/web/templates/base.html`: shared HTML base template.
+- `src/cobalt_wren/apps/web/templates/dynamic/`: dynamic list/detail/form/fragment templates, partials, and field renderers.
+- `src/cobalt_wren/apps/web/templates/dynamic/list.html`: list page template.
+- `src/cobalt_wren/apps/web/templates/dynamic/detail.html`: detail page template.
+- `src/cobalt_wren/apps/web/templates/dynamic/form.html`: form page template.
+- `src/cobalt_wren/apps/web/templates/dynamic/fragment.html`: fragment page template.
 
 ## Configuration
-- `src/langgraph_automation/config/`: Django settings, config loading, validation, and bootstrapping.
-- `src/langgraph_automation/config/__init__.py`: config package marker.
-- `src/langgraph_automation/config/settings.py`: Django settings module.
-- `src/langgraph_automation/config/urls.py`: project URL routing.
-- `src/langgraph_automation/config/asgi.py`: ASGI entrypoint.
-- `src/langgraph_automation/config/wsgi.py`: WSGI entrypoint.
-- `src/langgraph_automation/config/loader.py`: config loading helpers.
-- `src/langgraph_automation/config/normalizer.py`: config normalization logic.
-- `src/langgraph_automation/config/models.py`: config data models.
-- `src/langgraph_automation/config/security.py`: config security helpers.
-- `src/langgraph_automation/config/validator.py`: config validation rules.
+- `src/cobalt_wren/config/`: Django settings, config loading, validation, and bootstrapping.
+- `src/cobalt_wren/config/__init__.py`: config package marker.
+- `src/cobalt_wren/config/settings.py`: Django settings module.
+- `src/cobalt_wren/config/urls.py`: project URL routing.
+- `src/cobalt_wren/config/asgi.py`: ASGI entrypoint.
+- `src/cobalt_wren/config/wsgi.py`: WSGI entrypoint.
+- `src/cobalt_wren/config/loader.py`: config loading helpers.
+- `src/cobalt_wren/config/normalizer.py`: config normalization logic.
+- `src/cobalt_wren/config/models.py`: config data models.
+- `src/cobalt_wren/config/security.py`: config security helpers.
+- `src/cobalt_wren/config/validator.py`: config validation rules.
 
 ## Core
-- `src/langgraph_automation/core/`: shared low-level helpers used across the codebase.
-- `src/langgraph_automation/core/__init__.py`: core package marker.
-- `src/langgraph_automation/core/errors.py`: core error types.
-- `src/langgraph_automation/core/logging.py`: logging helpers.
-- `src/langgraph_automation/core/redaction.py`: redaction and sensitive-value detection.
-- `src/langgraph_automation/core/result_safety.py`: safe-output helpers.
-- `src/langgraph_automation/core/summary.py`: bounded summary and display-safe value helpers.
-- `src/langgraph_automation/core/types.py`: shared core typing helpers.
+- `src/cobalt_wren/core/`: shared low-level helpers used across the codebase.
+- `src/cobalt_wren/core/__init__.py`: core package marker.
+- `src/cobalt_wren/core/errors.py`: core error types.
+- `src/cobalt_wren/core/logging.py`: logging helpers.
+- `src/cobalt_wren/core/redaction.py`: redaction and sensitive-value detection.
+- `src/cobalt_wren/core/result_safety.py`: safe-output helpers.
+- `src/cobalt_wren/core/summary.py`: bounded summary and display-safe value helpers.
+- `src/cobalt_wren/core/types.py`: shared core typing helpers.
 
 ## Entrypoints
-- `src/langgraph_automation/entrypoints/`: explicit entrypoint namespace for future launch surfaces.
-- `src/langgraph_automation/entrypoints/__init__.py`: package marker.
+- `src/cobalt_wren/entrypoints/`: explicit entrypoint namespace for future launch surfaces.
+- `src/cobalt_wren/entrypoints/__init__.py`: package marker.
 
 ## Integrations
-- `src/langgraph_automation/integrations/`: concrete adapters for artifact storage, checkpointing, LLMs, observability, and tools.
-- `src/langgraph_automation/integrations/artifact/`: artifact store interfaces and memory implementation.
-- `src/langgraph_automation/integrations/artifact/base.py`: artifact store base types.
-- `src/langgraph_automation/integrations/artifact/keys.py`: artifact key helpers.
-- `src/langgraph_automation/integrations/artifact/memory_store.py`: in-memory artifact store.
-- `src/langgraph_automation/integrations/checkpoint/`: checkpoint store interfaces and memory implementation.
-- `src/langgraph_automation/integrations/checkpoint/base.py`: checkpoint store base types.
-- `src/langgraph_automation/integrations/checkpoint/memory_store.py`: in-memory checkpoint store.
-- `src/langgraph_automation/integrations/checkpoint/summary.py`: checkpoint summary helpers.
-- `src/langgraph_automation/integrations/llm/`: LLM client interfaces and adapters.
-- `src/langgraph_automation/integrations/llm/base.py`: LLM base types.
-- `src/langgraph_automation/integrations/llm/litellm_client.py`: LiteLLM adapter.
-- `src/langgraph_automation/integrations/llm/observed_client.py`: observed LLM client wrapper.
-- `src/langgraph_automation/integrations/observability/`: event sink, context, and failure policy helpers.
-- `src/langgraph_automation/integrations/observability/base.py`: observability base types.
-- `src/langgraph_automation/integrations/observability/context.py`: observability context binding.
-- `src/langgraph_automation/integrations/observability/django_event_sink.py`: Django-backed event sink.
-- `src/langgraph_automation/integrations/observability/events.py`: observability event types.
-- `src/langgraph_automation/integrations/observability/failure_policy.py`: failure masking and suppression policy.
-- `src/langgraph_automation/integrations/observability/types.py`: observability typing helpers.
-- `src/langgraph_automation/integrations/tools/`: tool policy, registry, and safe-tool wrappers.
-- `src/langgraph_automation/integrations/tools/base.py`: tool base types.
-- `src/langgraph_automation/integrations/tools/registry.py`: concrete tool registry.
-- `src/langgraph_automation/integrations/tools/policy.py`: tool allow/deny policy logic.
-- `src/langgraph_automation/integrations/tools/policy_registry.py`: policy-aware registry composition.
-- `src/langgraph_automation/integrations/tools/observed_registry.py`: observed tool registry wrapper.
-- `src/langgraph_automation/integrations/tools/safe_tools.py`: safe built-in tools.
+- `src/cobalt_wren/integrations/`: concrete adapters for artifact storage, checkpointing, LLMs, observability, and tools.
+- `src/cobalt_wren/integrations/artifact/`: artifact store interfaces and memory implementation.
+- `src/cobalt_wren/integrations/artifact/base.py`: artifact store base types.
+- `src/cobalt_wren/integrations/artifact/keys.py`: artifact key helpers.
+- `src/cobalt_wren/integrations/artifact/memory_store.py`: in-memory artifact store.
+- `src/cobalt_wren/integrations/checkpoint/`: checkpoint store interfaces and memory implementation.
+- `src/cobalt_wren/integrations/checkpoint/base.py`: checkpoint store base types.
+- `src/cobalt_wren/integrations/checkpoint/memory_store.py`: in-memory checkpoint store.
+- `src/cobalt_wren/integrations/checkpoint/summary.py`: checkpoint summary helpers.
+- `src/cobalt_wren/integrations/llm/`: LLM client interfaces and adapters.
+- `src/cobalt_wren/integrations/llm/base.py`: LLM base types.
+- `src/cobalt_wren/integrations/llm/litellm_client.py`: LiteLLM adapter.
+- `src/cobalt_wren/integrations/llm/observed_client.py`: observed LLM client wrapper.
+- `src/cobalt_wren/integrations/observability/`: event sink, context, and failure policy helpers.
+- `src/cobalt_wren/integrations/observability/base.py`: observability base types.
+- `src/cobalt_wren/integrations/observability/context.py`: observability context binding.
+- `src/cobalt_wren/integrations/observability/django_event_sink.py`: Django-backed event sink.
+- `src/cobalt_wren/integrations/observability/events.py`: observability event types.
+- `src/cobalt_wren/integrations/observability/failure_policy.py`: failure masking and suppression policy.
+- `src/cobalt_wren/integrations/observability/types.py`: observability typing helpers.
+- `src/cobalt_wren/integrations/tools/`: tool policy, registry, and safe-tool wrappers.
+- `src/cobalt_wren/integrations/tools/base.py`: tool base types.
+- `src/cobalt_wren/integrations/tools/registry.py`: concrete tool registry.
+- `src/cobalt_wren/integrations/tools/policy.py`: tool allow/deny policy logic.
+- `src/cobalt_wren/integrations/tools/policy_registry.py`: policy-aware registry composition.
+- `src/cobalt_wren/integrations/tools/observed_registry.py`: observed tool registry wrapper.
+- `src/cobalt_wren/integrations/tools/safe_tools.py`: safe built-in tools.
 
 ## Plugins
-- `src/langgraph_automation/plugins/`: plugin registry namespace.
-- `src/langgraph_automation/plugins/__init__.py`: package marker.
-- `src/langgraph_automation/plugins/registry.py`: plugin registry implementation.
+- `src/cobalt_wren/plugins/`: plugin registry namespace.
+- `src/cobalt_wren/plugins/__init__.py`: package marker.
+- `src/cobalt_wren/plugins/registry.py`: plugin registry implementation.
 
 ## Runtime
-- `src/langgraph_automation/runtime/`: runtime assembly, dependency wiring, context, and secret resolution.
-- `src/langgraph_automation/runtime/__init__.py`: runtime package marker.
-- `src/langgraph_automation/runtime/assembly.py`: runtime assembly logic.
-- `src/langgraph_automation/runtime/context.py`: runtime context object.
-- `src/langgraph_automation/runtime/dependencies.py`: runtime dependency definitions.
-- `src/langgraph_automation/runtime/secrets.py`: secret resolution helpers.
+- `src/cobalt_wren/runtime/`: runtime assembly, dependency wiring, context, and secret resolution.
+- `src/cobalt_wren/runtime/__init__.py`: runtime package marker.
+- `src/cobalt_wren/runtime/assembly.py`: runtime assembly logic.
+- `src/cobalt_wren/runtime/context.py`: runtime context object.
+- `src/cobalt_wren/runtime/dependencies.py`: runtime dependency definitions.
+- `src/cobalt_wren/runtime/secrets.py`: secret resolution helpers.
 
 ## Workflows
-- `src/langgraph_automation/workflows/`: workflow catalog, preparation, adapter, and reference workflow implementations.
-- `src/langgraph_automation/workflows/__init__.py`: workflows package marker.
-- `src/langgraph_automation/workflows/adapter.py`: workflow adapter surface.
-- `src/langgraph_automation/workflows/catalog.py`: built-in workflow catalog.
-- `src/langgraph_automation/workflows/prepare.py`: workflow preparation logic.
-- `src/langgraph_automation/workflows/requirements.py`: workflow requirement checks.
-- `src/langgraph_automation/workflows/applications/`: future application workflow namespace.
-- `src/langgraph_automation/workflows/applications/__init__.py`: application workflow package marker.
-- `src/langgraph_automation/workflows/reference/`: reference and diagnostic workflows.
-- `src/langgraph_automation/workflows/reference/__init__.py`: reference workflow package marker.
-- `src/langgraph_automation/workflows/reference/llm_echo_summary/`: current built-in reference workflow.
-- `src/langgraph_automation/workflows/reference/llm_echo_summary/__init__.py`: reference workflow package marker.
-- `src/langgraph_automation/workflows/reference/llm_echo_summary/definition.py`: workflow definition entry.
-- `src/langgraph_automation/workflows/reference/llm_echo_summary/executable.py`: executable implementation and internal LangGraph assembly.
-- `src/langgraph_automation/workflows/reference/llm_echo_summary/state.py`: checkpoint-safe workflow state definition.
+- `src/cobalt_wren/workflows/`: workflow catalog, preparation, adapter, and reference workflow implementations.
+- `src/cobalt_wren/workflows/__init__.py`: workflows package marker.
+- `src/cobalt_wren/workflows/adapter.py`: workflow adapter surface.
+- `src/cobalt_wren/workflows/catalog.py`: built-in workflow catalog.
+- `src/cobalt_wren/workflows/prepare.py`: workflow preparation logic.
+- `src/cobalt_wren/workflows/requirements.py`: workflow requirement checks.
+- `src/cobalt_wren/workflows/applications/`: future application workflow namespace.
+- `src/cobalt_wren/workflows/applications/__init__.py`: application workflow package marker.
+- `src/cobalt_wren/workflows/reference/`: reference and diagnostic workflows.
+- `src/cobalt_wren/workflows/reference/__init__.py`: reference workflow package marker.
+- `src/cobalt_wren/workflows/reference/llm_echo_summary/`: current built-in reference workflow.
+- `src/cobalt_wren/workflows/reference/llm_echo_summary/__init__.py`: reference workflow package marker.
+- `src/cobalt_wren/workflows/reference/llm_echo_summary/definition.py`: workflow definition entry.
+- `src/cobalt_wren/workflows/reference/llm_echo_summary/executable.py`: executable implementation and internal LangGraph assembly.
+- `src/cobalt_wren/workflows/reference/llm_echo_summary/state.py`: checkpoint-safe workflow state definition.
 
 ## Documentation
 - Start with `docs/index.md`.

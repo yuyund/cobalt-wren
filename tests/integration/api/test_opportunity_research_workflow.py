@@ -11,11 +11,11 @@ EXAMPLE_SRC = ROOT / "packages" / "opportunity_research_workflow" / "src"
 sys.path.insert(0, str(EXAMPLE_SRC))
 
 from opportunity_research_workflow import WORKFLOW_KIND, create_plugin  # noqa: E402
-from langgraph_automation.apps.automation.models.run import Run, RunStatus  # noqa: E402
-from langgraph_automation.apps.automation.models.workflow import Workflow  # noqa: E402
-from langgraph_automation.apps.automation.services import runs as run_services  # noqa: E402
-from langgraph_automation.apps.automation.services import runtime as runtime_module  # noqa: E402
-from langgraph_automation.integrations.tools.base import ToolResult  # noqa: E402
+from cobalt_wren.apps.automation.models.run import Run, RunStatus  # noqa: E402
+from cobalt_wren.apps.automation.models.workflow import Workflow  # noqa: E402
+from cobalt_wren.apps.automation.services import runs as run_services  # noqa: E402
+from cobalt_wren.apps.automation.services import runtime as runtime_module  # noqa: E402
+from cobalt_wren.integrations.tools.base import ToolResult  # noqa: E402
 from tests.support.recording_event_sink import RecordingEventSink  # noqa: E402
 
 
@@ -97,7 +97,7 @@ def test_django_control_plane_executes_complex_external_research_workflow(
     sink = RecordingEventSink()
     monkeypatch.setattr(runtime_module, "build_event_sink", lambda _run: sink)
     monkeypatch.setattr(
-        "langgraph_automation.integrations.llm.litellm_client.litellm.completion",
+        "cobalt_wren.integrations.llm.litellm_client.litellm.completion",
         _fake_litellm_completion,
     )
     services = runtime_module.build_run_execution_services(

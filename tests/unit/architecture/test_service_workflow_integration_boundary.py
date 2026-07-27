@@ -20,19 +20,19 @@ def _imports(path: Path) -> list[str]:
 
 
 def test_workflow_preparation_service_stays_within_allowed_boundaries() -> None:
-    module = Path('src/langgraph_automation/apps/automation/services/workflow_preparation.py')
+    module = Path('src/cobalt_wren/apps/automation/services/workflow_preparation.py')
     modules = _imports(module)
 
     forbidden_prefixes = (
-        'langgraph_automation.workflows.prepare',
-        'langgraph_automation.workflows.catalog',
-        'langgraph_automation.workflows.adapter',
-        'langgraph_automation.workflows.requirements',
-        'langgraph_automation.plugins.registry',
-        'langgraph_automation.runtime.assembly',
-        'langgraph_automation.runtime.dependencies',
-        'langgraph_automation.config.validator',
-        'langgraph_automation.graphs',
+        'cobalt_wren.workflows.prepare',
+        'cobalt_wren.workflows.catalog',
+        'cobalt_wren.workflows.adapter',
+        'cobalt_wren.workflows.requirements',
+        'cobalt_wren.plugins.registry',
+        'cobalt_wren.runtime.assembly',
+        'cobalt_wren.runtime.dependencies',
+        'cobalt_wren.config.validator',
+        'cobalt_wren.graphs',
     )
 
     offenders = [name for name in modules if name.startswith(forbidden_prefixes)]
@@ -40,11 +40,11 @@ def test_workflow_preparation_service_stays_within_allowed_boundaries() -> None:
 
 
 def test_workflow_preparation_service_imports_package_facing_boundary_only() -> None:
-    modules = _imports(Path('src/langgraph_automation/apps/automation/services/workflow_preparation.py'))
+    modules = _imports(Path('src/cobalt_wren/apps/automation/services/workflow_preparation.py'))
 
     expected_prefixes = (
-        'langgraph_automation.api.engine',
-        'langgraph_automation.api.plugins',
+        'cobalt_wren.api.engine',
+        'cobalt_wren.api.plugins',
     )
 
     assert any(name.startswith(expected_prefixes) for name in modules)

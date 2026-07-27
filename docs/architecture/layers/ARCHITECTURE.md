@@ -10,7 +10,9 @@
 - `apps/web`: presentation and dynamic UI rendering
 - `core`: safety, redaction, summaries, and shared errors
 
-LangGraph is not a package layer. A workflow may use LangGraph internally, as `reference.llm_echo_summary` does, without exposing graph-specific types to the engine or control plane.
+LangGraph is not a package layer. A workflow may use LangGraph internally without exposing graph-specific types to the engine or control plane.
+
+Integration helpers are a separate semantic adaptation layer around external workflow implementations. The generic adapter never branches on OSS identity. Helpers may contribute lifecycle projection, managed actions, versioned framework detail, and renderer-neutral UI sections through registered contracts.
 
 ## Dependency Direction
 
@@ -42,6 +44,8 @@ Every Run requires a valid `WorkflowReference`. `DeploymentEngineOwner` prepares
 ## Dynamic UI Boundary
 
 Dynamic UI is a metadata projection and rendering concern. It must not instantiate providers, tools, stores, workflows, or secrets. Rendered values use safe model projections and bounded summaries.
+
+Common and integration-specific presentation are composed into one operational view. Common semantics exist for cross-framework operations, correlation, audit, policy, and business context; they do not cap the information available from an integration.
 
 ## Persistence Convergence
 

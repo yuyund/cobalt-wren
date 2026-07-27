@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from langgraph_automation.integrations.tools.safe_tools import ECHO_TOOL_NAME, EchoTool
+from cobalt_wren.integrations.tools.safe_tools import ECHO_TOOL_NAME, EchoTool
 
 
 def test_echo_tool_returns_bounded_redacted_result() -> None:

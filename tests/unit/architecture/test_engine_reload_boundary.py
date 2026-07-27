@@ -6,11 +6,11 @@ from tests.support.import_scan import collect_import_targets
 
 def test_engine_generation_is_control_plane_owned() -> None:
     modules = collect_import_targets(
-        Path("src/langgraph_automation/apps/automation/services/runtime.py")
+        Path("src/cobalt_wren/apps/automation/services/runtime.py")
     )
-    assert "langgraph_automation.api.engine" in modules
+    assert "cobalt_wren.api.engine" in modules
     assert not any(
-        module.startswith("langgraph_automation.workflows.prepare") for module in modules
+        module.startswith("cobalt_wren.workflows.prepare") for module in modules
     )
 
 

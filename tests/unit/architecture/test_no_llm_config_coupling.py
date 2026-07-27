@@ -7,12 +7,12 @@ from pathlib import Path
 
 BANNED_WORKFLOW_CONFIG_IMPORTS = (
     'django.db',
-    'langgraph_automation.apps.automation.models',
-    'langgraph_automation.graphs.builders',
-    'langgraph_automation.graphs.nodes',
-    'langgraph_automation.integrations.llm.litellm_client',
-    'langgraph_automation.integrations.tools.safe_tools',
-    'langgraph_automation.config.settings',
+    'cobalt_wren.apps.automation.models',
+    'cobalt_wren.graphs.builders',
+    'cobalt_wren.graphs.nodes',
+    'cobalt_wren.integrations.llm.litellm_client',
+    'cobalt_wren.integrations.tools.safe_tools',
+    'cobalt_wren.config.settings',
 )
 
 
@@ -28,8 +28,8 @@ def _imported_modules(path: Path) -> list[str]:
 
 
 def test_litellm_client_does_not_import_django_or_graphs() -> None:
-    path = Path('src/langgraph_automation/integrations/llm/litellm_client.py')
+    path = Path('src/cobalt_wren/integrations/llm/litellm_client.py')
     modules = _imported_modules(path)
 
-    offenders = [module for module in modules if module.startswith(('django.db', 'langgraph_automation.apps.automation', 'langgraph_automation.graphs'))]
+    offenders = [module for module in modules if module.startswith(('django.db', 'cobalt_wren.apps.automation', 'cobalt_wren.graphs'))]
     assert offenders == []

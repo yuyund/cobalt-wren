@@ -1,0 +1,8 @@
+<div class="diagnostic-detail card card-sm mt-2" data-component="diagnostic.detail">
+  <div class="card-header"><div><h3 class="card-title mb-1">{{ detail.title }} details</h3><div class="text-secondary small">{{ detail.source }} · {{ detail.byte_size }} bytes{% if detail.truncated %} · bounded{% endif %}</div></div></div>
+  <div class="card-body">
+    {% include 'dynamic/components/value.html' with value=detail.value compact=False only %}
+    {% if detail.truncated %}<div class="text-secondary small mt-2">Some data was omitted by the diagnostic safety limits{% if detail.truncation_reason %} ({{ detail.truncation_reason }}){% endif %}.</div>{% endif %}
+    {% if detail.value.json_text %}<details class="structured-json mt-2"><summary>Technical JSON</summary><pre>{{ detail.value.json_text }}</pre></details>{% endif %}
+  </div>
+</div>

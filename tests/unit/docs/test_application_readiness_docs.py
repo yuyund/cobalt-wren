@@ -18,7 +18,7 @@ def test_application_readiness_docs_exist_and_cover_core_terms() -> None:
     assert 'WorkflowContribution' in readiness.read_text()
     assert 'RuntimeAssembler' in readiness.read_text()
     assert 'WorkflowRequirements' in guide.read_text()
-    assert 'reference.llm_echo_summary' in guide.read_text()
+    assert 'examples/native/' in guide.read_text()
     assert 'company_agent' in gate.read_text()
     assert 'api.runtime' in gate.read_text()
     assert 'Package Complete' in gate.read_text()

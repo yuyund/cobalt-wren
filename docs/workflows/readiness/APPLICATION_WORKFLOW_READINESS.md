@@ -13,30 +13,30 @@ Goal:
 
 Public facades:
 
-- `langgraph_automation.api.errors`
-- `langgraph_automation.api.plugins`
-- `langgraph_automation.api.workflow`
-- `langgraph_automation.api.llm`
-- `langgraph_automation.api.tools`
-- `langgraph_automation.api.stores`
-- `langgraph_automation.api.events`
+- `cobalt_wren.api.errors`
+- `cobalt_wren.api.plugins`
+- `cobalt_wren.api.workflow`
+- `cobalt_wren.api.llm`
+- `cobalt_wren.api.tools`
+- `cobalt_wren.api.stores`
+- `cobalt_wren.api.events`
 
 Internal / provisional:
 
-- `langgraph_automation.config.*`
-- `langgraph_automation.runtime.*`
-- `langgraph_automation.plugins.registry`
-- `langgraph_automation.workflows.adapter`
-- `langgraph_automation.workflows.requirements`
-- `langgraph_automation.workflows.catalog`
+- `cobalt_wren.config.*`
+- `cobalt_wren.runtime.*`
+- `cobalt_wren.plugins.registry`
+- `cobalt_wren.workflows.adapter`
+- `cobalt_wren.workflows.requirements`
+- `cobalt_wren.workflows.catalog`
 
 Internal foundation:
 
-- legacy `langgraph_automation.graphs.*` package: removed; no compatibility import is provided
+- legacy `cobalt_wren.graphs.*` package: removed; no compatibility import is provided
 
 Control plane:
 
-- `langgraph_automation.apps.automation.*`
+- `cobalt_wren.apps.automation.*`
 
 Application workflow code should use public facades by default and should not depend on control-plane modules directly.
 
@@ -70,9 +70,9 @@ Not ready:
 - workflow code depends on `api.runtime`
 - workflow code depends on public graph internals
 
-## Example workflow
+## Example workflow package
 
-The built-in `reference.llm_echo_summary` workflow is the readiness example.
+A test or application-owned Native plugin is the readiness example; no workflow is registered implicitly.
 
 It demonstrates:
 
@@ -114,7 +114,7 @@ Application workflow implementation remains deferred until:
 ## Package Facade Dependency
 
 Application workflow implementation remains deferred until the application-facing package facade is designed and implemented.
-`langgraph_automation.api.engine` is the implemented provisional facade target.
+`cobalt_wren.api.engine` is the implemented provisional facade target.
 `company_agent` remains deferred until a minimal application workflow validates the package facade.
 
 ## Boundary Hardening Gate

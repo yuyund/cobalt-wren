@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from langgraph_automation.integrations.tools.base import ToolResult
-from langgraph_automation.integrations.tools.policy import (
+from cobalt_wren.integrations.tools.base import ToolResult
+from cobalt_wren.integrations.tools.policy import (
     AllowlistToolPolicy,
     POLICY_DENIED_ERROR_CODE,
     POLICY_DENIED_EXIT_CODE,

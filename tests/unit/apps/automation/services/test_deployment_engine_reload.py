@@ -5,11 +5,11 @@ from threading import Event, Thread
 
 import pytest
 
-from langgraph_automation.api.engine import EnginePreparedWorkflow
-from langgraph_automation.api.errors import FrameworkError
-from langgraph_automation.apps.automation.services import runtime as runtime_module
-from langgraph_automation.apps.automation.services.runtime import DeploymentEngineOwner
-from langgraph_automation.apps.automation.services.workflow_reference import WorkflowReference
+from cobalt_wren.api.engine import EnginePreparedWorkflow
+from cobalt_wren.api.errors import FrameworkError
+from cobalt_wren.apps.automation.services import runtime as runtime_module
+from cobalt_wren.apps.automation.services.runtime import DeploymentEngineOwner
+from cobalt_wren.apps.automation.services.workflow_reference import WorkflowReference
 
 
 class FakeEngine:

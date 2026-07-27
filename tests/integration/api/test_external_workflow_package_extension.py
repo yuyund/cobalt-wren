@@ -4,9 +4,9 @@ from __future__ import annotations
 
 import pytest
 
-from langgraph_automation.api.engine import EnginePreparedWorkflow, create_engine
-from langgraph_automation.api.errors import RuntimeAssemblyError
-from langgraph_automation.api.workflow import WorkflowRequirements
+from cobalt_wren.api.engine import EnginePreparedWorkflow, create_engine
+from cobalt_wren.api.errors import RuntimeAssemblyError
+from cobalt_wren.api.workflow import WorkflowRequirements
 from tests.external_packages.acme_workflows import (
     EXTERNAL_WORKFLOW_KIND,
     ExternalGraph,
@@ -37,7 +37,7 @@ def test_external_workflow_prepares_without_foundation_or_control_plane_registra
         raise AssertionError("tool execution must not occur during workflow preparation")
 
     monkeypatch.setattr("litellm.completion", forbid_provider)
-    monkeypatch.setattr("langgraph_automation.integrations.tools.safe_tools.EchoTool.__call__", forbid_tool)
+    monkeypatch.setattr("cobalt_wren.integrations.tools.safe_tools.EchoTool.__call__", forbid_tool)
 
     plugin = create_plugin(on_build=record_build)
     engine = create_engine(_minimal_config(), plugins=(plugin,))
@@ -86,7 +86,7 @@ def test_external_workflow_receives_opaque_config_and_executes() -> None:
 
 
 def test_external_workflow_can_use_replaced_provider_and_tool_adapters() -> None:
-    from langgraph_automation.api.plugins import (
+    from cobalt_wren.api.plugins import (
         Plugin,
         PluginContributions,
         PluginMetadata,
@@ -148,7 +148,7 @@ def test_external_workflow_can_use_replaced_provider_and_tool_adapters() -> None
 
 
 def test_external_workflow_uses_artifact_checkpoint_and_event_sink_replacements(tmp_path) -> None:
-    from langgraph_automation.api.plugins import EventSinkContribution, Plugin, PluginContributions, PluginMetadata
+    from cobalt_wren.api.plugins import EventSinkContribution, Plugin, PluginContributions, PluginMetadata
     from tests.support.recording_event_sink import RecordingEventSink
 
     sink = RecordingEventSink()

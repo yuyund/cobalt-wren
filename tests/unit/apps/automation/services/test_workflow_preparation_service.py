@@ -4,24 +4,29 @@ from __future__ import annotations
 
 import pytest
 
-from langgraph_automation.api.engine import EnginePreparedWorkflow
-from langgraph_automation.api.errors import PluginResolutionError, RuntimeAssemblyError
-from langgraph_automation.apps.automation.services.workflow_preparation import (
+from cobalt_wren.api.engine import EnginePreparedWorkflow
+from cobalt_wren.api.errors import PluginResolutionError, RuntimeAssemblyError
+from cobalt_wren.apps.automation.services.workflow_preparation import (
     prepare_run_workflow,
 )
 from tests.support.engine_fixtures import create_reference_engine_config
+from tests.support.native_workflow_fixtures import (
+    TEST_REQUIRED_WORKFLOW_KIND,
+    create_required_native_plugin,
+)
 
 
 def test_prepare_run_workflow_returns_public_engine_handle(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv('OPENAI_API_KEY', 'test-key')
 
     prepared = prepare_run_workflow(
-        workflow_kind='reference.llm_echo_summary',
+        workflow_kind=TEST_REQUIRED_WORKFLOW_KIND,
         config=create_reference_engine_config(),
+        plugins=(create_required_native_plugin(),),
     )
 
     assert isinstance(prepared, EnginePreparedWorkflow)
-    assert prepared.kind == 'reference.llm_echo_summary'
+    assert prepared.kind == TEST_REQUIRED_WORKFLOW_KIND
     assert prepared.executable is not None
     assert type(prepared).__name__ == 'EnginePreparedWorkflow'
 
@@ -37,6 +42,10 @@ def test_prepare_run_workflow_rejects_unknown_workflow_kind(monkeypatch: pytest.
 
 def test_prepare_run_workflow_rejects_missing_requirements() -> None:
     with pytest.raises(RuntimeAssemblyError) as excinfo:
-        prepare_run_workflow(workflow_kind='reference.llm_echo_summary', config={'version': 1, 'environment': 'test'})
+        prepare_run_workflow(
+            workflow_kind=TEST_REQUIRED_WORKFLOW_KIND,
+            config={'version': 1, 'environment': 'test'},
+            plugins=(create_required_native_plugin(),),
+        )
 
     assert excinfo.value.code == 'WORKFLOW_REQUIREMENT_MISSING'

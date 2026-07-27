@@ -3,7 +3,7 @@ from __future__ import annotations
 import pytest
 from django.urls import reverse
 
-from langgraph_automation.apps.automation.models import Run, Workflow
+from cobalt_wren.apps.automation.models import Run, Workflow
 
 
 @pytest.mark.django_db

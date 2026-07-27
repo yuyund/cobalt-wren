@@ -40,7 +40,7 @@ def test_opportunity_workflow_installs_as_separate_distribution(
 import json
 from importlib import metadata
 from opportunity_research_workflow import WORKFLOW_KIND
-entries = metadata.entry_points().select(group='langgraph_automation.plugins')
+entries = metadata.entry_points().select(group='cobalt_wren.plugins')
 entry = next(item for item in entries if item.name == 'opportunity-research')
 plugin = entry.load()()
 workflow = next(item for item in plugin.contributions.workflows if item.kind == WORKFLOW_KIND)

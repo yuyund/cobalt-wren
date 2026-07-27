@@ -20,18 +20,18 @@ def _imports(path: Path) -> list[str]:
 
 
 def test_workflow_preparation_module_stays_within_internal_boundaries() -> None:
-    module = Path('src/langgraph_automation/workflows/prepare.py')
+    module = Path('src/cobalt_wren/workflows/prepare.py')
     modules = _imports(module)
 
     forbidden_prefixes = (
-        'langgraph_automation.apps.automation',
+        'cobalt_wren.apps.automation',
         'django',
         'django.conf',
         'django.db',
-        'langgraph_automation.graphs.runner',
-        'langgraph_automation.graphs.builders',
-        'langgraph_automation.config.validator',
-        'langgraph_automation.runtime.assembly',
+        'cobalt_wren.graphs.runner',
+        'cobalt_wren.graphs.builders',
+        'cobalt_wren.config.validator',
+        'cobalt_wren.runtime.assembly',
     )
 
     offenders = [name for name in modules if name.startswith(forbidden_prefixes)]
@@ -39,15 +39,15 @@ def test_workflow_preparation_module_stays_within_internal_boundaries() -> None:
 
 
 def test_workflow_preparation_module_can_import_required_internal_boundaries() -> None:
-    modules = _imports(Path('src/langgraph_automation/workflows/prepare.py'))
+    modules = _imports(Path('src/cobalt_wren/workflows/prepare.py'))
 
     allowed_prefixes = (
-        'langgraph_automation.api.workflow',
-        'langgraph_automation.api.errors',
-        'langgraph_automation.plugins.registry',
-        'langgraph_automation.runtime.dependencies',
-        'langgraph_automation.workflows.adapter',
-        'langgraph_automation.workflows.requirements',
+        'cobalt_wren.api.workflow',
+        'cobalt_wren.api.errors',
+        'cobalt_wren.plugins.registry',
+        'cobalt_wren.runtime.dependencies',
+        'cobalt_wren.workflows.adapter',
+        'cobalt_wren.workflows.requirements',
     )
 
     assert any(name.startswith(allowed_prefixes) for name in modules)
@@ -55,11 +55,11 @@ def test_workflow_preparation_module_can_import_required_internal_boundaries() -
 
 def test_workflow_related_internal_modules_do_not_import_preparation_layer() -> None:
     for path in (
-        Path('src/langgraph_automation/runtime/assembly.py'),
-        Path('src/langgraph_automation/config/validator.py'),
-        Path('src/langgraph_automation/plugins/registry.py'),
-        Path('src/langgraph_automation/api/workflow.py'),
+        Path('src/cobalt_wren/runtime/assembly.py'),
+        Path('src/cobalt_wren/config/validator.py'),
+        Path('src/cobalt_wren/plugins/registry.py'),
+        Path('src/cobalt_wren/api/workflow.py'),
     ):
         modules = _imports(path)
-        offenders = [name for name in modules if name == 'langgraph_automation.workflows.prepare']
+        offenders = [name for name in modules if name == 'cobalt_wren.workflows.prepare']
         assert offenders == [], f'{path} imports workflow preparation unexpectedly'

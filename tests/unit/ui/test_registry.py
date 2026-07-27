@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from langgraph_automation.apps.automation.ui.registry import get_model_ui_config
+from cobalt_wren.apps.automation.ui.registry import get_model_ui_config
 
 
 def test_runs_ui_actions_do_not_include_resume() -> None:

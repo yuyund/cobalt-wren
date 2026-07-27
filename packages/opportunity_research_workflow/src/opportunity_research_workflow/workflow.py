@@ -11,15 +11,15 @@ from typing import Annotated, Any, TypedDict
 from langgraph.graph import END, START, StateGraph
 from langgraph.types import Send
 
-from langgraph_automation.api.stores import (
+from cobalt_wren.api.stores import (
     ArtifactStore,
     ArtifactWriteRequest,
     CheckpointStore,
     CheckpointWriteRequest,
 )
-from langgraph_automation.api.workflow import WorkflowExecutionContext, WorkflowExecutionResult
-from langgraph_automation.integrations.llm.base import LLMClient
-from langgraph_automation.integrations.tools.base import ToolCallable
+from cobalt_wren.api.workflow import WorkflowExecutionContext, WorkflowExecutionResult
+from cobalt_wren.integrations.llm.base import LLMClient
+from cobalt_wren.integrations.tools.base import ToolCallable
 
 
 class ResearchState(TypedDict, total=False):

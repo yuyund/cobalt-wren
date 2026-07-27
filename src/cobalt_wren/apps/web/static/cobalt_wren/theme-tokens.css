@@ -1,0 +1,12 @@
+:root {
+  --cp-page-bottom-space: 3rem;
+  --cp-component-gap: 1rem;
+  --cp-component-padding: 1rem;
+  --cp-conversation-max-width: 56rem;
+  --cp-message-max-width: 94%;
+  --cp-timeline-indent: 1rem;
+  --cp-timeline-max-indent: 3rem;
+  --cp-readable-line-length: 78ch;
+  --cp-structured-key-width: 14rem;
+  --cp-structured-json-max-height: 24rem;
+}

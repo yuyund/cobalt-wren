@@ -8,9 +8,9 @@ from types import MappingProxyType
 
 import pytest
 
-from langgraph_automation.integrations.artifact import emission as emission_module
-from langgraph_automation.integrations.artifact.base import ArtifactWriteRequest
-from langgraph_automation.integrations.artifact.emission import (
+from cobalt_wren.integrations.artifact import emission as emission_module
+from cobalt_wren.integrations.artifact.base import ArtifactWriteRequest
+from cobalt_wren.integrations.artifact.emission import (
     ArtifactEmissionConflict,
     ArtifactEmissionContext,
     ArtifactEmissionRequest,
@@ -28,8 +28,8 @@ from langgraph_automation.integrations.artifact.emission import (
     normalize_artifact_slot,
     validate_duplicate_emission,
 )
-from langgraph_automation.integrations.artifact.mapping import build_artifact_write_request
-from langgraph_automation.integrations.artifact.keys import is_safe_storage_key
+from cobalt_wren.integrations.artifact.mapping import build_artifact_write_request
+from cobalt_wren.integrations.artifact.keys import is_safe_storage_key
 
 
 def test_artifact_emission_request_fields_are_explicit_and_body_aware() -> None:
@@ -347,7 +347,7 @@ def test_artifact_emission_write_mapping_is_deterministic_and_run_owned() -> Non
 
 
 def test_artifact_emission_module_has_no_random_time_or_store_dependency() -> None:
-    module_path = Path('src/langgraph_automation/integrations/artifact/emission.py')
+    module_path = Path('src/cobalt_wren/integrations/artifact/emission.py')
     text = module_path.read_text()
 
     for token in ('import uuid', 'import random', 'from datetime', 'uuid4(', 'random.', 'datetime.now', 'time.now', 'ArtifactStore(', 'MemoryArtifactStore(', 'FilesystemArtifactStore('):
@@ -357,7 +357,7 @@ def test_artifact_emission_module_has_no_random_time_or_store_dependency() -> No
 
 
 def test_artifact_emission_module_stays_pure_and_store_independent() -> None:
-    import langgraph_automation.integrations.artifact.emission as emission_module_runtime
+    import cobalt_wren.integrations.artifact.emission as emission_module_runtime
 
     signature = inspect.signature(emission_module_runtime.build_artifact_identity)
     assert tuple(signature.parameters) == ('context', 'request')

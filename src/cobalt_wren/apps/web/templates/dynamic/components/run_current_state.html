@@ -1,0 +1,15 @@
+{% load ui_presentation %}
+<div class="card mb-4" data-component="run.current_state">
+  <div class="card-header"><div><h2 class="card-title mb-1">Current state</h2><div class="text-secondary">Framework-neutral control-plane observation</div></div></div>
+  <div class="card-body">
+    <div class="d-grid gap-3 run-live-metrics">
+      <div class="run-live-metric"><div class="text-secondary">Status</div><div class="h3 mb-0"><span class="badge {{ live.status|status_badge_class }}">{{ live.status }}</span></div></div>
+      <div class="run-live-metric"><div class="text-secondary">Current activity</div><div class="h3 mb-0">{{ live.current_activity }}</div></div>
+      <div class="run-live-metric"><div class="text-secondary">Progress</div><div class="h3 mb-0">{{ live.completed_steps }} / {{ live.total_steps }} spans</div></div>
+      <div class="run-live-metric"><div class="text-secondary">Elapsed</div><div class="h3 mb-0">{{ live.elapsed }}</div></div>
+      <div class="run-live-metric"><div class="text-secondary">Last update</div><div class="h3 mb-0">{{ live.last_update }}</div></div>
+      <div class="run-live-metric"><div class="text-secondary">Worker heartbeat</div><div class="h3 mb-0">{{ live.heartbeat }}</div></div>
+    </div>
+    <div class="mt-3 border-top pt-3" data-testid="last-event"><span class="text-secondary">Latest event:</span> <strong>{{ live.last_event_type }}</strong>{% if live.last_event_message %} — {{ live.last_event_message }}{% endif %}</div>
+  </div>
+</div>

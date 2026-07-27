@@ -4,14 +4,14 @@ status: current
 authority: explanatory
 summary: Framework-neutral pause/resume contract validated with an external LangGraph human approval workflow.
 code_refs:
-  - src/langgraph_automation/api/workflow.py
-  - src/langgraph_automation/api/engine.py
-  - src/langgraph_automation/workflows/adapter.py
-  - src/langgraph_automation/apps/automation/services/runs.py
-  - src/langgraph_automation/apps/automation/services/execution.py
-  - src/langgraph_automation/apps/automation/models/run.py
-  - src/langgraph_automation/apps/automation/policies/runs.py
-  - src/langgraph_automation/apps/automation/migrations/0002_run_waiting_status.py
+  - src/cobalt_wren/api/workflow.py
+  - src/cobalt_wren/api/engine.py
+  - src/cobalt_wren/workflows/adapter.py
+  - src/cobalt_wren/apps/automation/services/runs.py
+  - src/cobalt_wren/apps/automation/services/execution.py
+  - src/cobalt_wren/apps/automation/models/run.py
+  - src/cobalt_wren/apps/automation/policies/runs.py
+  - src/cobalt_wren/apps/automation/migrations/0002_run_waiting_status.py
   - packages/human_approval_workflow
   - .github/workflows/ci.yml
 test_refs:

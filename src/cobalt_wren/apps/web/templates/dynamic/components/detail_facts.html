@@ -1,0 +1,4 @@
+<div class="card mb-4 semantic-detail-facts" data-component="detail.facts">
+  <div class="card-header"><h2 class="card-title">Overview</h2></div>
+  <div class="card-body"><div class="row g-3">{% for field in detail_presentation.primary_fields %}<div class="col-12 col-md-6 col-xl-4"><div class="datagrid-item"><div class="datagrid-title">{{ field.label }}</div><div class="datagrid-content detail-value">{% include 'dynamic/components/field_value.html' with field=field compact=False only %}</div></div></div>{% endfor %}</div></div>
+</div>

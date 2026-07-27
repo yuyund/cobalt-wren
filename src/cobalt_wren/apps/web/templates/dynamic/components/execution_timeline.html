@@ -1,0 +1,24 @@
+{% load ui_presentation %}
+<div class="card mb-4" data-component="run.timeline">
+  <div class="card-header"><h2 class="card-title">Execution Spans timeline</h2></div>
+  <div class="card-body">
+    {% if live.timeline %}
+    <ol class="run-timeline" data-testid="execution-timeline">
+      {% for item in live.timeline %}
+      <li class="run-timeline-item" data-status="{{ item.status }}" data-depth="{{ item.depth }}">
+        <span class="run-timeline-marker" aria-hidden="true"></span>
+        <div class="d-flex flex-wrap gap-2 align-items-center">
+          <a class="fw-semibold" href="{{ item.url }}">{{ item.name }}</a>
+          <span class="badge bg-secondary-lt text-secondary">{{ item.span_type }}</span>
+          <span class="badge {{ item.status|status_badge_class }}">{{ item.status }}</span>
+          {% if item.attempt > 1 %}<span class="badge bg-yellow-lt text-yellow">Attempt {{ item.attempt }}</span>{% endif %}
+        </div>
+        <div class="text-secondary small">{{ item.started_at }} · {{ item.duration }}</div>
+      </li>
+      {% endfor %}
+    </ol>
+    {% else %}
+    <div class="empty"><p class="empty-title">No execution spans yet</p><p class="empty-subtitle text-secondary">The timeline appears when the workflow emits framework-neutral spans.</p></div>
+    {% endif %}
+  </div>
+</div>

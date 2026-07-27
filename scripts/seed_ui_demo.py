@@ -12,7 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 for package in ("human_approval_workflow", "saga_workflow", "plain_python_workflow"):
     sys.path.insert(0, str(ROOT / "packages" / package / "src"))
 sys.path.insert(0, str(ROOT / "src"))
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "langgraph_automation.config.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "cobalt_wren.config.settings")
 
 import django  # noqa: E402
 
@@ -24,11 +24,11 @@ from django.db import transaction  # noqa: E402
 from human_approval_workflow import create_plugin as create_approval_plugin  # noqa: E402
 from saga_workflow import create_plugin as create_saga_plugin  # noqa: E402
 from plain_python_workflow import create_plugin as create_plain_plugin  # noqa: E402
-from langgraph_automation.api.plugins import Plugin, PluginContributions, PluginMetadata  # noqa: E402
-from langgraph_automation.api.workflow import WorkflowContribution, WorkflowDefinition, WorkflowMetadata, WorkflowRequirements  # noqa: E402
-from langgraph_automation.apps.automation.models import Run, Workflow  # noqa: E402
-from langgraph_automation.apps.automation.services import runs as run_services  # noqa: E402
-from langgraph_automation.apps.automation.services.runtime import build_run_execution_services  # noqa: E402
+from cobalt_wren.api.plugins import Plugin, PluginContributions, PluginMetadata  # noqa: E402
+from cobalt_wren.api.workflow import WorkflowContribution, WorkflowDefinition, WorkflowMetadata, WorkflowRequirements  # noqa: E402
+from cobalt_wren.apps.automation.models import Run, Workflow  # noqa: E402
+from cobalt_wren.apps.automation.services import runs as run_services  # noqa: E402
+from cobalt_wren.apps.automation.services.runtime import build_run_execution_services  # noqa: E402
 
 
 
@@ -63,7 +63,7 @@ def create_timeout_plugin() -> Plugin:
     )
 
 PREFIX = "[demo]"
-DEMO_ROOT = Path(os.environ.get("LANGGRAPH_AUTOMATION_UI_DEMO_ROOT", "/tmp/langgraph-automation-ui-demo")).resolve()
+DEMO_ROOT = Path(os.environ.get("COBALT_WREN_UI_DEMO_ROOT", "/tmp/cobalt-wren-ui-demo")).resolve()
 
 
 def create_run(workflow: Workflow, name: str, payload: dict[str, object]) -> Run:

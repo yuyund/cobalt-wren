@@ -17,7 +17,7 @@ If external users import internal modules directly, future design changes will b
 - Public API will be provided as a facade.
 - Public vocabulary should move toward `workflow` terms.
 - Internal implementation may keep `graph` vocabulary.
-- Plugin authors should eventually depend on `langgraph_automation.api.*`.
+- Plugin authors should eventually depend on `cobalt_wren.api.*`.
 - `apps/automation/services`, `graphs` runner/builders, core safety internals, and concrete integrations remain internal.
 - `workflows/catalog.py` is package composition internal; future workflow extension should go through a registration API.
 - Package P0-A is docs only, and `api/` modules are not implemented yet.

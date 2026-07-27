@@ -18,21 +18,21 @@ def _imported_modules(path: Path) -> list[str]:
 
 
 def test_config_validator_module_imports_only_allowed_boundaries() -> None:
-    path = Path('src/langgraph_automation/config/validator.py')
+    path = Path('src/cobalt_wren/config/validator.py')
     modules = _imported_modules(path)
 
     allowed_prefixes = (
-        'langgraph_automation.config.models',
-        'langgraph_automation.plugins.registry',
-        'langgraph_automation.api.errors',
-        'langgraph_automation.api.plugins',
+        'cobalt_wren.config.models',
+        'cobalt_wren.plugins.registry',
+        'cobalt_wren.api.errors',
+        'cobalt_wren.api.plugins',
     )
     forbidden_prefixes = (
-        'langgraph_automation.apps.automation',
-        'langgraph_automation.graphs.runner',
-        'langgraph_automation.graphs.builders',
-        'langgraph_automation.workflows.catalog',
-        'langgraph_automation.integrations.',
+        'cobalt_wren.apps.automation',
+        'cobalt_wren.graphs.runner',
+        'cobalt_wren.graphs.builders',
+        'cobalt_wren.workflows.catalog',
+        'cobalt_wren.integrations.',
         'django',
     )
 

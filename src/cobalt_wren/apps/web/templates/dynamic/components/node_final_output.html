@@ -1,0 +1,12 @@
+{% load ui_presentation %}
+<section id="run-node-output" class="card mb-4" data-component="run.node_output" data-extension-point="node-final-output" aria-label="Node final output">
+  <div class="card-header"><h2 class="card-title">Latest node output</h2></div>
+  <div class="card-body">
+    {% if live.node_output %}
+    <div class="d-flex flex-wrap gap-2 align-items-center mb-2"><a class="fw-semibold" href="{{ live.node_output.url }}">{{ live.node_output.node_name }}</a><span class="badge {{ live.node_output.status|status_badge_class }}">{{ live.node_output.status }}</span></div>
+    <div class="node-output-body">{{ live.node_output.output_preview|linebreaksbr }}</div>
+    {% else %}
+    <div class="empty py-4"><p class="empty-title">No node output recorded</p><p class="empty-subtitle text-secondary">A bounded final-output preview appears when a completed node emits one.</p></div>
+    {% endif %}
+  </div>
+</section>

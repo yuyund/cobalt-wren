@@ -6,8 +6,8 @@ from pathlib import Path
 
 
 def test_tool_policy_modules_do_not_depend_on_django_or_graphs() -> None:
-    policy = Path('src/langgraph_automation/integrations/tools/policy.py').read_text()
-    policy_registry = Path('src/langgraph_automation/integrations/tools/policy_registry.py').read_text()
+    policy = Path('src/cobalt_wren/integrations/tools/policy.py').read_text()
+    policy_registry = Path('src/cobalt_wren/integrations/tools/policy_registry.py').read_text()
 
     for text in [policy, policy_registry]:
         assert 'django.db' not in text
@@ -19,6 +19,6 @@ def test_tool_policy_modules_do_not_depend_on_django_or_graphs() -> None:
 
 
 def test_observed_tool_registry_does_not_import_policy_internals() -> None:
-    text = Path('src/langgraph_automation/integrations/tools/observed_registry.py').read_text()
+    text = Path('src/cobalt_wren/integrations/tools/observed_registry.py').read_text()
     assert 'PolicyAwareToolRegistry' not in text
     assert 'AllowlistToolPolicy' not in text

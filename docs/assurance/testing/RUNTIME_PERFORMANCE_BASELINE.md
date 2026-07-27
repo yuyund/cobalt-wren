@@ -6,8 +6,8 @@ summary: Reproducible local baseline for engine creation, workflow preparation, 
 code_refs:
   - scripts/benchmark_runtime.py
   - config/runtime-performance-baseline.json
-  - src/langgraph_automation/api/engine.py
-  - src/langgraph_automation/workflows/prepare.py
+  - src/cobalt_wren/api/engine.py
+  - src/cobalt_wren/workflows/prepare.py
 test_refs:
   - tests/unit/architecture/test_runtime_benchmark.py
   - tests/integration/api/test_public_execution_persistence.py

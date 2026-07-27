@@ -4,9 +4,9 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 import json
 
-from langgraph_automation.api.errors import WorkflowCheckpointCompatibilityError
-from langgraph_automation.api.stores import ArtifactStore, ArtifactWriteRequest, CheckpointStore, CheckpointWriteRequest, StoredArtifact, StoredCheckpoint
-from langgraph_automation.api.workflow import WorkflowExecutionContext, WorkflowExecutionResult, WorkflowResumeRequest
+from cobalt_wren.api.errors import WorkflowCheckpointCompatibilityError
+from cobalt_wren.api.stores import ArtifactStore, ArtifactWriteRequest, CheckpointStore, CheckpointWriteRequest, StoredArtifact, StoredCheckpoint
+from cobalt_wren.api.workflow import WorkflowExecutionContext, WorkflowExecutionResult, WorkflowResumeRequest
 
 _NAMESPACE = "plain-confirmation"
 _CHECKPOINT_ID = "awaiting-confirmation-v1"

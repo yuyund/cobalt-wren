@@ -6,7 +6,7 @@ from pathlib import Path
 
 
 def test_web_views_do_not_import_run_service_functions_directly() -> None:
-    root = Path('src/langgraph_automation/apps/web/views')
+    root = Path('src/cobalt_wren/apps/web/views')
     text = '\n'.join(path.read_text() for path in root.rglob('*.py'))
     assert 'start_run' not in text
     assert 'cancel_run' not in text

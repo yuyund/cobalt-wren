@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from langgraph_automation.integrations.observability.types import ObservabilityContext
+from cobalt_wren.integrations.observability.types import ObservabilityContext
 
 
 @dataclass(slots=True)

@@ -8,7 +8,7 @@ from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 from typing import Any
 
-from langgraph_automation.integrations.tools.base import ToolResult
+from cobalt_wren.integrations.tools.base import ToolResult
 
 Transport = Callable[[Request, float], bytes]
 

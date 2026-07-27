@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
-from langgraph_automation.integrations.llm.base import LLMResult
+from cobalt_wren.integrations.llm.base import LLMResult
 
 
 @dataclass(slots=True)

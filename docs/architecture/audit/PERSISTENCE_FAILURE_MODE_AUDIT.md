@@ -8,23 +8,23 @@ This audit records the current persistence paths, failure behavior, and missing 
 
 Current code-first evidence shows:
 
-- `src/langgraph_automation/apps/automation/services/runtime.py` constructs `MemoryArtifactStore` and `MemoryCheckpointStore`
-- `src/langgraph_automation/runtime/assembly.py` threads store objects through `RuntimeDependencies`
-- `src/langgraph_automation/graphs/runtime.py` carries the store objects on `GraphRuntime`
-- `src/langgraph_automation/apps/automation/services/execution.py` dispatches graph execution with raw `Run.input_payload`
-- `src/langgraph_automation/apps/automation/services/runs.py` normalizes run output/error for persistence
-- `src/langgraph_automation/integrations/observability/django_event_sink.py` persists metadata rows for events, spans, artifacts, and checkpoints
+- `src/cobalt_wren/apps/automation/services/runtime.py` constructs `MemoryArtifactStore` and `MemoryCheckpointStore`
+- `src/cobalt_wren/runtime/assembly.py` threads store objects through `RuntimeDependencies`
+- `src/cobalt_wren/graphs/runtime.py` carries the store objects on `GraphRuntime`
+- `src/cobalt_wren/apps/automation/services/execution.py` dispatches graph execution with raw `Run.input_payload`
+- `src/cobalt_wren/apps/automation/services/runs.py` normalizes run output/error for persistence
+- `src/cobalt_wren/integrations/observability/django_event_sink.py` persists metadata rows for events, spans, artifacts, and checkpoints
 
 No current code path in `src/` calls artifact or checkpoint store methods from the execution path.
 
 Evidence:
 
 - `rg -n "\\.put\\(|\\.save\\(|\\.load\\(|\\.delete\\(" src tests`
-- `src/langgraph_automation/apps/automation/services/runtime.py`
-- `src/langgraph_automation/apps/automation/services/execution.py`
-- `src/langgraph_automation/apps/automation/services/runs.py`
-- `src/langgraph_automation/graphs/runner.py`
-- `src/langgraph_automation/integrations/observability/django_event_sink.py`
+- `src/cobalt_wren/apps/automation/services/runtime.py`
+- `src/cobalt_wren/apps/automation/services/execution.py`
+- `src/cobalt_wren/apps/automation/services/runs.py`
+- `src/cobalt_wren/graphs/runner.py`
+- `src/cobalt_wren/integrations/observability/django_event_sink.py`
 
 ## Current Write / Read Flows
 
@@ -119,7 +119,7 @@ Buckets: W write failures, R read failures, C retry / concurrency failures, S sa
 
 ## Evidence Summary
 
-- `CODE_CONFIRMED`: `src/langgraph_automation/integrations/artifact/*`, `src/langgraph_automation/integrations/checkpoint/*`, `src/langgraph_automation/apps/automation/services/runtime.py`, `src/langgraph_automation/graphs/runtime.py`
+- `CODE_CONFIRMED`: `src/cobalt_wren/integrations/artifact/*`, `src/cobalt_wren/integrations/checkpoint/*`, `src/cobalt_wren/apps/automation/services/runtime.py`, `src/cobalt_wren/graphs/runtime.py`
 - `TEST_CONFIRMED`: `tests/unit/artifact/*`, `tests/unit/integrations/test_checkpoint_summary.py`, `tests/unit/runtime/test_runtime_assembler_stores.py`, `tests/unit/automation/test_run_safety.py`, `tests/integration/django/test_event_sink.py`
 - `GAP`: durable backend orchestration, checksum/versioning, restart durability, reconciliation
 - `CONTRACT_DRIFT`: current overwrite semantics do not satisfy the target immutability/idempotency contract

@@ -1,0 +1,4 @@
+{% extends 'base.html' %}{% load ui_presentation %}{% block title %}{{ page.title }}{% endblock %}{% block content %}
+<div class="page-header d-print-none"><h1 class="page-title">{{ page.title }}</h1></div><div class="card mt-3">
+{% if page.rows %}<div class="table-wrap"><table class="table table-vcenter card-table"><thead><tr>{% for column in page.columns %}<th>{{ column.label }}</th>{% endfor %}</tr></thead><tbody>{% for row in page.rows %}<tr>{% for field in row %}<td>{% include 'dynamic/components/field_value.html' with field=field compact=True only %}</td>{% endfor %}</tr>{% endfor %}</tbody></table></div>{% else %}<div class="empty"><p class="empty-title">{{ page.empty_message }}</p></div>{% endif %}
+</div>{% endblock %}

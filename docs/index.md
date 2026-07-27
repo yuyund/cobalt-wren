@@ -11,6 +11,7 @@ Start here when you are trying to understand the repository.
 - `./AGENTS.md`: docs subtree guidance and reading order.
 - `./agent/`: Codex and repo-operation guidance.
 - `./architecture/`: design principles, layer boundaries, dataflow rules, and persistence convergence concerns.
+- `./architecture/design/OSS_NEUTRAL_WORKFLOW_INTEGRATION.md`: current direction for OSS-neutral helpers, common operations, dynamic UI composition, persistence, and native authoring.
 - `./architecture/audit/`: code-first sufficiency audits and closure follow-ups.
 - `./api/`: public facade surfaces and staged APIs.
 - `./configuration/`: config model, schema, and validation.

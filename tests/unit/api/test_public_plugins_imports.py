@@ -4,9 +4,9 @@ from __future__ import annotations
 
 
 def test_public_plugins_api_exports() -> None:
-    import langgraph_automation.api.plugins as plugins_api
+    import cobalt_wren.api.plugins as plugins_api
 
-    from langgraph_automation.api.plugins import (
+    from cobalt_wren.api.plugins import (
         EventSinkContribution,
         Plugin,
         PluginContributions,
@@ -27,7 +27,7 @@ def test_public_plugins_api_exports() -> None:
 
 
 def test_public_plugins_api_all() -> None:
-    import langgraph_automation.api.plugins as plugins_api
+    import cobalt_wren.api.plugins as plugins_api
 
     assert set(plugins_api.__all__) == {
         'DEFAULT_PLUGIN_ENTRY_POINT_GROUP',

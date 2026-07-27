@@ -4,10 +4,10 @@ from __future__ import annotations
 
 import pytest
 
-from langgraph_automation.api.errors import RuntimeAssemblyError
-from langgraph_automation.api.workflow import WorkflowRequirements
-from langgraph_automation.runtime.dependencies import RuntimeDependencies
-from langgraph_automation.workflows.requirements import check_workflow_requirements
+from cobalt_wren.api.errors import RuntimeAssemblyError
+from cobalt_wren.api.workflow import WorkflowRequirements
+from cobalt_wren.runtime.dependencies import RuntimeDependencies
+from cobalt_wren.workflows.requirements import check_workflow_requirements
 
 
 def _dependencies() -> RuntimeDependencies:

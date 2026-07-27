@@ -4,10 +4,10 @@ status: current
 authority: explanatory
 summary: Minimal readability baseline for the registry-driven control-plane UI.
 code_refs:
-  - src/langgraph_automation/apps/web/templates/base.html
-  - src/langgraph_automation/apps/web/templates/dynamic/list.html
-  - src/langgraph_automation/apps/web/templates/dynamic/detail.html
-  - src/langgraph_automation/apps/web/templates/dynamic/artifact_preview.html
+  - src/cobalt_wren/apps/web/templates/base.html
+  - src/cobalt_wren/apps/web/templates/dynamic/list.html
+  - src/cobalt_wren/apps/web/templates/dynamic/detail.html
+  - src/cobalt_wren/apps/web/templates/dynamic/artifact_preview.html
 test_refs:
   - tests/integration/django/test_ui_shell.py
 verified:

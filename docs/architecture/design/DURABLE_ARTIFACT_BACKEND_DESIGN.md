@@ -2,7 +2,7 @@
 
 This document defines the design for the first durable artifact backend.
 
-The implementation now lives in `src/langgraph_automation/integrations/artifact/filesystem_store.py`.
+The implementation now lives in `src/cobalt_wren/integrations/artifact/filesystem_store.py`.
 The design remains the reference contract for that backend.
 
 ## Selected Backend Candidate

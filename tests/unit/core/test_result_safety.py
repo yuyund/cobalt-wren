@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from langgraph_automation.core.redaction import REDACTED_VALUE
-from langgraph_automation.core.result_safety import safe_run_error_message, safe_run_output_payload
+from cobalt_wren.core.redaction import REDACTED_VALUE
+from cobalt_wren.core.result_safety import safe_run_error_message, safe_run_output_payload
 
 
 def test_safe_run_output_payload_redacts_nested_mapping_and_bounds_output() -> None:

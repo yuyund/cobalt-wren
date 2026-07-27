@@ -7,14 +7,14 @@ from pathlib import Path
 from django.contrib import admin
 from django.test import RequestFactory
 
-from langgraph_automation.apps.automation.admin import RunAdmin, WorkflowAdmin
-from langgraph_automation.apps.automation.models.run import Run
-from langgraph_automation.apps.automation.models.workflow import Workflow
-from langgraph_automation.apps.automation.ui.registry import get_model_ui_config
+from cobalt_wren.apps.automation.admin import RunAdmin, WorkflowAdmin
+from cobalt_wren.apps.automation.models.run import Run
+from cobalt_wren.apps.automation.models.workflow import Workflow
+from cobalt_wren.apps.automation.ui.registry import get_model_ui_config
 
 
 def test_templates_do_not_use_raw_debug_dumps() -> None:
-    root = Path('src/langgraph_automation/apps/web/templates')
+    root = Path('src/cobalt_wren/apps/web/templates')
     offenders: list[str] = []
     forbidden_tokens = ('__dict__', '_meta', 'pprint', 'debug', 'json.dumps(')
 

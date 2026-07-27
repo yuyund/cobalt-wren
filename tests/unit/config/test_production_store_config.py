@@ -1,6 +1,6 @@
-from langgraph_automation.config.artifact_store import normalize_artifact_store_settings
-from langgraph_automation.config.checkpoint_store import normalize_checkpoint_store_settings
-from langgraph_automation.config.models import PostgresCheckpointStoreSettings, S3ArtifactStoreSettings, StoreBackendConfig
+from cobalt_wren.config.artifact_store import normalize_artifact_store_settings
+from cobalt_wren.config.checkpoint_store import normalize_checkpoint_store_settings
+from cobalt_wren.config.models import PostgresCheckpointStoreSettings, S3ArtifactStoreSettings, StoreBackendConfig
 
 
 def test_s3_artifact_settings() -> None:

@@ -52,7 +52,7 @@ def test_checkpoint_store_contract_docs_exist_and_cover_core_terms() -> None:
         'checkpointstore',
         'approved for durable backend implementation',
         'checkpoint metadata is preserved as a lossless logical json value',
-        'filesystemcheckpointstore is implemented in `langgraph_automation.integrations.checkpoint`',
+        'filesystemcheckpointstore is implemented in `cobalt_wren.integrations.checkpoint`',
     ):
         assert token in api_surface_text
 
@@ -64,6 +64,6 @@ def test_checkpoint_store_contract_docs_exist_and_cover_core_terms() -> None:
         'approved_for_implementation',
         'checkpoint store contract',
         'process_durable',
-        'filesystemcheckpointstore is implemented in `langgraph_automation.integrations.checkpoint`',
+        'filesystemcheckpointstore is implemented in `cobalt_wren.integrations.checkpoint`',
     ):
         assert token in core_contract_text

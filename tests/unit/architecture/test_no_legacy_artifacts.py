@@ -8,26 +8,26 @@ from pathlib import Path
 
 def test_legacy_notes_and_placeholder_models_are_removed() -> None:
     assert not Path('note.md').exists()
-    assert not Path('src/langgraph_automation/apps/automation/models/agent.py').exists()
-    assert not Path('src/langgraph_automation/apps/automation/models/config.py').exists()
-    assert not Path('src/langgraph_automation/integrations/llm/fake_client.py').exists()
-    assert not Path('src/langgraph_automation/integrations/llm/not_configured_client.py').exists()
-    assert not Path('src/langgraph_automation/integrations/observability/llm_observer.py').exists()
-    assert not Path('src/langgraph_automation/graphs/nodes/executor.py').exists()
-    assert not Path('src/langgraph_automation/graphs/llm_echo_summary.py').exists()
-    assert not Path('src/langgraph_automation/graphs/nodes/minimal.py').exists()
-    assert not Path('src/langgraph_automation/graphs/states.py').exists()
-    assert not Path('src/langgraph_automation/graphs/nodes/planner.py').exists()
-    assert not Path('src/langgraph_automation/graphs/nodes/summarizer.py').exists()
-    assert not Path('src/langgraph_automation/graphs/llm_echo_summary.py').exists()
-    assert not Path('src/langgraph_automation/graphs/nodes/minimal.py').exists()
-    assert not Path('src/langgraph_automation/graphs/states.py').exists()
-    assert not Path('src/langgraph_automation/graphs/nodes/reviewer.py').exists()
-    assert not Path('src/langgraph_automation/graphs/routing.py').exists()
-    assert not Path('src/langgraph_automation/entrypoints/run_worker.py').exists()
-    assert not Path('src/langgraph_automation/integrations/tools/file_tool.py').exists()
-    assert not Path('src/langgraph_automation/integrations/tools/shell_tool.py').exists()
-    assert not Path('src/langgraph_automation/integrations/artifact/local_store.py').exists()
+    assert not Path('src/cobalt_wren/apps/automation/models/agent.py').exists()
+    assert not Path('src/cobalt_wren/apps/automation/models/config.py').exists()
+    assert not Path('src/cobalt_wren/integrations/llm/fake_client.py').exists()
+    assert not Path('src/cobalt_wren/integrations/llm/not_configured_client.py').exists()
+    assert not Path('src/cobalt_wren/integrations/observability/llm_observer.py').exists()
+    assert not Path('src/cobalt_wren/graphs/nodes/executor.py').exists()
+    assert not Path('src/cobalt_wren/graphs/llm_echo_summary.py').exists()
+    assert not Path('src/cobalt_wren/graphs/nodes/minimal.py').exists()
+    assert not Path('src/cobalt_wren/graphs/states.py').exists()
+    assert not Path('src/cobalt_wren/graphs/nodes/planner.py').exists()
+    assert not Path('src/cobalt_wren/graphs/nodes/summarizer.py').exists()
+    assert not Path('src/cobalt_wren/graphs/llm_echo_summary.py').exists()
+    assert not Path('src/cobalt_wren/graphs/nodes/minimal.py').exists()
+    assert not Path('src/cobalt_wren/graphs/states.py').exists()
+    assert not Path('src/cobalt_wren/graphs/nodes/reviewer.py').exists()
+    assert not Path('src/cobalt_wren/graphs/routing.py').exists()
+    assert not Path('src/cobalt_wren/entrypoints/run_worker.py').exists()
+    assert not Path('src/cobalt_wren/integrations/tools/file_tool.py').exists()
+    assert not Path('src/cobalt_wren/integrations/tools/shell_tool.py').exists()
+    assert not Path('src/cobalt_wren/integrations/artifact/local_store.py').exists()
 
 
 def test_production_code_has_no_fake_or_placeholder_llm_runners() -> None:
@@ -69,13 +69,13 @@ def test_tests_support_is_not_imported_from_src() -> None:
 
 
 def test_observed_tool_registry_does_not_import_django_orm() -> None:
-    text = Path('src/langgraph_automation/integrations/tools/observed_registry.py').read_text()
+    text = Path('src/cobalt_wren/integrations/tools/observed_registry.py').read_text()
     assert 'django.db' not in text
     assert 'django.models' not in text
 
 
 def test_graph_nodes_do_not_directly_emit_lifecycle_events() -> None:
-    root = Path('src/langgraph_automation/graphs/nodes')
+    root = Path('src/cobalt_wren/graphs/nodes')
     offenders: list[str] = []
     for path in root.rglob('*.py'):
         text = path.read_text()
@@ -86,19 +86,19 @@ def test_graph_nodes_do_not_directly_emit_lifecycle_events() -> None:
 
 def test_shell_and_file_tool_placeholders_do_not_reappear() -> None:
     for relpath in [
-        'src/langgraph_automation/integrations/tools/file_tool.py',
-        'src/langgraph_automation/integrations/tools/shell_tool.py',
+        'src/cobalt_wren/integrations/tools/file_tool.py',
+        'src/cobalt_wren/integrations/tools/shell_tool.py',
     ]:
         assert not Path(relpath).exists()
 
 
 def test_reference_diagnostic_workflow_nodes_are_not_application_placeholders() -> None:
-    assert not Path('src/langgraph_automation/graphs/nodes/planner.py').exists()
-    assert not Path('src/langgraph_automation/graphs/nodes/summarizer.py').exists()
-    assert not Path('src/langgraph_automation/graphs/llm_echo_summary.py').exists()
-    assert not Path('src/langgraph_automation/graphs/nodes/minimal.py').exists()
-    assert not Path('src/langgraph_automation/graphs/states.py').exists()
+    assert not Path('src/cobalt_wren/graphs/nodes/planner.py').exists()
+    assert not Path('src/cobalt_wren/graphs/nodes/summarizer.py').exists()
+    assert not Path('src/cobalt_wren/graphs/llm_echo_summary.py').exists()
+    assert not Path('src/cobalt_wren/graphs/nodes/minimal.py').exists()
+    assert not Path('src/cobalt_wren/graphs/states.py').exists()
 
 
 def test_graph_package_is_removed() -> None:
-    assert not Path("src/langgraph_automation/graphs").exists()
+    assert not Path("src/cobalt_wren/graphs").exists()

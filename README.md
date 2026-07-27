@@ -1,81 +1,126 @@
-# LangGraph Automation
+# Cobalt Wren
 
-A workflow automation package with a Django control plane, a narrow public workflow/plugin API, replaceable runtime capabilities, and LangGraph as an optional workflow implementation detail.
+Cobalt Wren is a Python-first workflow toolkit for explicit, observable
+execution. Write workflows as ordinary async Python, declare runtime
+requirements, validate them locally, and operate them through a Django control
+plane. LangGraph and LlamaIndex Workflows are optional integrations rather than
+foundation requirements.
 
-The package is under active development and currently has no production consumers. Design rules are documented in `docs/architecture/design/DESIGN_PRINCIPLES.md` and `docs/architecture/design/DEVELOPMENT_COMPATIBILITY_POLICY.md`.
+> **Status:** 0.1.0 release candidate. The public API is intentionally narrow,
+> but breaking changes may still occur before 1.0.
 
-## Architecture
+## Install
 
-- `langgraph_automation.api`: public facades for workflows, plugins, providers, tools, stores, events, errors, and the engine.
-- `workflows`: public-workflow preparation and built-in workflow composition.
-- `runtime`: validated dependency assembly.
-- `integrations`: concrete LLM, tool, artifact, checkpoint, and observability adapters.
-- `apps/automation`: Django Run lifecycle, workflow reference parsing, engine ownership, safe persistence, and dynamic UI metadata.
-- `core`: redaction, summaries, and result safety.
+Cobalt Wren requires Python 3.12 or newer.
 
-There is no production `graphs` package, graph registry, graph runtime, or graph runner. The built-in `reference.llm_echo_summary` workflow uses LangGraph only inside its `LlmEchoSummaryExecutable` implementation.
-
-## Execution
-
-A Django `Workflow` selects an executable through `definition_payload`:
-
-```json
-{
-  "workflow": {
-    "kind": "reference.llm_echo_summary",
-    "config": {
-      "allowed_tools": ["echo"]
-    }
-  }
-}
+```bash
+pip install cobalt-wren
 ```
 
-Execution is one path:
+Install optional workflow integrations only when needed:
 
-```text
-Run
-→ WorkflowReference
-→ DeploymentEngineOwner
-→ EnginePreparedWorkflow
-→ public executable
-→ WorkflowExecutionResult
-→ ControlPlaneExecutionResult
-→ safe Run persistence
+```bash
+pip install "cobalt-wren[langgraph]"
+pip install "cobalt-wren[llamaindex]"
+pip install "cobalt-wren[oss-integrations]"
 ```
 
-Missing, malformed, or unknown workflow references fail closed. There is no graph fallback.
+## Write a Native workflow
 
-## Runtime Configuration
+```python
+from cobalt_wren.native import NativeWorkflowContext, workflow
 
-Deployment configuration owns provider, tool, store, event-sink, and safety selection. Workflow configuration is opaque to the foundation and validated by the workflow contribution. `Run.input_payload` is execution input, not configuration and cannot grant capabilities or provide credentials.
 
-The reference workflow requires the deployment to provide:
+@workflow("example.greeting")
+async def greeting(
+    ctx: NativeWorkflowContext,
+    request: dict[str, object],
+) -> dict[str, object]:
+    name = str(request.get("name", "world"))
 
-- provider profile `default`
-- tool `echo`
+    def build_message(value: str) -> str:
+        return f"Hello, {value}."
 
-Secrets are resolved by runtime assembly and are never exposed through `WorkflowBuildContext`.
+    message = await ctx.step("build-message", build_message, name)
 
-## Observability
+    await ctx.progress.update(current=1, total=1, message="Complete")
+    ctx.metric.record("messages.processed", 1, unit="message")
+    return {"message": message}
+```
 
-`WorkflowExecutionContext` carries per-run identity and observability context. The reference executable emits node spans and binds provider/tool spans to the node parent. Control-plane lifecycle emission follows `EnginePreparedWorkflow.lifecycle_events_owner`.
+Save it as `workflow.py`, then inspect, validate, and run it locally:
 
-Observability failures are secondary and must not replace the primary execution result.
+```bash
+cobalt-wren native-inspect workflow:greeting
+cobalt-wren native-validate workflow:greeting
+cobalt-wren native-run workflow:greeting --input '{"name":"Cobalt"}'
+```
 
-## Persistence
+Generate a distributable workflow package:
 
-- Memory artifact and checkpoint stores are `EPHEMERAL` defaults.
-- Filesystem artifact and checkpoint stores are `PROCESS_DURABLE` explicit opt-ins.
-- Store durability does not imply execution resume.
-- True resume and LangGraph `BaseCheckpointSaver` convergence remain deferred.
+```bash
+cobalt-wren init-workflow \
+  --name example-workflow \
+  --kind example.workflow \
+  --framework native \
+  --output .
+```
 
-## Extension
+## What the control plane provides
 
-External workflow distributions import only public `langgraph_automation.api.*` contracts. They may be explicitly registered or discovered through the optional `langgraph_automation.plugins` entry-point group.
+- explicit workflow references and fail-closed resolution
+- canonical run, span, event, artifact, checkpoint, and action records
+- bounded and redacted persistence
+- audit, permissions, diagnostics, and lifecycle operations
+- framework-neutral LLM and tool observation boundaries
+- versioned integration-native projections with generic fallback rendering
+- optional Django UI for runs, diagnostics, integrations, and live telemetry
 
-See:
+Cobalt Wren does not force every workflow framework into a universal state
+model. It stabilizes common facts, meanings, and operations while retaining
+framework-specific detail in versioned projections.
 
-- `docs/index.md`
+## Framework integrations
+
+External workflow objects remain opaque to the foundation. Integration providers
+use public execution capabilities and emit stable lifecycle observations plus
+versioned integration detail. Importing the foundation does not import
+LangGraph or LlamaIndex Workflows.
+
+Core design rules are documented in `docs/architecture/design/DESIGN_PRINCIPLES.md` and `docs/architecture/design/DEVELOPMENT_COMPATIBILITY_POLICY.md`.
+
+The observation model is documented in:
+
+- `docs/architecture/decisions/0001-observation-layers.md`
+- `docs/architecture/decisions/0002-schema-id-policy.md`
+- `docs/architecture/OBSERVATION_ARCHITECTURE_ROADMAP.md`
+
+## Runtime configuration
+
+Deployment configuration selects providers, tools, stores, event sinks, and
+safety policy. Workflow input cannot grant capabilities or supply credentials.
+Secrets are resolved during runtime assembly and are not exposed to workflow
+build contexts.
+
+Memory artifact and checkpoint stores are ephemeral defaults. Filesystem stores
+are explicit process-durable options. Store durability does not by itself imply
+execution resume.
+
+## Extension API
+
+External distributions should import public contracts from `cobalt_wren.api`
+and supported authoring or integration facades. Plugins may be registered
+explicitly or discovered through the `cobalt_wren.plugins` entry-point group.
+
+Start with:
+
 - `docs/workflows/authoring/WORKFLOW_AUTHOR_GUIDE.md`
 - `docs/api/surface/API_SURFACE.md`
 - `docs/contracts/core/CONTRACTS.md`
+- `docs/release/PYPI_RELEASE_CHECKLIST.md`
+
+## License
+
+Copyright 2026 Yudai Maruyama.
+
+Licensed under the Apache License, Version 2.0. See `LICENSE` and `NOTICE`.

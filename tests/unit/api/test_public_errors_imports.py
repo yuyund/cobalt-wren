@@ -4,7 +4,7 @@ from __future__ import annotations
 
 
 def test_public_errors_api_exports() -> None:
-    from langgraph_automation.api.errors import (
+    from cobalt_wren.api.errors import (
         ArtifactConflictError,
         ArtifactIntegrityError,
         ArtifactPersistenceError,
@@ -44,7 +44,7 @@ def test_public_errors_api_exports() -> None:
 
 
 def test_public_errors_api_all() -> None:
-    import langgraph_automation.api.errors as errors_api
+    import cobalt_wren.api.errors as errors_api
 
     assert set(errors_api.__all__) == {
         'FrameworkError',

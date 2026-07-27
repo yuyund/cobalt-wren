@@ -13,7 +13,7 @@ It remains a thin wrapper, not the final package boundary.
 
 ## Decision
 
-Introduce `langgraph_automation.api.engine` as the public-facing provisional facade for package orchestration.
+Introduce `cobalt_wren.api.engine` as the public-facing provisional facade for package orchestration.
 
 The initial API shape is:
 

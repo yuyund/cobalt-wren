@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import pytest
 
-from langgraph_automation.api.errors import PluginResolutionError
-from langgraph_automation.api.plugins import (
+from cobalt_wren.api.errors import PluginResolutionError
+from cobalt_wren.api.plugins import (
     EventSinkContribution,
     Plugin,
     PluginContributions,
@@ -14,7 +14,7 @@ from langgraph_automation.api.plugins import (
     StoreContribution,
     ToolContribution,
 )
-from langgraph_automation.config.models import (
+from cobalt_wren.config.models import (
     EffectivePluginSet,
     EventSinkBackendConfig,
     NormalizedPackageConfig,
@@ -26,9 +26,9 @@ from langgraph_automation.config.models import (
     ToolsConfig,
     ValidatedPackageConfig,
 )
-from langgraph_automation.config.normalizer import normalize_package_config
-from langgraph_automation.config.validator import ConfigValidator
-from langgraph_automation.plugins.registry import PluginRegistry
+from cobalt_wren.config.normalizer import normalize_package_config
+from cobalt_wren.config.validator import ConfigValidator
+from cobalt_wren.plugins.registry import PluginRegistry
 
 
 def _build_plugin(name: str, *, include_litellm: bool = False, include_openai: bool = False, include_stdout: bool = False, include_store: bool = True) -> Plugin:

@@ -4,10 +4,10 @@ from __future__ import annotations
 
 import pytest
 
-from langgraph_automation.apps.automation.models.run import Run, RunStatus
-from langgraph_automation.apps.automation.models.workflow import Workflow
-from langgraph_automation.apps.automation.ui.builders import build_detail_page_spec, build_fragment_spec
-from langgraph_automation.apps.automation.ui.registry import get_model_ui_config
+from cobalt_wren.apps.automation.models.run import Run, RunStatus
+from cobalt_wren.apps.automation.models.workflow import Workflow
+from cobalt_wren.apps.automation.ui.builders import build_detail_page_spec, build_fragment_spec
+from cobalt_wren.apps.automation.ui.registry import get_model_ui_config
 
 
 @pytest.mark.django_db

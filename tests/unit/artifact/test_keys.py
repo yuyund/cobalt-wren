@@ -4,10 +4,10 @@ from __future__ import annotations
 
 import pytest
 
-from langgraph_automation.api.errors import ArtifactValidationError
-from langgraph_automation.integrations.artifact.base import ArtifactWriteRequest
-from langgraph_automation.integrations.artifact.keys import is_safe_storage_key, validate_storage_key
-from langgraph_automation.integrations.artifact.memory_store import MemoryArtifactStore
+from cobalt_wren.api.errors import ArtifactValidationError
+from cobalt_wren.integrations.artifact.base import ArtifactWriteRequest
+from cobalt_wren.integrations.artifact.keys import is_safe_storage_key, validate_storage_key
+from cobalt_wren.integrations.artifact.memory_store import MemoryArtifactStore
 
 
 @pytest.mark.parametrize(

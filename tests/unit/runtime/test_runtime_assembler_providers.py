@@ -4,9 +4,9 @@ from __future__ import annotations
 
 import pytest
 
-from langgraph_automation.api.errors import RuntimeAssemblyError
-from langgraph_automation.api.plugins import Plugin, PluginContributions, PluginMetadata, ProviderContribution
-from langgraph_automation.config.models import (
+from cobalt_wren.api.errors import RuntimeAssemblyError
+from cobalt_wren.api.plugins import Plugin, PluginContributions, PluginMetadata, ProviderContribution
+from cobalt_wren.config.models import (
     EffectivePluginSet,
     LimitsConfig,
     NormalizedPackageConfig,
@@ -17,9 +17,9 @@ from langgraph_automation.config.models import (
     ValidatedPackageConfig,
     SecretRef,
 )
-from langgraph_automation.runtime.assembly import RuntimeAssembler
-from langgraph_automation.runtime.context import FactoryContext
-from langgraph_automation.runtime.secrets import EnvSecretResolver
+from cobalt_wren.runtime.assembly import RuntimeAssembler
+from cobalt_wren.runtime.context import FactoryContext
+from cobalt_wren.runtime.secrets import EnvSecretResolver
 
 
 def _validated_config(*, create_client, validate_profile=None) -> tuple[ValidatedPackageConfig, list[tuple[object, object]]]:

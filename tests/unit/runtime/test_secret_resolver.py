@@ -6,9 +6,9 @@ from types import SimpleNamespace
 
 import pytest
 
-from langgraph_automation.api.errors import RuntimeAssemblyError
-from langgraph_automation.config.models import SecretRef
-from langgraph_automation.runtime.secrets import EnvSecretResolver
+from cobalt_wren.api.errors import RuntimeAssemblyError
+from cobalt_wren.config.models import SecretRef
+from cobalt_wren.runtime.secrets import EnvSecretResolver
 
 
 def test_env_secret_resolver_resolves_env_secret_ref() -> None:

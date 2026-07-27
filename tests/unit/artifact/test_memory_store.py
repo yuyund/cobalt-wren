@@ -4,10 +4,10 @@ from __future__ import annotations
 
 import pytest
 
-from langgraph_automation.api.errors import ArtifactConflictError
-from langgraph_automation.core.redaction import REDACTED_VALUE
-from langgraph_automation.integrations.artifact.base import ArtifactReadResult, ArtifactWriteRequest
-from langgraph_automation.integrations.artifact.memory_store import MemoryArtifactStore
+from cobalt_wren.api.errors import ArtifactConflictError
+from cobalt_wren.core.redaction import REDACTED_VALUE
+from cobalt_wren.integrations.artifact.base import ArtifactReadResult, ArtifactWriteRequest
+from cobalt_wren.integrations.artifact.memory_store import MemoryArtifactStore
 
 
 def test_memory_artifact_store_put_get_and_list_for_run() -> None:

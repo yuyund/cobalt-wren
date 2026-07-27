@@ -4,14 +4,14 @@ status: current
 authority: explanatory
 summary: Framework-neutral cooperative cancellation and deadline propagation for external workflows.
 code_refs:
-  - src/langgraph_automation/api/errors.py
-  - src/langgraph_automation/api/workflow.py
-  - src/langgraph_automation/apps/automation/models/run.py
-  - src/langgraph_automation/apps/automation/policies/runs.py
-  - src/langgraph_automation/apps/automation/services/execution.py
-  - src/langgraph_automation/apps/automation/services/execution_control.py
-  - src/langgraph_automation/apps/automation/services/runs.py
-  - src/langgraph_automation/apps/automation/migrations/0003_run_timed_out_status.py
+  - src/cobalt_wren/api/errors.py
+  - src/cobalt_wren/api/workflow.py
+  - src/cobalt_wren/apps/automation/models/run.py
+  - src/cobalt_wren/apps/automation/policies/runs.py
+  - src/cobalt_wren/apps/automation/services/execution.py
+  - src/cobalt_wren/apps/automation/services/execution_control.py
+  - src/cobalt_wren/apps/automation/services/runs.py
+  - src/cobalt_wren/apps/automation/migrations/0003_run_timed_out_status.py
 test_refs:
   - tests/integration/django/test_execution_control.py
   - tests/unit/automation/test_run_policies.py

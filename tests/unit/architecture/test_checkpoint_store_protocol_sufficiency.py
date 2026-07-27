@@ -6,7 +6,7 @@ import inspect
 from pathlib import Path
 from typing import get_type_hints
 
-from langgraph_automation.api.errors import (
+from cobalt_wren.api.errors import (
     CheckpointConflictError,
     CheckpointIntegrityError,
     CheckpointPersistenceError,
@@ -14,13 +14,13 @@ from langgraph_automation.api.errors import (
     CheckpointValidationError,
     FrameworkError,
 )
-from langgraph_automation.integrations.checkpoint.base import (
+from cobalt_wren.integrations.checkpoint.base import (
     CheckpointReadResult,
     CheckpointStore,
     CheckpointWriteRequest,
     StoredCheckpoint,
 )
-from langgraph_automation.integrations.checkpoint.memory_store import MemoryCheckpointStore
+from cobalt_wren.integrations.checkpoint.memory_store import MemoryCheckpointStore
 
 
 def test_checkpoint_store_protocol_is_versioned_and_approved_for_implementation() -> None:
@@ -126,11 +126,11 @@ def test_checkpoint_store_protocol_is_versioned_and_approved_for_implementation(
 
 def test_checkpoint_persistence_modules_do_not_import_diagnostic_redaction_helpers() -> None:
     for relative in (
-        Path('src/langgraph_automation/integrations/checkpoint/base.py'),
-        Path('src/langgraph_automation/integrations/checkpoint/memory_store.py'),
+        Path('src/cobalt_wren/integrations/checkpoint/base.py'),
+        Path('src/cobalt_wren/integrations/checkpoint/memory_store.py'),
     ):
         source = relative.read_text()
-        assert 'langgraph_automation.core.redaction' not in source
+        assert 'cobalt_wren.core.redaction' not in source
         assert 'redact_text(' not in source
         assert 'REDACTED_VALUE' not in source
 

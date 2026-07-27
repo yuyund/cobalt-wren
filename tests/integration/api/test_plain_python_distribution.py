@@ -21,7 +21,7 @@ def test_plain_python_installs_without_langgraph_dependency(tmp_path: Path) -> N
         metadata_name = next(name for name in archive.namelist() if name.endswith(".dist-info/METADATA"))
         metadata_text = archive.read(metadata_name).decode()
     requirements = [line.removeprefix("Requires-Dist: ") for line in metadata_text.splitlines() if line.startswith("Requires-Dist: ")]
-    assert any(item.startswith("langgraph-automation") for item in requirements)
+    assert any(item.startswith("cobalt-wren") for item in requirements)
     assert not any(item == "langgraph" or item.startswith("langgraph ") for item in requirements)
 
     python = venv / "bin" / "python"
@@ -30,7 +30,7 @@ def test_plain_python_installs_without_langgraph_dependency(tmp_path: Path) -> N
     code = """
 import json
 from importlib import metadata
-entry = next(x for x in metadata.entry_points().select(group='langgraph_automation.plugins') if x.name == 'plain-python')
+entry = next(x for x in metadata.entry_points().select(group='cobalt_wren.plugins') if x.name == 'plain-python')
 plugin = entry.load()()
 workflow = plugin.contributions.workflows[0]
 print(json.dumps({'entry': entry.name, 'kind': workflow.kind, 'framework': workflow.definition.metadata.metadata['framework']}))

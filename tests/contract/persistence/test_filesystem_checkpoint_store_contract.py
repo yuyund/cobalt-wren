@@ -10,9 +10,9 @@ from pathlib import Path
 
 import pytest
 
-from langgraph_automation.api.errors import CheckpointConflictError, CheckpointIntegrityError
-from langgraph_automation.integrations.checkpoint import CheckpointReadResult, CheckpointWriteRequest, FilesystemCheckpointStore, StoredCheckpoint
-import langgraph_automation.integrations.checkpoint.filesystem_store as filesystem_store
+from cobalt_wren.api.errors import CheckpointConflictError, CheckpointIntegrityError
+from cobalt_wren.integrations.checkpoint import CheckpointReadResult, CheckpointWriteRequest, FilesystemCheckpointStore, StoredCheckpoint
+import cobalt_wren.integrations.checkpoint.filesystem_store as filesystem_store
 from tests.support.persistence import FaultPlan, FaultTiming, FaultingCheckpointStore
 
 

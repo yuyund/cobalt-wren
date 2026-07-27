@@ -28,7 +28,7 @@ MVP complete means:
 
 - the foundation is ready to accept application workflows safely
 - the main extension boundaries are stable
-- built-in reference workflows can serve as examples
+- examples can be explicitly registered without entering the built-in catalog
 
 ## What MVP complete does not mean
 
@@ -38,7 +38,7 @@ MVP complete does not mean:
 - `company_agent` is implemented
 - production application workflows are implemented
 - execution path migration is complete
-- external plugin discovery exists
+- installed entry-point plugin discovery exists
 - `api.runtime` exists as a public facade
 
 ## Not part of MVP
@@ -81,6 +81,6 @@ Package Complete does not mean:
 - production application workflows are implemented
 - worker / queue / outbox exists
 - true resume exists
-- external plugin discovery exists
+- installed entry-point plugin discovery exists
 - entry point discovery exists
 - long-running execution semantics are complete

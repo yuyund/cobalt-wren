@@ -5,14 +5,14 @@ from __future__ import annotations
 import pytest
 from django.urls import reverse
 
-from langgraph_automation.apps.automation.models.artifact import Artifact
-from langgraph_automation.apps.automation.models.checkpoint import CheckpointMetadata
-from langgraph_automation.apps.automation.models.event import RunEvent
-from langgraph_automation.apps.automation.models.execution import ExecutionSpan, ExecutionSpanType
-from langgraph_automation.apps.automation.models.run import Run
-from langgraph_automation.apps.automation.models.workflow import Workflow
-from langgraph_automation.apps.automation.services import runtime as runtime_module
-from langgraph_automation.integrations.observability import DjangoEventSink
+from cobalt_wren.apps.automation.models.artifact import Artifact
+from cobalt_wren.apps.automation.models.checkpoint import CheckpointMetadata
+from cobalt_wren.apps.automation.models.event import RunEvent
+from cobalt_wren.apps.automation.models.execution import ExecutionSpan, ExecutionSpanType
+from cobalt_wren.apps.automation.models.run import Run
+from cobalt_wren.apps.automation.models.workflow import Workflow
+from cobalt_wren.apps.automation.services import runtime as runtime_module
+from cobalt_wren.integrations.observability import DjangoEventSink
 
 
 @pytest.mark.django_db
@@ -75,13 +75,13 @@ def test_dynamic_list_form_action_and_fragment_views_do_not_render_raw_payload_c
 
     sink = DjangoEventSink()
     monkeypatch.setattr(runtime_module, 'build_event_sink', lambda _run: sink)
-    monkeypatch.setattr('langgraph_automation.integrations.llm.litellm_client.litellm.completion', fake_completion)
+    monkeypatch.setattr('cobalt_wren.integrations.llm.litellm_client.litellm.completion', fake_completion)
 
     workflow = Workflow.objects.create(
         name='wf-dynamic-safe-2',
         description='safe workflow',
         definition_payload={
-            'workflow': {'kind': 'reference.llm_echo_summary'},
+            'workflow': {'kind': 'test.unregistered.workflow'},
             'llm': {'enabled': True, 'model': 'test-model'},
             'tools': {'allowed': ['echo']},
         },

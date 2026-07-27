@@ -1,6 +1,6 @@
 # API Surface
 
-This document defines the boundary between public, provisional, internal, config-facing, and future APIs for `langgraph-automation`.
+This document defines the boundary between public, provisional, internal, config-facing, and future APIs for `cobalt-wren`.
 
 The goal is to keep the package small on the outside, flexible on the inside, and safe for future plugin authors who should not depend on internal implementation details.
 
@@ -27,18 +27,18 @@ The package-wide design and review rules are defined in `../../architecture/desi
 
 Current implemented public facade:
 
-- `langgraph_automation.api.llm`
-- `langgraph_automation.api.tools`
-- `langgraph_automation.api.stores`
-- `langgraph_automation.api.events`
-- `langgraph_automation.api.errors`
-- `langgraph_automation.api.plugins`
-- `langgraph_automation.api.workflow`
-- `langgraph_automation.api.engine`
+- `cobalt_wren.api.llm`
+- `cobalt_wren.api.tools`
+- `cobalt_wren.api.stores`
+- `cobalt_wren.api.events`
+- `cobalt_wren.api.errors`
+- `cobalt_wren.api.plugins`
+- `cobalt_wren.api.workflow`
+- `cobalt_wren.api.engine`
 
 Deferred public surfaces:
 
-- `langgraph_automation.api.runtime`
+- `cobalt_wren.api.runtime`
 
 Package P0-B plus the package facade blocks implement the minimal facade described below.
 
@@ -74,7 +74,7 @@ Guidance:
 
 - A future `WorkflowRuntime` protocol or facade may replace direct reliance on the concrete class.
 - `ApplicationRuntimeFactory` and `RunExecutionServices` remain internal composition helpers and are not exported through the public facade.
-- deployment-owned startup config sources such as `LANGGRAPH_AUTOMATION` and `AutomationConfig.ready()` are configuration/bootstrap concerns, not public API surface.
+- deployment-owned startup config sources such as `COBALT_WREN` and `AutomationConfig.ready()` are configuration/bootstrap concerns, not public API surface.
 
 ## Tool API surface
 
@@ -162,7 +162,7 @@ Guidance:
 - `ArtifactIdentity` is logical identity only and does not imply a storage location.
 - `ArtifactSlot` and `ArtifactOccurrence` are caller-issued logical discriminators.
 - `ArtifactEmitter` remains package-internal until a future orchestration layer is approved.
-- external plugin import of `langgraph_automation.integrations.artifact.emission` is unsupported
+- external plugin import of `cobalt_wren.integrations.artifact.emission` is unsupported
 - `ArtifactEmissionContext` owns the execution-provided `run_id`
 - attempt identifiers are excluded from the default identity and storage encoding
 - explicit emission is required-only in X2A; optional / best-effort modes are deferred
@@ -184,7 +184,7 @@ Guidance:
 - `CheckpointStore` is approved for durable backend implementation.
 - `CheckpointStore` is storage-only; execution persistence orchestration and LangGraph saver integration remain future internal layers.
 - PROCESS_DURABLE checkpoint storage does not imply true resume. Package checkpoint semantics and LangGraph `BaseCheckpointSaver` semantics require an explicit convergence design before a public resume surface is added.
-- FilesystemCheckpointStore is implemented in `langgraph_automation.integrations.checkpoint`.
+- FilesystemCheckpointStore is implemented in `cobalt_wren.integrations.checkpoint`.
 - It remains internal/provisional and is not re-exported from `api.stores`.
 - checkpoint runtime selection is controlled by typed config under `stores.checkpoint` in trusted package settings.
 - `MemoryCheckpointStore` remains the default checkpoint backend when the section is absent.
@@ -219,7 +219,7 @@ Guidance:
 
 Implemented:
 
-- `langgraph_automation.api.errors`
+- `cobalt_wren.api.errors`
 
 Exports:
 
@@ -254,7 +254,7 @@ Unknown workflow kinds remain represented by `PluginResolutionError` in the impl
 
 Implemented:
 
-- `langgraph_automation.api.plugins`
+- `cobalt_wren.api.plugins`
 
 Exports:
 
@@ -279,17 +279,17 @@ Guidance:
 
 - `api.plugins` is the public vocabulary for plugin packages and contributions.
 - `PluginContributions.workflows` aggregates workflow contributions, but `WorkflowContribution` itself is owned by `api.workflow`.
-- `PluginRegistry` remains an internal mechanism under `langgraph_automation.plugins.registry`.
+- `PluginRegistry` remains an internal mechanism under `cobalt_wren.plugins.registry`.
 - `api.plugins` does not expose registry, config validator, runtime assembly, or concrete runtime dependencies.
 
 ## Implemented public facade in P0-B
 
-- `langgraph_automation.api.llm`
-- `langgraph_automation.api.tools`
-- `langgraph_automation.api.stores`
-- `langgraph_automation.api.events`
-- `langgraph_automation.api.workflow`
-- `langgraph_automation.api.engine`
+- `cobalt_wren.api.llm`
+- `cobalt_wren.api.tools`
+- `cobalt_wren.api.stores`
+- `cobalt_wren.api.events`
+- `cobalt_wren.api.workflow`
+- `cobalt_wren.api.engine`
 
 These modules re-export selected stable interfaces only. They do not expose runtime concrete implementation, plugin loader, config loader, or public error taxonomy.
 
@@ -298,7 +298,7 @@ It is a body-aware breaking revision that keeps the public facade minimal while 
 
 ## Deferred public surfaces
 
-- `langgraph_automation.api.runtime`
+- `cobalt_wren.api.runtime`
 - `WorkflowPlugin`
 - `ToolPlugin`
 - plugin loader
@@ -308,24 +308,24 @@ It is a body-aware breaking revision that keeps the public facade minimal while 
 
 The following should be treated as internal-only for plugin authors and external consumers:
 
-- `langgraph_automation.apps.automation.services.*`
-- `langgraph_automation.apps.automation.models`
-- `langgraph_automation.workflows.catalog`
-- `langgraph_automation.core.result_safety`
-- `langgraph_automation.core.redaction`
+- `cobalt_wren.apps.automation.services.*`
+- `cobalt_wren.apps.automation.models`
+- `cobalt_wren.workflows.catalog`
+- `cobalt_wren.core.result_safety`
+- `cobalt_wren.core.redaction`
 - concrete integration modules
 - Django settings and model internals
 
 Notes:
 
 - `workflows/catalog.py` is package composition internal / semi-internal.
-- Built-in reference workflows are composed through `workflows.catalog`, `workflows.adapter`, and `workflows.reference.*`.
+- The built-in workflow catalog is currently empty. Native examples live under `examples/native/` and require explicit plugin registration.
 - A future registration API should become the supported path for extending workflows.
 
 ## Plugin taxonomy
 
 - Plugin taxonomy is defined in `../../plugins/PLUGINS.md`.
-- Plugins should depend on `langgraph_automation.api.*` public facade modules, not internal implementation modules.
+- Plugins should depend on `cobalt_wren.api.*` public facade modules, not internal implementation modules.
 - `api.workflow` and `api.errors` are implemented public facades, `api.engine` is the public-facing provisional package facade, and `api.runtime` remains deferred.
 - Manual registration and registry boundaries are defined in `../../plugins/PLUGIN_REGISTRATION.md`.
 - Plugin API shapes are documented in `../../plugins/PLUGIN_API_SHAPE.md`.
@@ -383,19 +383,19 @@ Forbidden config behavior:
 - `workflows/catalog.py` is treated as internal / semi-internal composition.
 - arbitrary import from config is rejected.
 - safety cannot be disabled by config.
-- `langgraph_automation.api.engine` is implemented as the package facade, while `langgraph_automation.api.runtime` remains deferred.
+- `cobalt_wren.api.engine` is implemented as the package facade, while `cobalt_wren.api.runtime` remains deferred.
 
 
 ## Config Surface
 
 - No public `api.config` facade exists yet.
-- `langgraph_automation.config.*` is internal/provisional.
+- `cobalt_wren.config.*` is internal/provisional.
 - Config Core Block B is intentionally not part of the public facade.
 
 
 ## Config Validation Surface
 
-- `langgraph_automation.config.*` remains internal/provisional.
+- `cobalt_wren.config.*` remains internal/provisional.
 - `ConfigValidator` is internal/provisional and is not exposed through `api.config`.
 - `EffectivePluginSet` and `ValidatedPackageConfig` are internal config models.
 - public facade work is still limited to `api.llm`, `api.tools`, `api.stores`, `api.events`, `api.errors`, and `api.plugins`.
@@ -404,45 +404,45 @@ Forbidden config behavior:
 ## Runtime Surface
 
 - No public `api.runtime` facade exists yet.
-- `langgraph_automation.runtime.*` is internal/provisional.
+- `cobalt_wren.runtime.*` is internal/provisional.
 - runtime assembly is not part of the public facade yet.
 
 ## Application Workflow Policy
 
 Application workflow authors should use the public facades:
 
-- `langgraph_automation.api.errors`
-- `langgraph_automation.api.plugins`
-- `langgraph_automation.api.workflow`
-- `langgraph_automation.api.engine`
-- `langgraph_automation.api.llm`
-- `langgraph_automation.api.tools`
-- `langgraph_automation.api.stores`
-- `langgraph_automation.api.events`
+- `cobalt_wren.api.errors`
+- `cobalt_wren.api.plugins`
+- `cobalt_wren.api.workflow`
+- `cobalt_wren.api.engine`
+- `cobalt_wren.api.llm`
+- `cobalt_wren.api.tools`
+- `cobalt_wren.api.stores`
+- `cobalt_wren.api.events`
 
 Internal / provisional APIs:
 
-- `langgraph_automation.config.*`
-- `langgraph_automation.runtime.*`
-- `langgraph_automation.plugins.registry`
-- `langgraph_automation.workflows.adapter`
-- `langgraph_automation.workflows.requirements`
-- `langgraph_automation.workflows.prepare`
-- `langgraph_automation.workflows.catalog`
+- `cobalt_wren.config.*`
+- `cobalt_wren.runtime.*`
+- `cobalt_wren.plugins.registry`
+- `cobalt_wren.workflows.adapter`
+- `cobalt_wren.workflows.requirements`
+- `cobalt_wren.workflows.prepare`
+- `cobalt_wren.workflows.catalog`
 
 Internal foundation:
 
-- legacy `langgraph_automation.graphs.*` package: removed; no compatibility import is provided
+- legacy `cobalt_wren.graphs.*` package: removed; no compatibility import is provided
 
 Control plane:
 
-- `langgraph_automation.apps.automation.*`
+- `cobalt_wren.apps.automation.*`
 
 Application workflows are expected to use the public facades first and to keep control-plane dependencies out of workflow packages.
 
 ## Package Facade Surface
 
-`langgraph_automation.api.engine` is the implemented public-facing provisional package facade.
+`cobalt_wren.api.engine` is the implemented public-facing provisional package facade.
 Block M verifies the `create_engine` -> `prepare_workflow` path through this facade.
 
 It hides internal package mechanics:
@@ -463,7 +463,7 @@ The service-layer workflow preparation bridge is transitional and should eventua
 
 ## Package-Facing Boundary
 
-`langgraph_automation.api.engine` is the package-facing facade for application/control-plane code.
+`cobalt_wren.api.engine` is the package-facing facade for application/control-plane code.
 It hides `PluginRegistry`, `WorkflowPreparer`, `RuntimeAssembler`, `ConfigValidator`, `RuntimeDependencies`, `workflows.catalog`, `workflows.prepare`, `workflows.adapter`, and `workflows.requirements`.
 `run_workflow` and `api.runtime` remain deferred.
 `apps/automation/services/workflow_preparation.py` now routes through `api.engine`; the transitional exception has been removed.
@@ -476,7 +476,7 @@ The supported executable capabilities are, in order, `execute`, `invoke`, and ca
 
 ## Optional Installed Plugin Discovery
 
-Installed distributions may publish a zero-argument plugin factory or a `Plugin` instance through the Python entry-point group `langgraph_automation.plugins`. Discovery is opt-in:
+Installed distributions may publish a zero-argument plugin factory or a `Plugin` instance through the Python entry-point group `cobalt_wren.plugins`. Discovery is opt-in:
 
 ```python
 engine = create_engine(config, discover_plugins=True)
@@ -523,3 +523,22 @@ Prepared handles expose `engine_generation` and a hashed `engine_signature`. The
 `EnginePreparedWorkflow.executable` is the sole opaque executable handle. `execute(..., context=WorkflowExecutionContext(...))` is the execution boundary. The Django control plane resolves only `WorkflowReference` values and has no graph-specific runtime or fallback contract. LangGraph may be used inside workflow implementations.
 
 `RunExecutionServices` and `DeploymentEngineOwner` are internal control-plane composition helpers. `api.runtime` remains deferred. True resume requires an explicit package checkpoint / LangGraph `BaseCheckpointSaver` convergence design.
+
+## Workflow Integration API Surface
+
+`cobalt_wren.api.integrations` is the provisional public SPI for official and external workflow-OSS helpers. It contains framework-neutral definitions, capability and availability descriptors, projection DTOs, action DTOs, and `WorkflowIntegrationProvider`.
+
+The internal `WorkflowIntegrationRegistry` stores centrally declared definitions, checks target distribution/import availability, validates supported version ranges, lazy-loads provider implementations, and resolves only explicitly named integrations. Automatic target inference remains deferred.
+
+The generic workflow adapter does not import this registry or branch on integration identity. Integration providers wrap targets before those targets reach the existing capability adapter.
+
+Provisional projection and action vocabulary:
+
+- `ExecutionUnitProjection`
+- `LifecycleProjection`
+- `IntegrationProjection`
+- `IntegrationProjectionBatch`
+- `IntegrationActionDescriptor`
+- `IntegrationActionRequest`
+
+These DTOs define a semantic boundary only. They do not grant persistence, rendering, or execution authority by themselves. Framework-specific payloads remain versioned and attached to canonical owners instead of being flattened into the canonical schema.

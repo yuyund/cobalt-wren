@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from langgraph_automation.integrations.observability.context import bind_observability_context
-from langgraph_automation.integrations.observability.types import ObservabilityContext, SpanRef
+from cobalt_wren.integrations.observability.context import bind_observability_context
+from cobalt_wren.integrations.observability.types import ObservabilityContext, SpanRef
 from tests.support.observability_doubles import ObservabilityBoundDouble
 
 

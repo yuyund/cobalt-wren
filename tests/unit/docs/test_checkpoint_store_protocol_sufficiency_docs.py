@@ -84,7 +84,7 @@ def test_checkpoint_store_protocol_sufficiency_docs_exist_and_cover_core_terms()
         'specific-version reads',
         'history listing',
         'durable checkpoint implementation is now closed for the first durable backend',
-        'filesystemcheckpointstore is implemented in `langgraph_automation.integrations.checkpoint`',
+        'filesystemcheckpointstore is implemented in `cobalt_wren.integrations.checkpoint`',
         'lossless logical json value',
         'checkpoint runtime selection is implemented through typed config and the canonical builder',
     ):

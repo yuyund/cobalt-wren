@@ -21,13 +21,13 @@ This document defines the verification strategy for package-facing boundaries.
 ### L3: Integration Tests
 
 - verify that config -> runtime -> workflow preparation can flow through the package-facing entrypoint
-- for this phase, the package-facing entrypoint is `langgraph_automation.api.engine`
+- for this phase, the package-facing entrypoint is `cobalt_wren.api.engine`
 - api.engine integration is verified in Block M
 
 ### L4: Headless Smoke Tests
 
-- verify that the reference workflow can be prepared through the package-facing path
-- reference.llm_echo_summary headless prepare is verified in Block M
+- verify that an explicitly registered workflow can be prepared through the package-facing path
+- explicit test-plugin headless prepare is verified in Block M
 
 ### L5: Failure Matrix Tests
 
@@ -76,13 +76,13 @@ The long-term direction remains to keep application/control-plane code on the pa
 The first package-facade verification target should be:
 
 - `create_engine(config_mapping)`
-- `engine.prepare_workflow("reference.llm_echo_summary")`
+- `engine.prepare_workflow("acme.document_summary")`
 - `EnginePreparedWorkflow`
 
 Verification levels:
 
 - L3: config -> runtime -> workflow preparation through `api.engine`
-- L4: reference workflow headless prepare through `api.engine`
+- L4: explicit test workflow headless prepare through `api.engine`
 - L5: facade-level safe failures verified through `api.engine`
 
 Headless smoke tests should only prepare workflows.

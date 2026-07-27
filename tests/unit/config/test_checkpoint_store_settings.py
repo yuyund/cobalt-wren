@@ -5,12 +5,12 @@ from pathlib import Path
 
 import pytest
 
-from langgraph_automation.api.errors import ConfigError
-from langgraph_automation.config.models import (
+from cobalt_wren.api.errors import ConfigError
+from cobalt_wren.config.models import (
     FilesystemCheckpointStoreSettings,
     MemoryCheckpointStoreSettings,
 )
-from langgraph_automation.config.normalizer import load_normalized_package_config_from_mapping
+from cobalt_wren.config.normalizer import load_normalized_package_config_from_mapping
 
 
 def test_checkpoint_store_settings_default_to_memory_when_section_is_absent() -> None:

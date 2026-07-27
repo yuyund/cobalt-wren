@@ -5,11 +5,11 @@ import time
 
 import pytest
 
-from langgraph_automation.api.engine import EnginePreparedWorkflow
-from langgraph_automation.api.workflow import WorkflowExecutionContext
-from langgraph_automation.apps.automation.models import Run, RunStatus, Workflow
-from langgraph_automation.apps.automation.services.execution import dispatch_prepared_workflow_execution
-from langgraph_automation.apps.automation.services.runs import cancel_run
+from cobalt_wren.api.engine import EnginePreparedWorkflow
+from cobalt_wren.api.workflow import WorkflowExecutionContext
+from cobalt_wren.apps.automation.models import Run, RunStatus, Workflow
+from cobalt_wren.apps.automation.services.execution import dispatch_prepared_workflow_execution
+from cobalt_wren.apps.automation.services.runs import cancel_run
 from tests.support.recording_event_sink import RecordingEventSink
 
 

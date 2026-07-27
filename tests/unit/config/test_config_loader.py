@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import pytest
 
-from langgraph_automation.api.errors import ConfigError
-from langgraph_automation.config.loader import load_package_config_from_mapping
-from langgraph_automation.config.models import RawPackageConfig
+from cobalt_wren.api.errors import ConfigError
+from cobalt_wren.config.loader import load_package_config_from_mapping
+from cobalt_wren.config.models import RawPackageConfig
 
 
 def test_load_package_config_from_mapping_accepts_minimal_payload() -> None:

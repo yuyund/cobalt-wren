@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import pytest
 
-from langgraph_automation.integrations.tools.base import ToolResult
-from langgraph_automation.integrations.tools.registry import InMemoryToolRegistry
+from cobalt_wren.integrations.tools.base import ToolResult
+from cobalt_wren.integrations.tools.registry import InMemoryToolRegistry
 
 
 def test_in_memory_tool_registry_registers_and_runs_tools() -> None:

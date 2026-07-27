@@ -8,9 +8,9 @@ import json
 
 import pytest
 
-from langgraph_automation.integrations.llm.base import LLMResult
-from langgraph_automation.integrations.llm.observed_client import ObservedLLMClient
-from langgraph_automation.integrations.observability.types import ObservabilityContext, SpanRef
+from cobalt_wren.integrations.llm.base import LLMResult
+from cobalt_wren.integrations.llm.observed_client import ObservedLLMClient
+from cobalt_wren.integrations.observability.types import ObservabilityContext, SpanRef
 from tests.support.failing_event_sink import FailingSpanFailedEventSink
 from tests.support.llm_doubles import FailingLLMClient, RecordingLLMClient
 from tests.support.recording_event_sink import RecordingEventSink
@@ -55,6 +55,10 @@ def test_observed_llm_client_records_successful_call() -> None:
     assert span.started_metadata['model'] == 'demo-model'
     assert span.started_metadata['input_summary']['message_count'] == 2
     assert span.started_metadata['input_summary']['roles'] == ['system', 'user']
+    assert span.started_metadata['input_summary']['messages'][0]['role'] == 'system'
+    assert span.started_metadata['input_summary']['messages'][1]['role'] == 'user'
+    assert span.started_metadata['message_previews'][1]['role'] == 'user'
+    assert 'abcdefghijklmnop' not in span.started_metadata['input_summary']['messages'][1]['preview']
     assert 'abcdefghijklmnop' not in span.started_metadata['input_summary']['preview']
     assert 'REDACTED' in span.started_metadata['input_summary']['preview']
 

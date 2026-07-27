@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from langgraph_automation.config.models import (
+from cobalt_wren.config.models import (
     FilesystemArtifactStoreSettings,
     FilesystemCheckpointStoreSettings,
     EventSinkBackendConfig,

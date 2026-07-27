@@ -17,7 +17,7 @@ def test_package_completion_docs_exist_and_cover_core_terms() -> None:
     verification_text = verification.read_text()
 
     assert 'application-facing package facade' in completion_text
-    assert 'langgraph_automation.api.engine' in completion_text
+    assert 'cobalt_wren.api.engine' in completion_text
     assert 'service bridge routes through `api.engine`' in completion_text.lower()
     assert 'package complete is complete' in completion_text.lower()
     assert 'package complete+' in completion_text.lower()

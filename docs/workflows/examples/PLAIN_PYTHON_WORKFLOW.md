@@ -5,8 +5,8 @@ authority: explanatory
 summary: Framework-free external workflow and real cross-process durable resume validation.
 code_refs:
   - packages/plain_python_workflow
-  - src/langgraph_automation/api/workflow.py
-  - src/langgraph_automation/apps/automation/services/runs.py
+  - src/cobalt_wren/api/workflow.py
+  - src/cobalt_wren/apps/automation/services/runs.py
 test_refs:
   - tests/integration/api/test_plain_python_workflow.py
   - tests/integration/api/test_plain_python_distribution.py

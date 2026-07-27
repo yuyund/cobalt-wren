@@ -4,13 +4,13 @@ status: current
 authority: normative
 summary: Converged control-plane execution through public workflow executables and framework-neutral results.
 code_refs:
-  - src/langgraph_automation/api/engine.py
-  - src/langgraph_automation/api/workflow.py
-  - src/langgraph_automation/workflows/prepare.py
-  - src/langgraph_automation/runtime/assembly.py
-  - src/langgraph_automation/apps/automation/services/execution.py
-  - src/langgraph_automation/apps/automation/services/runs.py
-  - src/langgraph_automation/apps/automation/services/runtime.py
+  - src/cobalt_wren/api/engine.py
+  - src/cobalt_wren/api/workflow.py
+  - src/cobalt_wren/workflows/prepare.py
+  - src/cobalt_wren/runtime/assembly.py
+  - src/cobalt_wren/apps/automation/services/execution.py
+  - src/cobalt_wren/apps/automation/services/runs.py
+  - src/cobalt_wren/apps/automation/services/runtime.py
 test_refs:
   - tests/integration/api/test_public_execution_persistence.py
   - tests/unit/automation/test_run_execution_public_workflow.py

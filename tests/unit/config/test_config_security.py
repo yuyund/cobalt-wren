@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import pytest
 
-from langgraph_automation.api.errors import ConfigError
-from langgraph_automation.config.security import precheck_package_config_mapping
+from cobalt_wren.api.errors import ConfigError
+from cobalt_wren.config.security import precheck_package_config_mapping
 
 
 @pytest.mark.parametrize(

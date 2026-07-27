@@ -1,0 +1,9 @@
+{% if live.progress or live.metrics %}
+<div class="card mb-4" data-component="run.native_telemetry">
+  <div class="card-header"><div><h2 class="card-title mb-1">Workflow progress and metrics</h2><div class="text-secondary">Latest author-reported operational state</div></div></div>
+  <div class="card-body">
+    {% if live.progress %}<div data-testid="native-progress" class="mb-3"><div class="d-flex justify-content-between"><strong>{{ live.progress.message }}</strong><span>{{ live.progress.current }} / {{ live.progress.total }}</span></div>{% if live.progress.percent != '—' %}<div class="progress mt-2"><div class="progress-bar" style="width: {{ live.progress.percent }}%">{{ live.progress.percent }}%</div></div>{% endif %}</div>{% endif %}
+    {% if live.metrics %}<div class="table-responsive"><table class="table table-sm"><thead><tr><th>Metric</th><th>Value</th></tr></thead><tbody>{% for metric in live.metrics %}<tr><td>{{ metric.name }}</td><td>{{ metric.value }}{% if metric.unit %} {{ metric.unit }}{% endif %}</td></tr>{% endfor %}</tbody></table></div>{% endif %}
+  </div>
+</div>
+{% endif %}

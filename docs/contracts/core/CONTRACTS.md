@@ -4,9 +4,9 @@ status: current
 authority: normative
 summary: Current framework-neutral workflow, service, safety, and lifecycle contracts.
 code_refs:
-  - src/langgraph_automation/api/workflow.py
-  - src/langgraph_automation/workflows/adapter.py
-  - src/langgraph_automation/apps/automation/services
+  - src/cobalt_wren/api/workflow.py
+  - src/cobalt_wren/workflows/adapter.py
+  - src/cobalt_wren/apps/automation/services
 test_refs:
   - tests/unit/architecture/test_public_run_single_path.py
   - tests/unit/architecture/test_execution_lifecycle_convergence_boundary.py
@@ -86,7 +86,7 @@ These contracts describe the current internal foundation surface. If parts of th
 - missing `stores.checkpoint` normalizes to `MemoryCheckpointStore`
 - explicit filesystem checkpoint selection requires an absolute root and startup-only construction
 - checkpoint runtime selection must not silently fall back from filesystem to memory
-- FilesystemCheckpointStore is implemented in `langgraph_automation.integrations.checkpoint`.
+- FilesystemCheckpointStore is implemented in `cobalt_wren.integrations.checkpoint`.
 
 ## Configuration Schema Contract
 
@@ -139,7 +139,7 @@ These contracts describe the current internal foundation surface. If parts of th
 - `WorkflowDefinition.build` is retained on the definition shape, but `PluginRegistry` does not call it
 - `PluginRegistry` stores workflow contributions only
 - `PluginRegistry` does not build or execute workflows
-- built-in/reference workflows use the same `Plugin` / `WorkflowContribution` path as external workflows
+- bundled examples or future built-in workflows, if added, must use the same `Plugin` / `WorkflowContribution` path as external workflows; the current built-in catalog is empty
 - `workflows.adapter` is the only place that calls `WorkflowDefinition.build`
 - `workflows.requirements` is the internal `WorkflowRequirements` / `RuntimeDependencies` checker
 - `ConfigValidator` does not validate workflow configs yet
@@ -238,7 +238,7 @@ These contracts describe the current internal foundation surface. If parts of th
 - returned checkpoint metadata is defensively isolated from stored state
 - `MemoryCheckpointStore` is the EPHEMERAL semantic reference implementation
 - `CheckpointStore` audit result is `APPROVED_FOR_IMPLEMENTATION`
-- `FilesystemCheckpointStore` is implemented in `langgraph_automation.integrations.checkpoint` and is `PROCESS_DURABLE`
+- `FilesystemCheckpointStore` is implemented in `cobalt_wren.integrations.checkpoint` and is `PROCESS_DURABLE`
 - checkpoint runtime selection is controlled by typed config and the canonical builder
 - `MemoryCheckpointStore` remains the default checkpoint backend when the section is absent
 - `FilesystemCheckpointStore` is explicit opt-in and is constructed from typed config exactly once per runtime assembly
@@ -247,10 +247,10 @@ These contracts describe the current internal foundation surface. If parts of th
 
 ## P0-B Public Facade Contract
 
-- `langgraph_automation.api.llm`
-- `langgraph_automation.api.tools`
-- `langgraph_automation.api.stores`
-- `langgraph_automation.api.events`
+- `cobalt_wren.api.llm`
+- `cobalt_wren.api.tools`
+- `cobalt_wren.api.stores`
+- `cobalt_wren.api.events`
 
 These modules re-export selected foundation interfaces. They do not expose workflow definition, runtime concrete implementation, plugin loader, config loader, or public error taxonomy yet. `LLMRequest` is a provisional loose alias for request shape, not a provider-specific contract.
 
@@ -350,7 +350,7 @@ These modules re-export selected foundation interfaces. They do not expose workf
 ## Package Facade Contract
 
 - package complete requires an application-facing package facade
-- the implemented provisional facade module name is `langgraph_automation.api.engine`
+- the implemented provisional facade module name is `cobalt_wren.api.engine`
 - the facade must hide `PluginRegistry`, `WorkflowPreparer`, `workflows.catalog`, `workflows.prepare`, `workflows.adapter`, `workflows.requirements`, `ConfigValidator`, `RuntimeAssembler`, and `RuntimeDependencies`
 - `create_engine` accepts raw package config plus explicit plugins
 - explicit plugins passed to `create_engine` are registered and auto-enabled for validation and runtime assembly
@@ -368,7 +368,7 @@ These modules re-export selected foundation interfaces. They do not expose workf
 ## Boundary Hardening Contract
 
 - application/control-plane code must not couple directly to package internals
-- `langgraph_automation.api.engine` is the allowed package-facing boundary
+- `cobalt_wren.api.engine` is the allowed package-facing boundary
 - `apps/automation/services/workflow_preparation.py` now routes through `api.engine`; the temporary exception has been removed
 - `apps/automation` must not grow new direct imports into `graphs.*`, `runtime.*`, `workflows.prepare`, `workflows.catalog`, `workflows.adapter`, `workflows.requirements`, `plugins.registry`, or `config.validator` outside the explicit execution adapters above
 - exact allowlists for the execution adapters are enforced by architecture guards
@@ -412,3 +412,143 @@ A workflow is selected by `workflow.kind`, receives opaque workflow config, decl
 ## Dynamic UI Projection Contract
 
 Dynamic UI renders safe metadata projections only. It does not execute workflows, construct runtime capabilities, resolve secrets, or expose raw payloads.
+
+## Workflow OSS Integration Contract
+
+- `api.integrations` contains framework-neutral SPI vocabulary only.
+- `IntegrationDefinition` centrally declares identity, target distribution/import, provider path, supported version range, maturity, priority, capabilities, limitations, documentation, and auto-detection eligibility.
+- integration target distributions remain optional deployment dependencies.
+- provider implementation loading is lazy.
+- explicit integration selection is implemented; automatic inference is deferred.
+- `WorkflowIntegrationRegistry` is internal and does not import Django, control-plane modules, the generic workflow adapter, or concrete workflow frameworks.
+- availability inspection checks import and distribution metadata without loading provider implementation.
+- provider definitions must exactly match centrally registered definitions.
+- duplicate, unknown, missing, incompatible, invalid, and load-failed integrations fail through safe plugin registration/resolution errors.
+
+## Integration Projection And Action Contract
+
+- canonical execution units and lifecycle events use package-owned DTOs.
+- framework-specific detail uses versioned `IntegrationProjection` payloads attached to canonical owner identities.
+- actions are declared as data through `IntegrationActionDescriptor` and requested through `IntegrationActionRequest`.
+- projection/action DTOs defensively copy top-level mappings.
+- framework objects, pickles, compiled graphs, handles, and private object dumps are not valid projection payloads.
+- future control-plane persistence, renderer composition, and action routing must remain separate from these DTO definitions.
+
+## Integration Action Routing Contract
+
+- `integration.actions.v1` is a framework-neutral persisted descriptor schema.
+- an action descriptor is a UI and audit snapshot, not execution authority.
+- the server revalidates Run policy, active projection ownership and expiry, descriptor availability, action support, and current executable capability on every submission.
+- the common router currently executes only `resume`; unsupported action IDs fail closed.
+- integration resume uses the existing `dispatch_resume` path and therefore supports both inline execution and `ExecutionJobOperation.RESUME`.
+- UI permission maps integration actions to `automation.resume_run`.
+- action request audit payloads are stored through the existing safe summary boundary.
+- the common action router does not import or branch on a workflow framework.
+
+## LlamaIndex Workflows Integration Contract
+
+- the optional target distribution is `llama-index-workflows>=2.22,<3`; it is not a mandatory package dependency.
+- integration identity is `llamaindex-workflows`.
+- the provider uses public run, handler, streamed-event, and step-state APIs only.
+- step lifecycle maps to canonical `step` spans and `llamaindex.step.v1`.
+- streamed events map to bounded `llamaindex.event.v1` projections.
+- step success is not finalized until the stream has ruled out a following `WorkflowFailedEvent`.
+- synchronous EventSink operations are buffered while the async handler runs and replayed in synchronous execution context.
+- resume, waiting, checkpoints, external event actions, and cancellation routing are unsupported and declared as such.
+
+## Integration Projection Semantics Contract
+
+- `projection_kind` is one of `snapshot`, `event`, `reference`, or `action`.
+- `owner_kind` identifies the canonical persisted record relationship; `subject_kind` and `subject_external_id` identify what the projection describes.
+- snapshot subjects must be stable across lifecycle transitions; framework task-attempt IDs may remain in payload or owner metadata but are not the current-state identity.
+- `occurred_at`, `sequence`, and record identity define deterministic timeline order.
+- current state selects the latest snapshot per integration, subject kind, subject identity, and schema.
+- event, reference, and action records do not overwrite current snapshot state.
+- all records remain append-only and available through technical projection detail until expiry.
+
+## External OSS Integration Distribution Contract
+
+- external workflow packages publish contributions through the `cobalt_wren.plugins` entry-point group.
+- external OSS workflow packages may depend on public integration helpers but must not import control-plane, registry, preparation, runtime-assembly, persistence, or renderer internals.
+- a separately installed plugin must be discoverable without explicit `Plugin` object injection.
+- clean-room verification builds and installs both foundation and plugin wheels, migrates an isolated database, resolves database-backed workflow references, executes contributed workflows, persists spans and projections, and renders Run detail UI.
+- framework dependencies are declared by the external distribution when the distribution provides workflows for those frameworks.
+- wheel installation and entry-point discovery are required evidence before claiming distribution-level neutrality.
+
+## Optional Workflow OSS Dependency Contract
+
+- the foundation project dependencies do not include LangGraph or LlamaIndex Workflows.
+- `langgraph`, `llamaindex`, and `oss-integrations` are explicit optional extras.
+- importing the engine facade, empty built-in workflow catalog, public integration helpers, and Native examples must not import a target workflow OSS.
+- concrete integration provider modules may import their target OSS because they are loaded lazily after availability and version resolution.
+- plain Python executable compatibility is a separate lower-level SPI and is verified independently from Native examples.
+- external plugin distributions declare the framework dependencies required by their contributed workflows.
+
+## Integration Availability And Health UI Contract
+
+- integration health presentation is built from central definitions, registry availability, and safe provider resolution results.
+- missing or incompatible targets do not load provider modules.
+- provider loading is attempted only when target import and distribution version are compatible.
+- provider load failures, invalid providers, and definition mismatches render fixed diagnostics without causes, tracebacks, private paths, or exception messages.
+- installation guidance comes from definition metadata and never from runtime exception text.
+- capability and limitation rendering is framework-neutral and does not branch on integration ID.
+- the combined UI health status distinguishes a ready integration from an installed target whose provider cannot load.
+
+## Native Authoring Direction Contract
+
+- Native Authoring is a convenience and execution layer that produces ordinary public workflow contributions.
+- the primary authoring model preserves normal Python control flow and requires explicit named step boundaries for orchestration behavior.
+- step callables remain ordinary synchronous or asynchronous Python functions and must be directly unit-testable.
+- the `workflow` decorator must not parse Python AST, infer a complete static DAG, rewrite control flow, or serialize local variables.
+- Native uses the generic workflow adapter, canonical Run lifecycle, EventSink, integration projection persistence, common actions, and common UI; it receives no private control-plane path.
+- Native MVP supports bounded business pipelines, branching, bounded iteration, step observation, cooperative cancellation, providers, tools, and artifacts.
+- retry and timeout attach to explicit step execution boundaries and do not imply idempotency or hard termination of arbitrary synchronous code.
+- Native MVP does not promise checkpoint continuation, durable waiting, deterministic replay, time travel, state fork, exactly-once side effects, arbitrary distributed fan-out, or stateful subgraphs.
+- LangGraph remains the recommended integration when durable stateful graph semantics are required.
+- Native projections are versioned and framework-neutral UI composition must not branch on the Native integration ID.
+
+## Native Authoring P1 Contract
+
+- `cobalt_wren.native` is the provisional public Native facade.
+- `workflow(...)` attaches metadata and returns a `NativeWorkflow`; it does not alter the wrapped function's Python control flow.
+- `NativeWorkflow.contribution(...)` and `.plugin(...)` produce ordinary public contract objects.
+- Native execution is async-first and explicit named steps accept synchronous and asynchronous callables.
+- synchronous step callables execute through a worker thread and must not access thread-affine resources without an application-owned adapter.
+- each started Native step has a stable logical subject name, ordered sequence, canonical `step` span, and `native.step.v1` snapshot.
+- synchronous EventSink operations are buffered during async execution and replayed after coroutine completion or failure.
+- Native step failure re-raises the original exception but retained step diagnostics use a fixed safe error message.
+- execution control is checked before a step and after its callable returns; cancellation between steps prevents the next step from starting.
+- direct synchronous Native execution from an active event loop is unsupported and fails explicitly.
+- reusable step definitions, artifact helpers, progress, metrics, and durable waiting are not implemented by P2A.
+
+## Bundled Workflow Integration Boundary Contract
+
+- a bundled workflow or authoring implementation does not receive a private foundation execution path.
+- Native authoring objects are converted by the official `native` integration provider before the generic workflow adapter sees them.
+- the generic preparer, adapter, engine facade, Django execution service, Run lifecycle, persistence services, and UI must not import Native implementation modules or branch on the `native` integration ID.
+- bundled and external workflows use the same `WorkflowContribution`, opaque executable, execution context, EventSink, projection persistence, action routing, and UI composition contracts.
+- Native, LangGraph, and LlamaIndex capabilities and health are declared through the same central integration definition and registry vocabulary.
+- bundling affects package availability and registration only; it does not change runtime semantics or control-plane privileges.
+
+## Native Authoring P2 Policy Contract
+
+- retry and timeout remain Native integration execution semantics and do not add branches to the generic foundation path.
+- `RetryPolicy` is explicit and retry does not imply callable idempotency.
+- every attempt receives a separate canonical step Span while all attempts for one call share a stable occurrence subject.
+- intermediate attempt failure produces a `retrying` snapshot; only the last exhausted attempt produces `failed`.
+- retained retry diagnostics use fixed safe messages and never persist the original exception text.
+- cancellation and workflow deadline checks occur before attempts, during retry delays, and after callables return.
+- the effective step timeout is the smaller of the requested step timeout and remaining workflow deadline.
+- asynchronous callables are cancelled by the timeout boundary; synchronous callables may continue in their worker thread after the awaiting workflow times out.
+- a terminal step timeout raises `WorkflowTimeoutError` and is normalized by the common control plane to a timed-out Run.
+- repeated step calls require a safe occurrence key; occurrence identities are unique within one Run.
+- occurrence keys are bounded safe identifiers and the Native executor enforces a maximum of 1,000 step occurrences per Run.
+
+## Native Examples Contract
+
+- the foundation currently ships no product workflows and the built-in workflow catalog is empty.
+- Native examples live under `examples/native/` and are not imported or registered by the engine.
+- examples demonstrate public authoring behavior but do not establish stable workflow kinds, compatibility promises, or control-plane privileges.
+- applications explicitly register example-derived or application-owned plugins, or publish them through the normal plugin entry-point group.
+- generic preparation, execution, persistence, and UI paths remain verified by explicit test plugins rather than implicit examples.
+- plain Python executable compatibility remains a separate lower-level SPI contract.

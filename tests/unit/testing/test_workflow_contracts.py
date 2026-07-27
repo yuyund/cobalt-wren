@@ -8,7 +8,7 @@ EXAMPLE_SRC = ROOT / "packages" / "opportunity_research_workflow" / "src"
 sys.path.insert(0, str(EXAMPLE_SRC))
 
 from opportunity_research_workflow import WORKFLOW_KIND, create_plugin  # noqa: E402
-from langgraph_automation.testing import (  # noqa: E402
+from cobalt_wren.testing import (  # noqa: E402
     assert_plugin_declares_workflow,
     assert_workflow_definition_is_framework_neutral,
 )

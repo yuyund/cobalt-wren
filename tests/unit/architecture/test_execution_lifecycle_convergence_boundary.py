@@ -6,27 +6,27 @@ from tests.support.import_scan import collect_import_targets
 
 def test_public_execution_adapter_uses_engine_facade_not_workflow_internals() -> None:
     modules = collect_import_targets(
-        Path("src/langgraph_automation/apps/automation/services/execution.py")
+        Path("src/cobalt_wren/apps/automation/services/execution.py")
     )
-    assert "langgraph_automation.api.engine" in modules
+    assert "cobalt_wren.api.engine" in modules
     forbidden = (
-        "langgraph_automation.workflows.prepare",
-        "langgraph_automation.workflows.adapter",
-        "langgraph_automation.runtime.assembly",
-        "langgraph_automation.runtime.dependencies",
-        "langgraph_automation.plugins.registry",
+        "cobalt_wren.workflows.prepare",
+        "cobalt_wren.workflows.adapter",
+        "cobalt_wren.runtime.assembly",
+        "cobalt_wren.runtime.dependencies",
+        "cobalt_wren.plugins.registry",
     )
     assert not any(module.startswith(forbidden) for module in modules)
 
 
 def test_run_service_does_not_prepare_plugins_or_workflows_directly() -> None:
     modules = collect_import_targets(
-        Path("src/langgraph_automation/apps/automation/services/runs.py")
+        Path("src/cobalt_wren/apps/automation/services/runs.py")
     )
     forbidden = (
-        "langgraph_automation.workflows",
-        "langgraph_automation.plugins.registry",
-        "langgraph_automation.runtime.assembly",
+        "cobalt_wren.workflows",
+        "cobalt_wren.plugins.registry",
+        "cobalt_wren.runtime.assembly",
     )
     assert not any(module.startswith(forbidden) for module in modules)
 

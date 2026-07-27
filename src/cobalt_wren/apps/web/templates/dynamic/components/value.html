@@ -1,0 +1,14 @@
+{% if value.kind == 'empty' %}<span class="text-secondary">No data recorded</span>
+{% elif value.kind == 'redacted' %}<span class="badge bg-orange-lt text-orange">Redacted</span>
+{% elif value.kind == 'truncated' %}<span class="badge bg-secondary-lt text-secondary">{{ value.text }}</span>{% if value.omitted_count %}<span class="text-secondary small ms-1">{{ value.omitted_count }} omitted</span>{% endif %}
+{% elif value.kind == 'boolean' %}<span class="badge {% if value.text == 'Yes' %}bg-green-lt text-green{% else %}bg-secondary-lt text-secondary{% endif %}">{{ value.text }}</span>
+{% elif value.kind == 'multiline' %}<div class="structured-text">{{ value.text|linebreaksbr }}</div>
+{% elif value.kind == 'mapping' %}
+  {% if value.count == 0 %}<span class="text-secondary">No data recorded</span>
+  {% elif compact %}<span class="badge bg-azure-lt text-azure">{{ value.summary }}</span>
+  {% else %}<details class="structured-value" {% if value.count <= 6 %}open{% endif %}><summary>{{ value.summary }}{% if value.omitted_count %} · {{ value.omitted_count }} more omitted{% elif value.truncated %} · partial preview{% endif %}</summary><dl class="structured-map">{% for entry in value.entries %}<div class="structured-map-row"><dt>{{ entry.key }}</dt><dd>{% include 'dynamic/components/value.html' with value=entry.value compact=False only %}</dd></div>{% endfor %}</dl></details>{% endif %}
+{% elif value.kind == 'list' %}
+  {% if value.count == 0 %}<span class="text-secondary">No data recorded</span>
+  {% elif compact %}<span class="badge bg-azure-lt text-azure">{{ value.summary }}</span>
+  {% else %}<details class="structured-value" {% if value.count <= 6 %}open{% endif %}><summary>{{ value.summary }}{% if value.omitted_count %} · {{ value.omitted_count }} more omitted{% elif value.truncated %} · partial preview{% endif %}</summary><ol class="structured-list">{% for item in value.items %}<li>{% include 'dynamic/components/value.html' with value=item compact=False only %}</li>{% endfor %}</ol></details>{% endif %}
+{% else %}{{ value.text }}{% endif %}

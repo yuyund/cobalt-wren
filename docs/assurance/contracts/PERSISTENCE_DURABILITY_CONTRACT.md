@@ -4,8 +4,8 @@ status: current
 authority: normative
 summary: Durability and metadata/body separation contract; retained as a historical execution-architecture snapshot.
 code_refs:
-  - src/langgraph_automation/integrations/artifact
-  - src/langgraph_automation/integrations/checkpoint
+  - src/cobalt_wren/integrations/artifact
+  - src/cobalt_wren/integrations/checkpoint
 test_refs:
   - tests/unit/integrations
   - tests/unit/architecture/test_persistence_orchestration_boundary.py
@@ -143,10 +143,10 @@ Artifact persistence is explicit only.
 
 Evidence:
 
-- `src/langgraph_automation/integrations/artifact/memory_store.py`
-- `src/langgraph_automation/integrations/checkpoint/memory_store.py`
-- `src/langgraph_automation/config/checkpoint_store.py`
-- `src/langgraph_automation/runtime/checkpoint_store.py`
+- `src/cobalt_wren/integrations/artifact/memory_store.py`
+- `src/cobalt_wren/integrations/checkpoint/memory_store.py`
+- `src/cobalt_wren/config/checkpoint_store.py`
+- `src/cobalt_wren/runtime/checkpoint_store.py`
 - `tests/unit/artifact/test_memory_store.py`
 - `tests/unit/integrations/test_checkpoint_summary.py`
 
@@ -171,18 +171,18 @@ Evidence:
 - history listing is supported
 - `CheckpointStore` sufficiency audit result is `APPROVED_FOR_IMPLEMENTATION`
 - durable checkpoint implementation is now closed for the first durable backend
-- `FilesystemCheckpointStore` is implemented in `langgraph_automation.integrations.checkpoint`
-- `FilesystemCheckpointStore` is implemented in `langgraph_automation.integrations.checkpoint` and is not re-exported from `api.stores`
-- FilesystemCheckpointStore is implemented in `langgraph_automation.integrations.checkpoint`.
+- `FilesystemCheckpointStore` is implemented in `cobalt_wren.integrations.checkpoint`
+- `FilesystemCheckpointStore` is implemented in `cobalt_wren.integrations.checkpoint` and is not re-exported from `api.stores`
+- FilesystemCheckpointStore is implemented in `cobalt_wren.integrations.checkpoint`.
 - `checkpoint runtime selection is implemented through typed config and the canonical builder`
 - checkpoint runtime selection is implemented through typed config and the canonical builder
-- `FilesystemCheckpointStore` is implemented in `langgraph_automation.integrations.checkpoint` and is not re-exported from `api.stores`
+- `FilesystemCheckpointStore` is implemented in `cobalt_wren.integrations.checkpoint` and is not re-exported from `api.stores`
 - true resume remains deferred until the adapter layer is designed
 
 Evidence:
 
-- `src/langgraph_automation/integrations/checkpoint/base.py`
-- `src/langgraph_automation/integrations/checkpoint/memory_store.py`
+- `src/cobalt_wren/integrations/checkpoint/base.py`
+- `src/cobalt_wren/integrations/checkpoint/memory_store.py`
 - `tests/contract/persistence/test_checkpoint_store_baseline_contract.py`
 - `tests/unit/integrations/test_checkpoint_summary.py`
 
@@ -253,10 +253,10 @@ Advanced durable semantics remain deferred until runtime selection and orchestra
 
 Evidence:
 
-- `src/langgraph_automation/apps/automation/services/runtime.py`
-- `src/langgraph_automation/runtime/assembly.py`
-- `src/langgraph_automation/graphs/runtime.py`
-- `src/langgraph_automation/integrations/observability/django_event_sink.py`
+- `src/cobalt_wren/apps/automation/services/runtime.py`
+- `src/cobalt_wren/runtime/assembly.py`
+- `src/cobalt_wren/graphs/runtime.py`
+- `src/cobalt_wren/integrations/observability/django_event_sink.py`
 - `rg -n "\\.put\\(|\\.save\\(|\\.load\\(|\\.delete\\(" src tests`
 
 ### Target baseline
@@ -307,7 +307,7 @@ Current:
 
 Evidence:
 
-- `src/langgraph_automation/integrations/artifact/memory_store.py`
+- `src/cobalt_wren/integrations/artifact/memory_store.py`
 - `tests/unit/artifact/test_memory_store.py`
 
 ### Checkpoint
@@ -323,8 +323,8 @@ Target and current:
 
 Evidence:
 
-- `src/langgraph_automation/integrations/checkpoint/base.py`
-- `src/langgraph_automation/integrations/checkpoint/memory_store.py`
+- `src/cobalt_wren/integrations/checkpoint/base.py`
+- `src/cobalt_wren/integrations/checkpoint/memory_store.py`
 
 ## Idempotency / Conflict
 
@@ -380,9 +380,9 @@ Failure-mode matrix details live in `../../architecture/audit/PERSISTENCE_FAILUR
 
 Evidence:
 
-- `src/langgraph_automation/integrations/observability/failure_policy.py`
-- `src/langgraph_automation/apps/automation/services/runs.py`
-- `src/langgraph_automation/graphs/runner.py`
+- `src/cobalt_wren/integrations/observability/failure_policy.py`
+- `src/cobalt_wren/apps/automation/services/runs.py`
+- `src/cobalt_wren/graphs/runner.py`
 - `tests/unit/automation/test_run_failure_observability_masking.py`
 - `tests/unit/graphs/test_runner.py`
 

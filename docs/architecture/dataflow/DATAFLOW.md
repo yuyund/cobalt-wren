@@ -7,6 +7,8 @@ This document summarizes the important dependency and flow paths.
 - workflow preparation flows through `api.engine` and `workflows.prepare`
 - execution input flows from `Run.input_payload` into graph execution input and then into safe persistence
 - observability flows through the Django event sink and observed client/registry wrappers
+- external OSS signals flow through an integration helper into canonical control-plane records and bounded versioned projections
+- dynamic presentation flows from canonical records plus registered integration view sections into renderer-owned safe blocks
 
 ## Boundary Rules
 - `graphs` must stay free of workflow catalog imports

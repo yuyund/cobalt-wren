@@ -4,7 +4,7 @@ status: current
 authority: normative
 summary: Checkpoint store identity, append-only ordering, integrity, and durability contract.
 code_refs:
-  - src/langgraph_automation/integrations/checkpoint
+  - src/cobalt_wren/integrations/checkpoint
 test_refs:
   - tests/unit/integrations
   - tests/unit/architecture/test_filesystem_checkpoint_store_boundary.py
@@ -27,10 +27,10 @@ This document fixes the contract that durable backends must satisfy.
 
 - protocol sufficiency decision: `APPROVED_FOR_IMPLEMENTATION`
 - `MemoryCheckpointStore` is the EPHEMERAL semantic reference implementation and remains the default runtime wiring
-- `FilesystemCheckpointStore` is implemented, `PROCESS_DURABLE`, and exported from `langgraph_automation.integrations.checkpoint`
-- `FilesystemCheckpointStore` is implemented in `langgraph_automation.integrations.checkpoint`
-- `FilesystemCheckpointStore` is implemented in `langgraph_automation.integrations.checkpoint` and is not re-exported from `api.stores`
-- FilesystemCheckpointStore is implemented in `langgraph_automation.integrations.checkpoint`.
+- `FilesystemCheckpointStore` is implemented, `PROCESS_DURABLE`, and exported from `cobalt_wren.integrations.checkpoint`
+- `FilesystemCheckpointStore` is implemented in `cobalt_wren.integrations.checkpoint`
+- `FilesystemCheckpointStore` is implemented in `cobalt_wren.integrations.checkpoint` and is not re-exported from `api.stores`
+- FilesystemCheckpointStore is implemented in `cobalt_wren.integrations.checkpoint`.
 - pending append intent is part of the crash-window recovery contract
 - checkpoint runtime selection is implemented through typed config and the canonical runtime builder
 - checkpoint runtime selection is implemented through typed config and the canonical builder

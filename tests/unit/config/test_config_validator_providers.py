@@ -4,12 +4,12 @@ from __future__ import annotations
 
 import pytest
 
-from langgraph_automation.api.errors import PluginResolutionError, PluginValidationError
-from langgraph_automation.api.plugins import Plugin, PluginContributions, PluginMetadata, ProviderContribution
-from langgraph_automation.config.models import NormalizedPackageConfig, ProviderProfileConfig, RawPackageConfig
-from langgraph_automation.config.normalizer import normalize_package_config
-from langgraph_automation.config.validator import ConfigValidator
-from langgraph_automation.plugins.registry import PluginRegistry
+from cobalt_wren.api.errors import PluginResolutionError, PluginValidationError
+from cobalt_wren.api.plugins import Plugin, PluginContributions, PluginMetadata, ProviderContribution
+from cobalt_wren.config.models import NormalizedPackageConfig, ProviderProfileConfig, RawPackageConfig
+from cobalt_wren.config.normalizer import normalize_package_config
+from cobalt_wren.config.validator import ConfigValidator
+from cobalt_wren.plugins.registry import PluginRegistry
 
 
 def _provider_plugin(*, validate_profile=None, create_client=None) -> Plugin:

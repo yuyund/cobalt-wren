@@ -5,14 +5,14 @@ from __future__ import annotations
 import inspect
 from pathlib import Path
 
-from langgraph_automation.apps.automation.services import runs as run_services
+from cobalt_wren.apps.automation.services import runs as run_services
 
 
 def test_execution_path_does_not_call_artifact_or_checkpoint_store_persistence_methods() -> None:
     paths = (
-        Path('src/langgraph_automation/apps/automation/services/runtime.py'),
-        Path('src/langgraph_automation/apps/automation/services/execution.py'),
-        Path('src/langgraph_automation/apps/automation/services/runs.py'),
+        Path('src/cobalt_wren/apps/automation/services/runtime.py'),
+        Path('src/cobalt_wren/apps/automation/services/execution.py'),
+        Path('src/cobalt_wren/apps/automation/services/runs.py'),
     )
 
     forbidden_tokens = (
@@ -29,7 +29,7 @@ def test_execution_path_does_not_call_artifact_or_checkpoint_store_persistence_m
 
 
 def test_application_runtime_does_not_directly_construct_concrete_persistence_stores() -> None:
-    path = Path('src/langgraph_automation/apps/automation/services/runtime.py')
+    path = Path('src/cobalt_wren/apps/automation/services/runtime.py')
     text = path.read_text()
 
     for token in (
@@ -42,7 +42,7 @@ def test_application_runtime_does_not_directly_construct_concrete_persistence_st
 
 
 def test_application_runtime_does_not_source_physical_store_selection_from_workflow_payload() -> None:
-    path = Path('src/langgraph_automation/apps/automation/services/runtime.py')
+    path = Path('src/cobalt_wren/apps/automation/services/runtime.py')
     text = path.read_text()
 
     forbidden_tokens = (

@@ -6,8 +6,8 @@ from types import SimpleNamespace
 
 import pytest
 
-from langgraph_automation.integrations.llm.base import LLMResult
-from langgraph_automation.integrations.llm.litellm_client import LiteLLMClient
+from cobalt_wren.integrations.llm.base import LLMResult
+from cobalt_wren.integrations.llm.litellm_client import LiteLLMClient
 
 
 def test_litellm_client_maps_completion_response(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -23,7 +23,7 @@ def test_litellm_client_maps_completion_response(monkeypatch: pytest.MonkeyPatch
         captured.update(kwargs)
         return response
 
-    monkeypatch.setattr('langgraph_automation.integrations.llm.litellm_client.litellm.completion', fake_completion)
+    monkeypatch.setattr('cobalt_wren.integrations.llm.litellm_client.litellm.completion', fake_completion)
 
     client = LiteLLMClient(
         model='gpt-4o-mini',
@@ -56,7 +56,7 @@ def test_litellm_client_propagates_provider_exceptions(monkeypatch: pytest.Monke
     def fake_completion(**kwargs):  # type: ignore[no-untyped-def]
         raise RuntimeError('provider failed')
 
-    monkeypatch.setattr('langgraph_automation.integrations.llm.litellm_client.litellm.completion', fake_completion)
+    monkeypatch.setattr('cobalt_wren.integrations.llm.litellm_client.litellm.completion', fake_completion)
 
     client = LiteLLMClient(model='gpt-4o-mini')
 

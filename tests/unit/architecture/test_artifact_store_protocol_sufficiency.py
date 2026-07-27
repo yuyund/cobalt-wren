@@ -5,7 +5,7 @@ from __future__ import annotations
 import inspect
 from typing import get_type_hints
 
-from langgraph_automation.integrations.artifact.base import (
+from cobalt_wren.integrations.artifact.base import (
     ArtifactReadResult,
     ArtifactStore,
     ArtifactWriteRequest,

@@ -4,20 +4,20 @@ from __future__ import annotations
 
 import pytest
 
-from langgraph_automation.api.errors import RuntimeAssemblyError
-from langgraph_automation.api.workflow import (
+from cobalt_wren.api.errors import RuntimeAssemblyError
+from cobalt_wren.api.workflow import (
     WorkflowBuildContext,
     WorkflowDefinition,
     WorkflowExecutionResult,
     WorkflowMetadata,
     WorkflowRequirements,
 )
-from langgraph_automation.workflows.adapter import build_workflow_graph, execute_workflow
+from cobalt_wren.workflows.adapter import build_workflow_graph, execute_workflow
 
 
 def _workflow_definition(build_callable):
     return WorkflowDefinition(
-        kind='reference.llm_echo_summary',
+        kind='test.sample.workflow',
         metadata=WorkflowMetadata(name='LLM Echo Summary'),
         requirements=WorkflowRequirements(),
         build=build_callable,

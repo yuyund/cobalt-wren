@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from langgraph_automation.api.errors import (
+from cobalt_wren.api.errors import (
     ArtifactConflictError,
     ArtifactIntegrityError,
     ArtifactValidationError,
@@ -12,9 +12,9 @@ from langgraph_automation.api.errors import (
     CheckpointIntegrityError,
     CheckpointValidationError,
 )
-from langgraph_automation.core.redaction import REDACTED_VALUE
-from langgraph_automation.integrations.artifact.base import ArtifactReadResult, ArtifactStore, ArtifactWriteRequest
-from langgraph_automation.integrations.checkpoint.base import CheckpointReadResult, CheckpointStore, CheckpointWriteRequest, StoredCheckpoint
+from cobalt_wren.core.redaction import REDACTED_VALUE
+from cobalt_wren.integrations.artifact.base import ArtifactReadResult, ArtifactStore, ArtifactWriteRequest
+from cobalt_wren.integrations.checkpoint.base import CheckpointReadResult, CheckpointStore, CheckpointWriteRequest, StoredCheckpoint
 
 
 def assert_artifact_round_trip(store: ArtifactStore) -> None:

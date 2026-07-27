@@ -1,6 +1,6 @@
 # Plugin API Shape
 
-This document defines the plugin API shape for `langgraph-automation`.
+This document defines the plugin API shape for `cobalt-wren`.
 
 Purpose:
 
@@ -154,7 +154,7 @@ Reason:
 
 ## WorkflowContribution
 
-`WorkflowContribution` is implemented in `langgraph_automation.api.workflow` and is a first-class plugin contribution type.
+`WorkflowContribution` is implemented in `cobalt_wren.api.workflow` and is a first-class plugin contribution type.
 
 ### Purpose
 
@@ -171,7 +171,7 @@ WorkflowContribution:
     build_workflow(context) -> WorkflowDefinition
 ```
 
-`WorkflowDefinition` and `WorkflowRequirements` are implemented in `langgraph_automation.api.workflow`.
+`WorkflowDefinition` and `WorkflowRequirements` are implemented in `cobalt_wren.api.workflow`.
 Legacy graph-runtime vocabulary is removed; `WorkflowDefinition`, `WorkflowRequirements`, and `WorkflowExecutable` are the supported framework-neutral contracts.
 Built-in reference workflows are still ordinary workflow contributions; the workflow adapter is the only place that calls `WorkflowDefinition.build`.
 Application workflows are expected to use the same `Plugin` / `WorkflowContribution` path as built-in reference workflows.
@@ -215,7 +215,7 @@ ToolContribution:
     create_tool(context) -> ToolAdapter
 ```
 
-`ToolContribution` is implemented in `langgraph_automation.api.plugins`.
+`ToolContribution` is implemented in `cobalt_wren.api.plugins`.
 `ToolAdapter` and `ToolDefinition` remain deferred.
 
 ### ToolPolicy boundary
@@ -515,17 +515,17 @@ Factory hooks do not replace validation.
 
 Current public facade:
 
-- `langgraph_automation.api.llm`
-- `langgraph_automation.api.tools`
-- `langgraph_automation.api.stores`
-- `langgraph_automation.api.events`
+- `cobalt_wren.api.llm`
+- `cobalt_wren.api.tools`
+- `cobalt_wren.api.stores`
+- `cobalt_wren.api.events`
 
 Future public facade candidates:
 
-- `langgraph_automation.api.plugins`
-- `langgraph_automation.api.workflow`
-- `langgraph_automation.api.runtime`
-- `langgraph_automation.api.errors`
+- `cobalt_wren.api.plugins`
+- `cobalt_wren.api.workflow`
+- `cobalt_wren.api.runtime`
+- `cobalt_wren.api.errors`
 
 P3-C does not create those modules.
 Public API should not be frozen prematurely.

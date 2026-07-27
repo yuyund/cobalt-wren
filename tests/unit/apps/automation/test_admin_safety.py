@@ -6,7 +6,7 @@ from django.contrib import admin
 from django.test import RequestFactory
 import pytest
 
-from langgraph_automation.apps.automation.admin import (
+from cobalt_wren.apps.automation.admin import (
     ArtifactAdmin,
     CheckpointMetadataAdmin,
     ExecutionSpanAdmin,
@@ -14,13 +14,13 @@ from langgraph_automation.apps.automation.admin import (
     RunEventAdmin,
     WorkflowAdmin,
 )
-from langgraph_automation.apps.automation.models.artifact import Artifact
-from langgraph_automation.apps.automation.models.checkpoint import CheckpointMetadata
-from langgraph_automation.apps.automation.models.event import RunEvent
-from langgraph_automation.apps.automation.models.execution import ExecutionSpan, ExecutionSpanType
-from langgraph_automation.apps.automation.models.run import Run
-from langgraph_automation.apps.automation.models.workflow import Workflow
-from langgraph_automation.integrations.observability import DjangoEventSink
+from cobalt_wren.apps.automation.models.artifact import Artifact
+from cobalt_wren.apps.automation.models.checkpoint import CheckpointMetadata
+from cobalt_wren.apps.automation.models.event import RunEvent
+from cobalt_wren.apps.automation.models.execution import ExecutionSpan, ExecutionSpanType
+from cobalt_wren.apps.automation.models.run import Run
+from cobalt_wren.apps.automation.models.workflow import Workflow
+from cobalt_wren.integrations.observability import DjangoEventSink
 
 
 @pytest.mark.django_db

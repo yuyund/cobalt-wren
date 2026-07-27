@@ -4,13 +4,13 @@ from pathlib import Path
 
 import pytest
 
-from langgraph_automation.api.errors import ConfigError
-from langgraph_automation.config.artifact_store import (
+from cobalt_wren.api.errors import ConfigError
+from cobalt_wren.config.artifact_store import (
     FilesystemArtifactStoreSettings,
     MemoryArtifactStoreSettings,
     normalize_artifact_store_settings,
 )
-from langgraph_automation.config.models import StoreBackendConfig
+from cobalt_wren.config.models import StoreBackendConfig
 
 
 def test_normalize_artifact_store_settings_defaults_to_memory_when_section_is_absent() -> None:
@@ -27,11 +27,11 @@ def test_normalize_artifact_store_settings_accepts_explicit_memory() -> None:
 
 def test_normalize_artifact_store_settings_accepts_filesystem_root() -> None:
     settings = normalize_artifact_store_settings(
-        StoreBackendConfig(backend="filesystem", config={"root": "/srv/langgraph-automation/artifacts"})
+        StoreBackendConfig(backend="filesystem", config={"root": "/srv/cobalt-wren/artifacts"})
     )
 
-    assert settings == FilesystemArtifactStoreSettings(root=Path("/srv/langgraph-automation/artifacts"))
-    assert "/srv/langgraph-automation/artifacts" not in repr(settings)
+    assert settings == FilesystemArtifactStoreSettings(root=Path("/srv/cobalt-wren/artifacts"))
+    assert "/srv/cobalt-wren/artifacts" not in repr(settings)
 
 
 @pytest.mark.parametrize(
@@ -42,7 +42,7 @@ def test_normalize_artifact_store_settings_accepts_filesystem_root() -> None:
         (StoreBackendConfig(backend="filesystem", config={"root": "~/artifacts"}), "CONFIG_ARTIFACT_STORE_INVALID_ROOT"),
         (StoreBackendConfig(backend="filesystem", config={"root": "file:///srv/artifacts"}), "CONFIG_ARTIFACT_STORE_INVALID_ROOT"),
         (StoreBackendConfig(backend="filesystem", config={"root": ""}), "CONFIG_ARTIFACT_STORE_INVALID_ROOT"),
-        (StoreBackendConfig(backend="memory", config={"root": "/srv/langgraph-automation/artifacts"}), "CONFIG_ARTIFACT_STORE_MEMORY_OPTIONS"),
+        (StoreBackendConfig(backend="memory", config={"root": "/srv/cobalt-wren/artifacts"}), "CONFIG_ARTIFACT_STORE_MEMORY_OPTIONS"),
         (StoreBackendConfig(backend="sqlite"), "CONFIG_UNSUPPORTED_ARTIFACT_STORE_BACKEND"),
     ],
 )
@@ -51,4 +51,4 @@ def test_normalize_artifact_store_settings_rejects_invalid_config(store_config: 
         normalize_artifact_store_settings(store_config)
 
     assert excinfo.value.code == code
-    assert "/srv/langgraph-automation/artifacts" not in str(excinfo.value)
+    assert "/srv/cobalt-wren/artifacts" not in str(excinfo.value)

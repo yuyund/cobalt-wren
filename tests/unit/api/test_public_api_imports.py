@@ -4,7 +4,7 @@ from __future__ import annotations
 
 
 def test_llm_api_exports() -> None:
-    from langgraph_automation.api.llm import LLMClient, LLMRequest, LLMResult
+    from cobalt_wren.api.llm import LLMClient, LLMRequest, LLMResult
 
     assert LLMClient is not None
     assert LLMRequest is not None
@@ -12,13 +12,13 @@ def test_llm_api_exports() -> None:
 
 
 def test_llm_api_all() -> None:
-    import langgraph_automation.api.llm as llm_api
+    import cobalt_wren.api.llm as llm_api
 
     assert set(llm_api.__all__) == {'LLMClient', 'LLMRequest', 'LLMResult'}
 
 
 def test_tool_api_exports() -> None:
-    from langgraph_automation.api.tools import ToolPolicy, ToolPolicyContext, ToolPolicyDecision, ToolRegistry, ToolResult
+    from cobalt_wren.api.tools import ToolPolicy, ToolPolicyContext, ToolPolicyDecision, ToolRegistry, ToolResult
 
     assert ToolRegistry is not None
     assert ToolResult is not None
@@ -28,13 +28,13 @@ def test_tool_api_exports() -> None:
 
 
 def test_tool_api_all() -> None:
-    import langgraph_automation.api.tools as tools_api
+    import cobalt_wren.api.tools as tools_api
 
     assert set(tools_api.__all__) == {'ToolRegistry', 'ToolResult', 'ToolPolicy', 'ToolPolicyContext', 'ToolPolicyDecision'}
 
 
 def test_store_api_exports() -> None:
-    from langgraph_automation.api.stores import (
+    from cobalt_wren.api.stores import (
         ArtifactReadResult,
         ArtifactStore,
         ArtifactWriteRequest,
@@ -56,7 +56,7 @@ def test_store_api_exports() -> None:
 
 
 def test_store_api_does_not_export_concrete_backends() -> None:
-    import langgraph_automation.api.stores as stores_api
+    import cobalt_wren.api.stores as stores_api
 
     assert 'FilesystemArtifactStore' not in stores_api.__all__
     assert 'FilesystemCheckpointStore' not in stores_api.__all__
@@ -65,7 +65,7 @@ def test_store_api_does_not_export_concrete_backends() -> None:
 
 
 def test_store_api_all() -> None:
-    import langgraph_automation.api.stores as stores_api
+    import cobalt_wren.api.stores as stores_api
 
     assert set(stores_api.__all__) == {
         'ArtifactStore',
@@ -80,9 +80,9 @@ def test_store_api_all() -> None:
 
 
 def test_checkpoint_public_api_is_bounded_to_facades() -> None:
-    import langgraph_automation as package_root
-    import langgraph_automation.api as api_package
-    import langgraph_automation.integrations.checkpoint as checkpoint_integration
+    import cobalt_wren as package_root
+    import cobalt_wren.api as api_package
+    import cobalt_wren.integrations.checkpoint as checkpoint_integration
 
     assert not hasattr(package_root, 'CheckpointStore')
     assert not hasattr(package_root, 'CheckpointWriteRequest')
@@ -103,22 +103,22 @@ def test_checkpoint_public_api_is_bounded_to_facades() -> None:
 
 
 def test_event_api_exports() -> None:
-    from langgraph_automation.api.events import EventSink
+    from cobalt_wren.api.events import EventSink
 
     assert EventSink is not None
 
 
 def test_event_api_all() -> None:
-    import langgraph_automation.api.events as events_api
+    import cobalt_wren.api.events as events_api
 
     assert set(events_api.__all__) == {'EventSink'}
 
 
 def test_artifact_emission_contract_is_not_public_api() -> None:
-    import langgraph_automation as package_root
-    import langgraph_automation.api as api_package
-    import langgraph_automation.api.stores as stores_api
-    import langgraph_automation.api.plugins as plugins_api
+    import cobalt_wren as package_root
+    import cobalt_wren.api as api_package
+    import cobalt_wren.api.stores as stores_api
+    import cobalt_wren.api.plugins as plugins_api
 
     assert not hasattr(package_root, 'ArtifactEmissionRequest')
     assert not hasattr(package_root, 'ArtifactIdentity')

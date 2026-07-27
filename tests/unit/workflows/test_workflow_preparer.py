@@ -4,18 +4,17 @@ from __future__ import annotations
 
 import pytest
 
-from langgraph_automation.api.errors import PluginResolutionError, RuntimeAssemblyError
-from langgraph_automation.api.plugins import Plugin, PluginContributions, PluginMetadata
-from langgraph_automation.api.workflow import (
+from cobalt_wren.api.errors import PluginResolutionError, RuntimeAssemblyError
+from cobalt_wren.api.plugins import Plugin, PluginContributions, PluginMetadata
+from cobalt_wren.api.workflow import (
     WorkflowContribution,
     WorkflowDefinition,
     WorkflowMetadata,
     WorkflowRequirements,
 )
-from langgraph_automation.plugins.registry import PluginRegistry
-from langgraph_automation.runtime.dependencies import RuntimeDependencies
-from langgraph_automation.workflows.catalog import create_builtin_workflow_registry
-from langgraph_automation.workflows.prepare import PreparedWorkflow, WorkflowPreparer, prepare_workflow
+from cobalt_wren.plugins.registry import PluginRegistry
+from cobalt_wren.runtime.dependencies import RuntimeDependencies
+from cobalt_wren.workflows.prepare import PreparedWorkflow, WorkflowPreparer, prepare_workflow
 
 
 def _runtime_dependencies() -> RuntimeDependencies:
@@ -28,12 +27,39 @@ def _runtime_dependencies() -> RuntimeDependencies:
     )
 
 
+def _required_workflow_registry() -> PluginRegistry:
+    contribution = WorkflowContribution(
+        kind="test.sample.workflow",
+        definition=WorkflowDefinition(
+            kind="test.sample.workflow",
+            metadata=WorkflowMetadata(name="Test sample workflow"),
+            requirements=WorkflowRequirements(
+                provider_profiles=("default",),
+                tools=("echo",),
+            ),
+            build=lambda: {"workflow": "test.sample.workflow"},
+        ),
+    )
+    return PluginRegistry(
+        (
+            Plugin(
+                metadata=PluginMetadata(
+                    name="tests.sample.workflow",
+                    version="1.0.0",
+                    plugin_types=("workflow",),
+                ),
+                contributions=PluginContributions(workflows=(contribution,)),
+            ),
+        )
+    )
+
+
 def test_workflow_preparer_prepares_registered_workflow(monkeypatch: pytest.MonkeyPatch) -> None:
     registry = PluginRegistry()
     contribution_calls: list[str] = []
 
-    from langgraph_automation.api.plugins import Plugin, PluginContributions, PluginMetadata
-    from langgraph_automation.api.workflow import WorkflowContribution, WorkflowDefinition, WorkflowMetadata, WorkflowRequirements
+    from cobalt_wren.api.plugins import Plugin, PluginContributions, PluginMetadata
+    from cobalt_wren.api.workflow import WorkflowContribution, WorkflowDefinition, WorkflowMetadata, WorkflowRequirements
 
     def _validate(*, config):
         contribution_calls.append(f"validate:{dict(config)}")
@@ -59,7 +85,7 @@ def test_workflow_preparer_prepares_registered_workflow(monkeypatch: pytest.Monk
         assert context_arg.workflow_kind == definition_arg.kind
         return {'prepared': definition_arg.kind}
 
-    monkeypatch.setattr('langgraph_automation.workflows.prepare.build_workflow_graph', fake_build_workflow_graph)
+    monkeypatch.setattr('cobalt_wren.workflows.prepare.build_workflow_graph', fake_build_workflow_graph)
 
     prepared = WorkflowPreparer(registry).prepare(workflow_kind='sample.workflow', dependencies=_runtime_dependencies())
 
@@ -84,26 +110,26 @@ def test_workflow_preparer_wraps_unknown_workflow_kind() -> None:
 
 
 def test_workflow_preparer_raises_for_missing_requirements() -> None:
-    registry = create_builtin_workflow_registry()
+    registry = _required_workflow_registry()
 
     with pytest.raises(RuntimeAssemblyError) as excinfo:
         WorkflowPreparer(registry).prepare(
-            workflow_kind='reference.llm_echo_summary',
+            workflow_kind='test.sample.workflow',
             dependencies=RuntimeDependencies(providers={}, tools={}, artifact_store=None, checkpoint_store=None, event_sinks={}),
         )
 
     assert excinfo.value.code == 'WORKFLOW_REQUIREMENT_MISSING'
 
 
-def test_prepare_workflow_helper_prepares_builtin_workflow() -> None:
+def test_prepare_workflow_helper_prepares_explicit_workflow() -> None:
     prepared = prepare_workflow(
-        workflow_kind='reference.llm_echo_summary',
-        registry=create_builtin_workflow_registry(),
+        workflow_kind='test.sample.workflow',
+        registry=_required_workflow_registry(),
         dependencies=_runtime_dependencies(),
     )
 
-    assert prepared.kind == 'reference.llm_echo_summary'
-    assert prepared.definition.kind == 'reference.llm_echo_summary'
+    assert prepared.kind == 'test.sample.workflow'
+    assert prepared.definition.kind == 'test.sample.workflow'
     assert prepared.executable is not None
 
 

@@ -27,7 +27,7 @@ def test_human_approval_installs_as_separate_distribution(tmp_path: Path) -> Non
 import json
 from importlib import metadata
 from human_approval_workflow import WORKFLOW_KIND
-entry = next(item for item in metadata.entry_points().select(group='langgraph_automation.plugins') if item.name == 'human-approval')
+entry = next(item for item in metadata.entry_points().select(group='cobalt_wren.plugins') if item.name == 'human-approval')
 plugin = entry.load()()
 workflow = next(item for item in plugin.contributions.workflows if item.kind == WORKFLOW_KIND)
 print(json.dumps({'entry': entry.name, 'plugin': plugin.metadata.name, 'workflow': workflow.kind, 'capabilities': workflow.definition.extra['capabilities']}))

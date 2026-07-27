@@ -10,7 +10,7 @@ Docs record the current decision and the target backend boundary.
 
 ## Current Protocol Surface
 
-The current public facade re-exports the artifact protocol from `src/langgraph_automation/api/stores.py`.
+The current public facade re-exports the artifact protocol from `src/cobalt_wren/api/stores.py`.
 
 The current protocol is body-aware.
 
@@ -50,18 +50,18 @@ The read result type is `ArtifactReadResult` with fields:
 
 | Required semantic | Available in current protocol? | Exact type/field | Implementation evidence | Test evidence | Blocker? |
 | --- | --- | --- | --- | --- | --- |
-| Artifact body input | Yes | `ArtifactWriteRequest.body` | `src/langgraph_automation/integrations/artifact/base.py` | `tests/unit/architecture/test_artifact_store_protocol_sufficiency.py` | No |
-| Body output | Yes | `ArtifactReadResult.body` | `src/langgraph_automation/integrations/artifact/base.py` | `tests/unit/architecture/test_artifact_store_protocol_sufficiency.py` | No |
-| Stable logical identity | Yes | `storage_key` | `src/langgraph_automation/integrations/artifact/base.py`, `src/langgraph_automation/integrations/artifact/memory_store.py` | `tests/unit/artifact/test_memory_store.py` | No |
-| Run association | Yes | `run_id` | `src/langgraph_automation/integrations/artifact/base.py`, `src/langgraph_automation/integrations/artifact/memory_store.py` | `tests/contract/persistence/test_artifact_store_baseline_contract.py` | No |
-| Storage reference | Yes | `storage_key` | `src/langgraph_automation/integrations/artifact/base.py`, `src/langgraph_automation/integrations/artifact/keys.py` | `tests/unit/artifact/test_keys.py` | No |
-| Content type | Yes | `content_type` | `src/langgraph_automation/integrations/artifact/base.py` | `tests/unit/artifact/test_memory_store.py` | No |
-| Body size | Yes | `StoredArtifact.size` | `src/langgraph_automation/integrations/artifact/base.py` | `tests/unit/artifact/test_memory_store.py` | No |
-| Body digest | Yes | `StoredArtifact.digest` | `src/langgraph_automation/integrations/artifact/base.py` | `tests/unit/artifact/test_memory_store.py` | No |
-| Safe metadata | Yes | `metadata` | `src/langgraph_automation/integrations/artifact/base.py`, `src/langgraph_automation/integrations/artifact/memory_store.py` | `tests/contract/persistence/test_artifact_store_baseline_contract.py` | No |
-| Idempotency equivalence | Yes | request + descriptor + body | `src/langgraph_automation/integrations/artifact/memory_store.py` | `tests/unit/artifact/test_memory_store.py` | No |
-| Conflict detection | Yes | same key + different canonical request | `src/langgraph_automation/integrations/artifact/memory_store.py` | `tests/unit/artifact/test_memory_store.py` | No |
-| Integrity error representable | Yes | `ArtifactIntegrityError` | `src/langgraph_automation/api/errors.py` | `tests/support/persistence/contracts.py` | No |
+| Artifact body input | Yes | `ArtifactWriteRequest.body` | `src/cobalt_wren/integrations/artifact/base.py` | `tests/unit/architecture/test_artifact_store_protocol_sufficiency.py` | No |
+| Body output | Yes | `ArtifactReadResult.body` | `src/cobalt_wren/integrations/artifact/base.py` | `tests/unit/architecture/test_artifact_store_protocol_sufficiency.py` | No |
+| Stable logical identity | Yes | `storage_key` | `src/cobalt_wren/integrations/artifact/base.py`, `src/cobalt_wren/integrations/artifact/memory_store.py` | `tests/unit/artifact/test_memory_store.py` | No |
+| Run association | Yes | `run_id` | `src/cobalt_wren/integrations/artifact/base.py`, `src/cobalt_wren/integrations/artifact/memory_store.py` | `tests/contract/persistence/test_artifact_store_baseline_contract.py` | No |
+| Storage reference | Yes | `storage_key` | `src/cobalt_wren/integrations/artifact/base.py`, `src/cobalt_wren/integrations/artifact/keys.py` | `tests/unit/artifact/test_keys.py` | No |
+| Content type | Yes | `content_type` | `src/cobalt_wren/integrations/artifact/base.py` | `tests/unit/artifact/test_memory_store.py` | No |
+| Body size | Yes | `StoredArtifact.size` | `src/cobalt_wren/integrations/artifact/base.py` | `tests/unit/artifact/test_memory_store.py` | No |
+| Body digest | Yes | `StoredArtifact.digest` | `src/cobalt_wren/integrations/artifact/base.py` | `tests/unit/artifact/test_memory_store.py` | No |
+| Safe metadata | Yes | `metadata` | `src/cobalt_wren/integrations/artifact/base.py`, `src/cobalt_wren/integrations/artifact/memory_store.py` | `tests/contract/persistence/test_artifact_store_baseline_contract.py` | No |
+| Idempotency equivalence | Yes | request + descriptor + body | `src/cobalt_wren/integrations/artifact/memory_store.py` | `tests/unit/artifact/test_memory_store.py` | No |
+| Conflict detection | Yes | same key + different canonical request | `src/cobalt_wren/integrations/artifact/memory_store.py` | `tests/unit/artifact/test_memory_store.py` | No |
+| Integrity error representable | Yes | `ArtifactIntegrityError` | `src/cobalt_wren/api/errors.py` | `tests/support/persistence/contracts.py` | No |
 
 ## Current Production Call Sites
 
@@ -69,12 +69,12 @@ Current production code wires `MemoryArtifactStore` through runtime assembly, bu
 
 Evidence:
 
-- `src/langgraph_automation/apps/automation/services/runtime.py`
-- `src/langgraph_automation/runtime/assembly.py`
-- `src/langgraph_automation/graphs/runtime.py`
-- `src/langgraph_automation/graphs/runner.py`
-- `src/langgraph_automation/apps/automation/services/execution.py`
-- `src/langgraph_automation/apps/automation/services/runs.py`
+- `src/cobalt_wren/apps/automation/services/runtime.py`
+- `src/cobalt_wren/runtime/assembly.py`
+- `src/cobalt_wren/graphs/runtime.py`
+- `src/cobalt_wren/graphs/runner.py`
+- `src/cobalt_wren/apps/automation/services/execution.py`
+- `src/cobalt_wren/apps/automation/services/runs.py`
 
 ## Runtime Selection Boundary
 

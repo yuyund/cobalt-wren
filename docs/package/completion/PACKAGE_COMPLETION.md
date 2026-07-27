@@ -8,7 +8,7 @@ Package Complete means the package-facing surface is ready for application and c
 
 ## Package Facade Implementation Status
 
-- `langgraph_automation.api.engine` is implemented as the initial package facade
+- `cobalt_wren.api.engine` is implemented as the initial package facade
 - the facade remains public-facing provisional
 - preparation-only scope is still intentional
 - `run_workflow` remains deferred
@@ -19,7 +19,7 @@ Package Complete means the package-facing surface is ready for application and c
 - `api.engine` integration, smoke, and failure-matrix coverage is implemented
 - explicit plugins passed to `create_engine` are registered and auto-enabled for validation and runtime assembly
 - the facade-level verification harness covers the package-facing preparation path
-- `reference.llm_echo_summary` headless preparation is verified through `api.engine`
+- explicit test-plugin headless preparation is verified through `api.engine`
 
 Required:
 
@@ -44,8 +44,8 @@ Package Complete does not require:
 - a production application workflow
 - worker / queue / outbox
 - true resume
-- external plugin discovery
-- entry point discovery
+- plugin API version migration
+- broken-plugin partial-startup policy
 - long-running execution semantics
 
 ## Future Package Complete+
@@ -59,7 +59,7 @@ A later package-complete-plus phase may add:
 
 ## Package Facade Module
 
-The preferred facade module name is `langgraph_automation.api.engine`.
+The preferred facade module name is `cobalt_wren.api.engine`.
 
 Why not `api.runtime` yet:
 
@@ -77,7 +77,7 @@ The initial facade should focus on:
 
 - package context creation
 - workflow preparation
-- reference workflow verification
+- explicit test-workflow verification
 
 It should not prematurely expose:
 
@@ -93,8 +93,8 @@ Package Complete is complete.
 
 It is complete because:
 
-- `langgraph_automation.api.engine` is implemented
-- `langgraph_automation.api.engine` is verified
+- `cobalt_wren.api.engine` is implemented
+- `cobalt_wren.api.engine` is verified
 - boundary hardening is complete
 - the service bridge routes through `api.engine`
 - the temporary exception has been removed
@@ -109,7 +109,7 @@ Package Complete does not require:
 - graph execution public API
 - worker / queue / outbox
 - true resume
-- external plugin discovery
-- entry point discovery
+- plugin API version migration
+- broken-plugin partial-startup policy
 - `company_agent`
 - production application workflow

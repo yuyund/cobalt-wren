@@ -1,0 +1,5 @@
+{% load ui_presentation %}
+{% if field.url %}<a href="{{ field.url }}">{% include 'dynamic/components/value.html' with value=field.value compact=True only %}</a>
+{% elif field.name == 'status' %}<span class="badge {{ field.display_value|status_badge_class }}">{{ field.display_value }}</span>
+{% else %}{% include 'dynamic/components/value.html' with value=field.value compact=compact only %}{% if not compact and field.value.json_text %}<details class="structured-json"><summary>Technical JSON</summary><pre>{{ field.value.json_text }}</pre></details>{% endif %}{% endif %}
+{% if not compact and field.value.detail_url %}<div class="diagnostic-inspect mt-2"><button type="button" class="btn btn-sm btn-outline-secondary" hx-get="{{ field.value.detail_url }}" hx-target="#diagnostic-{{ field.name }}" hx-swap="innerHTML">Inspect details</button><div id="diagnostic-{{ field.name }}" aria-live="polite"></div></div>{% endif %}

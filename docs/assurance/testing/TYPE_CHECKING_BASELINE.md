@@ -8,12 +8,12 @@ code_refs:
   - config/mypy-baseline.json
   - pyproject.toml
   - .github/workflows/ci.yml
-  - src/langgraph_automation/apps/automation/migrations/0001_initial.py
-  - src/langgraph_automation/apps/automation/ui/builders.py
-  - src/langgraph_automation/config/models.py
-  - src/langgraph_automation/config/validator.py
-  - src/langgraph_automation/integrations/llm/observed_client.py
-  - src/langgraph_automation/integrations/tools/observed_registry.py
+  - src/cobalt_wren/apps/automation/migrations/0001_initial.py
+  - src/cobalt_wren/apps/automation/ui/builders.py
+  - src/cobalt_wren/config/models.py
+  - src/cobalt_wren/config/validator.py
+  - src/cobalt_wren/integrations/llm/observed_client.py
+  - src/cobalt_wren/integrations/tools/observed_registry.py
 test_refs:
   - tests/unit/architecture/test_type_checking_baseline.py
 verified:

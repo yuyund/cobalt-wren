@@ -1,1 +1,1 @@
-"""Test package for langgraph_automation."""
+"""Test package for cobalt_wren."""

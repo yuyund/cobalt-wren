@@ -2,8 +2,8 @@ from types import SimpleNamespace
 
 import pytest
 
-from langgraph_automation.api.errors import PluginResolutionError
-from langgraph_automation.api.plugins import PLUGIN_API_VERSION, Plugin, PluginContributions, PluginMetadata, discover_plugins
+from cobalt_wren.api.errors import PluginResolutionError
+from cobalt_wren.api.plugins import PLUGIN_API_VERSION, Plugin, PluginContributions, PluginMetadata, discover_plugins
 
 
 class FakeEntryPoint:
@@ -19,7 +19,7 @@ def test_plugin_api_version_is_public_integer() -> None:
 
 def test_incompatible_plugin_api_version_fails_discovery(monkeypatch: pytest.MonkeyPatch) -> None:
     selection = SimpleNamespace(select=lambda **_kwargs: (FakeEntryPoint(),))
-    monkeypatch.setattr("langgraph_automation.api.plugins.importlib_metadata.entry_points", lambda: selection)
+    monkeypatch.setattr("cobalt_wren.api.plugins.importlib_metadata.entry_points", lambda: selection)
     with pytest.raises(PluginResolutionError) as exc_info:
         discover_plugins()
     assert exc_info.value.code == "PLUGIN_API_VERSION_INCOMPATIBLE"

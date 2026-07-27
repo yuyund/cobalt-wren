@@ -4,6 +4,7 @@ Read this folder when you want target backend designs and implementation boundar
 
 ## Entry Points
 - `DESIGN_PRINCIPLES.md`: package-wide design principles and review rules for internal and external loose coupling.
+- `OSS_NEUTRAL_WORKFLOW_INTEGRATION.md`: target architecture for official OSS helpers, common operations, dynamic presentation, persistence, and native authoring boundaries.
 - `DURABLE_ARTIFACT_BACKEND_DESIGN.md`: target design for the first durable artifact backend.
 - `DURABLE_CHECKPOINT_BACKEND_DESIGN.md`: implemented durable checkpoint backend design and recovery contract.
 

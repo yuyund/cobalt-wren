@@ -8,8 +8,8 @@ SRC = ROOT / "packages" / "saga_workflow" / "src"
 sys.path.insert(0, str(SRC))
 
 from saga_workflow import WORKFLOW_KIND, create_plugin  # noqa: E402
-from langgraph_automation.api.engine import create_engine  # noqa: E402
-from langgraph_automation.api.workflow import WorkflowExecutionContext, WorkflowResumeRequest  # noqa: E402
+from cobalt_wren.api.engine import create_engine  # noqa: E402
+from cobalt_wren.api.workflow import WorkflowExecutionContext, WorkflowResumeRequest  # noqa: E402
 
 
 def _engine(tmp_path: Path):

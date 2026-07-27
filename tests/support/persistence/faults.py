@@ -7,9 +7,9 @@ from dataclasses import dataclass
 from enum import StrEnum
 from typing import Callable
 
-from langgraph_automation.core.redaction import redact_text
-from langgraph_automation.integrations.artifact.base import ArtifactReadResult, ArtifactStore, ArtifactWriteRequest, StoredArtifact
-from langgraph_automation.integrations.checkpoint.base import CheckpointReadResult, CheckpointStore, CheckpointWriteRequest, StoredCheckpoint
+from cobalt_wren.core.redaction import redact_text
+from cobalt_wren.integrations.artifact.base import ArtifactReadResult, ArtifactStore, ArtifactWriteRequest, StoredArtifact
+from cobalt_wren.integrations.checkpoint.base import CheckpointReadResult, CheckpointStore, CheckpointWriteRequest, StoredCheckpoint
 
 
 class FaultTiming(StrEnum):

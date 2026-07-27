@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from langgraph_automation.core.redaction import REDACTED_VALUE
-from langgraph_automation.core.summary import hash_text, preview_text, summarize_mapping, summarize_messages, summarize_sequence, truncate_text
+from cobalt_wren.core.redaction import REDACTED_VALUE
+from cobalt_wren.core.summary import hash_text, preview_text, summarize_display_value, summarize_mapping, summarize_messages, summarize_sequence, truncate_text
 
 
 def test_truncate_text_bounds_length() -> None:
@@ -69,3 +69,10 @@ def test_summarize_messages_returns_hash_preview_and_roles() -> None:
     assert 'abcdefghijklmnop' not in summary['preview']
     assert 'hello' in summary['preview']
     assert 'result' in summary['preview']
+
+
+def test_display_summary_includes_bounded_redacted_scalar_previews() -> None:
+    summary = summarize_display_value({"status": "ready", "api_token": "super-secret", "count": 4})
+    assert summary["preview"]["status"] == "ready"
+    assert summary["preview"]["count"] == 4
+    assert "super-secret" not in repr(summary)

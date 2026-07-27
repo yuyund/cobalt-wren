@@ -20,17 +20,16 @@ def _imported_modules(path: Path) -> list[str]:
 
 
 def test_application_workflow_packages_do_not_import_control_plane_or_runtime_boundaries() -> None:
-    application_root = Path('src/langgraph_automation/workflows/applications')
+    application_root = Path('src/cobalt_wren/workflows/applications')
     if not application_root.exists():
         return
 
     forbidden_prefixes = (
-        'langgraph_automation.apps.automation',
-        'langgraph_automation.plugins.registry',
-        'langgraph_automation.runtime.assembly',
-        'langgraph_automation.config.validator',
-        'langgraph_automation.workflows.catalog',
-        'langgraph_automation.workflows.reference',
+        'cobalt_wren.apps.automation',
+        'cobalt_wren.plugins.registry',
+        'cobalt_wren.runtime.assembly',
+        'cobalt_wren.config.validator',
+        'cobalt_wren.workflows.catalog',
         'django',
         'django.conf',
         'django.db',

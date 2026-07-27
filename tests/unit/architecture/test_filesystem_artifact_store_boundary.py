@@ -8,18 +8,18 @@ from tests.support.import_scan import collect_import_targets
 
 
 def test_filesystem_artifact_store_does_not_import_django_or_app_layers() -> None:
-    targets = collect_import_targets(Path('src/langgraph_automation/integrations/artifact/filesystem_store.py'))
+    targets = collect_import_targets(Path('src/cobalt_wren/integrations/artifact/filesystem_store.py'))
     offenders = [
         target
         for target in targets
         if target.startswith(
             (
                 'django',
-                'langgraph_automation.apps.automation',
-                'langgraph_automation.graphs',
-                'langgraph_automation.workflows',
-                'langgraph_automation.runtime.assembly',
-                'langgraph_automation.apps.web',
+                'cobalt_wren.apps.automation',
+                'cobalt_wren.graphs',
+                'cobalt_wren.workflows',
+                'cobalt_wren.runtime.assembly',
+                'cobalt_wren.apps.web',
             )
         )
     ]
@@ -27,7 +27,7 @@ def test_filesystem_artifact_store_does_not_import_django_or_app_layers() -> Non
 
 
 def test_api_stores_does_not_export_filesystem_artifact_store() -> None:
-    import langgraph_automation.api.stores as stores_api
+    import cobalt_wren.api.stores as stores_api
 
     assert 'FilesystemArtifactStore' not in stores_api.__all__
     assert not hasattr(stores_api, 'FilesystemArtifactStore')

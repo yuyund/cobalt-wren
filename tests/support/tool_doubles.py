@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
-from langgraph_automation.integrations.tools.base import ToolResult
+from cobalt_wren.integrations.tools.base import ToolResult
 
 
 @dataclass(slots=True)

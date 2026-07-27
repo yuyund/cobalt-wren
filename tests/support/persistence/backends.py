@@ -13,13 +13,13 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable
 
-from langgraph_automation.integrations.artifact import (
+from cobalt_wren.integrations.artifact import (
     ArtifactStore,
     FilesystemArtifactStore,
     MemoryArtifactStore,
     S3ArtifactStore,
 )
-from langgraph_automation.integrations.checkpoint import (
+from cobalt_wren.integrations.checkpoint import (
     CheckpointStore,
     FilesystemCheckpointStore,
     MemoryCheckpointStore,
@@ -99,7 +99,7 @@ def artifact_backend_specs() -> tuple[ArtifactBackendSpec, ...]:
             name="filesystem",
             implementation=FilesystemArtifactStore,
             factory=lambda: FilesystemArtifactStore(
-                Path(tempfile.mkdtemp(prefix="langgraph-automation-artifact-"))
+                Path(tempfile.mkdtemp(prefix="cobalt-wren-artifact-"))
             ),
             durability=DurabilityLevel.PROCESS_DURABLE,
             capabilities=frozenset(
@@ -173,7 +173,7 @@ def checkpoint_backend_specs() -> tuple[CheckpointBackendSpec, ...]:
             name="filesystem",
             implementation=FilesystemCheckpointStore,
             factory=lambda: FilesystemCheckpointStore(
-                Path(tempfile.mkdtemp(prefix="langgraph-automation-checkpoint-"))
+                Path(tempfile.mkdtemp(prefix="cobalt-wren-checkpoint-"))
             ),
             durability=DurabilityLevel.PROCESS_DURABLE,
             capabilities=frozenset(
@@ -255,11 +255,11 @@ def _discover_concrete_types(package_name: str, protocol: type) -> frozenset[typ
 
 def discover_concrete_artifact_store_types() -> frozenset[type[ArtifactStore]]:
     return _discover_concrete_types(
-        "langgraph_automation.integrations.artifact", ArtifactStore
+        "cobalt_wren.integrations.artifact", ArtifactStore
     )
 
 
 def discover_concrete_checkpoint_store_types() -> frozenset[type[CheckpointStore]]:
     return _discover_concrete_types(
-        "langgraph_automation.integrations.checkpoint", CheckpointStore
+        "cobalt_wren.integrations.checkpoint", CheckpointStore
     )

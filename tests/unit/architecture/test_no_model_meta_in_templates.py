@@ -6,7 +6,7 @@ from pathlib import Path
 
 
 def test_templates_do_not_use_meta_introspection() -> None:
-    root = Path('src/langgraph_automation/apps/web/templates')
+    root = Path('src/cobalt_wren/apps/web/templates')
     offenders: list[str] = []
     for path in root.rglob('*.html'):
         if '_meta' in path.read_text():

@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from typing import cast
 
-from langgraph_automation.api.plugins import Plugin, PluginContributions, PluginMetadata
-from langgraph_automation.api.stores import ArtifactStore, CheckpointStore
-from langgraph_automation.api.workflow import WorkflowBuildContext, WorkflowContribution, WorkflowDefinition, WorkflowMetadata, WorkflowRequirements
+from cobalt_wren.api.plugins import Plugin, PluginContributions, PluginMetadata
+from cobalt_wren.api.stores import ArtifactStore, CheckpointStore
+from cobalt_wren.api.workflow import WorkflowBuildContext, WorkflowContribution, WorkflowDefinition, WorkflowMetadata, WorkflowRequirements
 
 from .workflow import PlainPythonExecutable
 

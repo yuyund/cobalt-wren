@@ -4,10 +4,10 @@ status: current
 authority: normative
 summary: Stable public error categories, safe payload shape, and execution-stage normalization.
 code_refs:
-  - src/langgraph_automation/api/errors.py
-  - src/langgraph_automation/workflows/prepare.py
-  - src/langgraph_automation/apps/automation/services/execution.py
-  - src/langgraph_automation/apps/automation/services/runs.py
+  - src/cobalt_wren/api/errors.py
+  - src/cobalt_wren/workflows/prepare.py
+  - src/cobalt_wren/apps/automation/services/execution.py
+  - src/cobalt_wren/apps/automation/services/runs.py
 test_refs:
   - tests/unit/api/test_error_contracts.py
   - tests/unit/api/test_public_errors_imports.py
@@ -21,7 +21,7 @@ verified:
 ---
 # Error Taxonomy
 
-This document defines the error taxonomy for `langgraph-automation`.
+This document defines the error taxonomy for `cobalt-wren`.
 
 Purpose:
 
@@ -598,7 +598,7 @@ The framework owns safe message construction.
 
 ## api.errors
 
-The minimal public facade is implemented in `src/langgraph_automation/api/errors.py` and staged in `../../api/errors/API_ERRORS_FACADE.md`.
+The minimal public facade is implemented in `src/cobalt_wren/api/errors.py` and staged in `../../api/errors/API_ERRORS_FACADE.md`.
 The broader taxonomy remains staged here for future extensions.
 
 Implemented public facade:

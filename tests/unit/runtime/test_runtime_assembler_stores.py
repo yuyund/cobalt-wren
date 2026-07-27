@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from langgraph_automation.config.models import (
+from cobalt_wren.config.models import (
     CheckpointStoreSettings,
     EffectivePluginSet,
     FilesystemArtifactStoreSettings,
@@ -20,12 +20,12 @@ from langgraph_automation.config.models import (
     ToolsConfig,
     ValidatedPackageConfig,
 )
-from langgraph_automation.api.errors import ArtifactPersistenceError
-from langgraph_automation.integrations.artifact import ArtifactReadResult, ArtifactWriteRequest, FilesystemArtifactStore, MemoryArtifactStore
-from langgraph_automation.integrations.checkpoint import CheckpointReadResult, CheckpointWriteRequest, FilesystemCheckpointStore, MemoryCheckpointStore
-from langgraph_automation.runtime import assembly as runtime_assembly
-from langgraph_automation.runtime.assembly import RuntimeAssembler
-from langgraph_automation.runtime.secrets import EnvSecretResolver
+from cobalt_wren.api.errors import ArtifactPersistenceError
+from cobalt_wren.integrations.artifact import ArtifactReadResult, ArtifactWriteRequest, FilesystemArtifactStore, MemoryArtifactStore
+from cobalt_wren.integrations.checkpoint import CheckpointReadResult, CheckpointWriteRequest, FilesystemCheckpointStore, MemoryCheckpointStore
+from cobalt_wren.runtime import assembly as runtime_assembly
+from cobalt_wren.runtime.assembly import RuntimeAssembler
+from cobalt_wren.runtime.secrets import EnvSecretResolver
 
 
 def _validated_config(

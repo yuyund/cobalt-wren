@@ -19,24 +19,24 @@ def _imported_modules(path: Path) -> list[str]:
 
 def test_runtime_package_does_not_import_forbidden_boundaries() -> None:
     forbidden_prefixes = (
-        'langgraph_automation.plugins.registry',
-        'langgraph_automation.apps.automation',
-        'langgraph_automation.graphs.runner',
-        'langgraph_automation.graphs.builders',
-        'langgraph_automation.workflows.catalog',
-        'langgraph_automation.integrations.',
+        'cobalt_wren.plugins.registry',
+        'cobalt_wren.apps.automation',
+        'cobalt_wren.graphs.runner',
+        'cobalt_wren.graphs.builders',
+        'cobalt_wren.workflows.catalog',
+        'cobalt_wren.integrations.',
         'django',
     )
     allowed_imports = {
-        'langgraph_automation.integrations.checkpoint.base',
+        'cobalt_wren.integrations.checkpoint.base',
     }
 
     for relative in (
-        Path('src/langgraph_automation/runtime/__init__.py'),
-        Path('src/langgraph_automation/runtime/dependencies.py'),
-        Path('src/langgraph_automation/runtime/context.py'),
-        Path('src/langgraph_automation/runtime/secrets.py'),
-        Path('src/langgraph_automation/runtime/assembly.py'),
+        Path('src/cobalt_wren/runtime/__init__.py'),
+        Path('src/cobalt_wren/runtime/dependencies.py'),
+        Path('src/cobalt_wren/runtime/context.py'),
+        Path('src/cobalt_wren/runtime/secrets.py'),
+        Path('src/cobalt_wren/runtime/assembly.py'),
     ):
         modules = _imported_modules(relative)
         offenders = [module for module in modules if module.startswith(forbidden_prefixes) and module not in allowed_imports]
@@ -46,11 +46,11 @@ def test_runtime_package_does_not_import_forbidden_boundaries() -> None:
 def test_runtime_package_may_import_public_facades_only() -> None:
     modules = []
     for relative in (
-        Path('src/langgraph_automation/runtime/context.py'),
-        Path('src/langgraph_automation/runtime/secrets.py'),
-        Path('src/langgraph_automation/runtime/assembly.py'),
+        Path('src/cobalt_wren/runtime/context.py'),
+        Path('src/cobalt_wren/runtime/secrets.py'),
+        Path('src/cobalt_wren/runtime/assembly.py'),
     ):
         modules.extend(_imported_modules(relative))
 
-    assert any(module.startswith('langgraph_automation.api.errors') for module in modules)
-    assert any(module.startswith('langgraph_automation.config.models') for module in modules)
+    assert any(module.startswith('cobalt_wren.api.errors') for module in modules)
+    assert any(module.startswith('cobalt_wren.config.models') for module in modules)

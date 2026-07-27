@@ -2,14 +2,14 @@ from __future__ import annotations
 
 import pytest
 
-from langgraph_automation.api.workflow import WorkflowRequirements
-from langgraph_automation.apps.automation.models.run import Run, RunStatus
-from langgraph_automation.apps.automation.models.workflow import Workflow
-from langgraph_automation.apps.automation.services import runs as run_services
-from langgraph_automation.apps.automation.services import runtime as runtime_module
-from langgraph_automation.apps.automation.services.workflow_reference import WorkflowReference
-from langgraph_automation.integrations.artifact.base import ArtifactStore
-from langgraph_automation.integrations.checkpoint.base import CheckpointStore
+from cobalt_wren.api.workflow import WorkflowRequirements
+from cobalt_wren.apps.automation.models.run import Run, RunStatus
+from cobalt_wren.apps.automation.models.workflow import Workflow
+from cobalt_wren.apps.automation.services import runs as run_services
+from cobalt_wren.apps.automation.services import runtime as runtime_module
+from cobalt_wren.apps.automation.services.workflow_reference import WorkflowReference
+from cobalt_wren.integrations.artifact.base import ArtifactStore
+from cobalt_wren.integrations.checkpoint.base import CheckpointStore
 from tests.external_packages.acme_workflows.plugin import (
     EXTERNAL_WORKFLOW_KIND,
     ExternalGraph,

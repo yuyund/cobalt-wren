@@ -1,0 +1,36 @@
+{% load ui_presentation %}
+<div class="card mb-4" data-component="run.llm_conversation">
+  <div class="card-header"><div><h2 class="card-title mb-1">LLM conversation</h2><div class="text-secondary">Redacted, bounded previews from framework-neutral LLM spans</div></div></div>
+  <div class="card-body">
+    {% if live.llm_interactions %}
+    <div class="llm-conversation-list">
+      {% for interaction in live.llm_interactions %}
+      <details class="llm-interaction" data-status="{{ interaction.status }}" {% if forloop.last %}open{% endif %}>
+        <summary class="d-flex flex-wrap gap-2 align-items-center">
+          <span class="fw-semibold">{{ interaction.node_name }}</span>
+          <span class="badge {{ interaction.status|status_badge_class }}">{{ interaction.status }}</span>
+          {% if interaction.attempt > 1 %}<span class="badge bg-yellow-lt text-yellow">Attempt {{ interaction.attempt }}</span>{% endif %}
+          <span class="text-secondary small">{{ interaction.provider }} / {{ interaction.model }}</span>
+        </summary>
+        <div class="pt-2">
+          {% if interaction.messages %}
+            {% for message in interaction.messages %}
+            <div class="llm-message llm-message-{{ message.role|lower }}">
+              <div class="llm-message-role">{{ message.role }}</div>
+              <div class="llm-message-body">{{ message.preview|linebreaksbr }}</div>
+            </div>
+            {% endfor %}
+          {% else %}
+          <div class="llm-message llm-message-user"><div class="llm-message-role">Prompt preview</div><div class="llm-message-body">{% if interaction.prompt_preview %}{{ interaction.prompt_preview|linebreaksbr }}{% else %}<span class="text-secondary">No prompt preview recorded</span>{% endif %}</div></div>
+          {% endif %}
+          <div class="llm-message llm-message-assistant"><div class="llm-message-role">Assistant</div><div class="llm-message-body">{% if interaction.response_preview %}{{ interaction.response_preview|linebreaksbr }}{% else %}<span class="text-secondary">Waiting for response</span>{% endif %}</div></div>
+          <div class="d-flex flex-wrap gap-3 align-items-center text-secondary small mt-2"><span>Input {{ interaction.input_tokens }} tokens</span><span>Output {{ interaction.output_tokens }} tokens</span><span>{{ interaction.duration }}</span><a href="{{ interaction.url }}">Open span</a></div>
+        </div>
+      </details>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty py-4"><p class="empty-title">No LLM interaction recorded</p><p class="empty-subtitle text-secondary">This section appears when a workflow emits a standard LLM execution span.</p></div>
+    {% endif %}
+  </div>
+</div>

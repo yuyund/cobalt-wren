@@ -1,0 +1,5 @@
+<section id="run-live-state" class="mb-4" data-run-id="{{ live.run_id }}" data-revision="{{ live.revision }}" data-terminal="{{ live.terminal|yesno:'true,false' }}" data-stream-url="{{ live.stream_url }}" data-fragment-url="{{ live.fragment_url }}">
+  {% for component in components %}
+    {% include component.template_name with live=live only %}
+  {% endfor %}
+</section>

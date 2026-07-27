@@ -10,10 +10,10 @@ PACKAGE_SRC = ROOT / "packages" / "human_approval_workflow" / "src"
 sys.path.insert(0, str(PACKAGE_SRC))
 
 from human_approval_workflow import WORKFLOW_KIND, create_plugin  # noqa: E402
-from langgraph_automation.apps.automation.models.run import Run, RunStatus  # noqa: E402
-from langgraph_automation.apps.automation.models.workflow import Workflow  # noqa: E402
-from langgraph_automation.apps.automation.services import runs as run_services  # noqa: E402
-from langgraph_automation.apps.automation.services import runtime as runtime_module  # noqa: E402
+from cobalt_wren.apps.automation.models.run import Run, RunStatus  # noqa: E402
+from cobalt_wren.apps.automation.models.workflow import Workflow  # noqa: E402
+from cobalt_wren.apps.automation.services import runs as run_services  # noqa: E402
+from cobalt_wren.apps.automation.services import runtime as runtime_module  # noqa: E402
 
 
 @pytest.mark.django_db

@@ -9,8 +9,8 @@ PACKAGE_SRC = ROOT / "packages" / "human_approval_workflow" / "src"
 sys.path.insert(0, str(PACKAGE_SRC))
 
 from human_approval_workflow import WORKFLOW_KIND, create_plugin  # noqa: E402
-from langgraph_automation.api.engine import create_engine  # noqa: E402
-from langgraph_automation.api.workflow import WorkflowExecutionContext, WorkflowResumeRequest  # noqa: E402
+from cobalt_wren.api.engine import create_engine  # noqa: E402
+from cobalt_wren.api.workflow import WorkflowExecutionContext, WorkflowResumeRequest  # noqa: E402
 
 
 def _engine(tmp_path: Path):
@@ -72,7 +72,7 @@ def test_revision_loops_back_to_a_second_pause_then_can_be_rejected(tmp_path: Pa
 
 
 def test_plain_python_resumable_uses_same_public_contract() -> None:
-    from langgraph_automation.workflows.adapter import execute_workflow, resume_workflow
+    from cobalt_wren.workflows.adapter import execute_workflow, resume_workflow
 
     class PlainPythonWorkflow:
         def execute(self, input_payload, *, context):

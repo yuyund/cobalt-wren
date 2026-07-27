@@ -4,8 +4,8 @@ status: current
 authority: normative
 summary: Artifact emission identity and explicit persistence contract.
 code_refs:
-  - src/langgraph_automation/integrations/artifact/emission.py
-  - src/langgraph_automation/integrations/artifact/mapping.py
+  - src/cobalt_wren/integrations/artifact/emission.py
+  - src/cobalt_wren/integrations/artifact/mapping.py
 test_refs:
   - tests/unit/architecture/test_artifact_emission_boundary.py
   - tests/unit/artifact/test_artifact_emission_contract.py

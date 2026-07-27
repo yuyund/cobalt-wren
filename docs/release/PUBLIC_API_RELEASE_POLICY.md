@@ -4,12 +4,12 @@ status: current
 authority: normative
 summary: Versioning, deprecation, compatibility, and support policy for the public workflow platform API.
 code_refs:
-  - src/langgraph_automation/api/plugins.py
-  - src/langgraph_automation/api/workflow.py
-  - src/langgraph_automation/api/stores.py
-  - src/langgraph_automation/api/errors.py
-  - src/langgraph_automation/testing
-  - src/langgraph_automation/scaffold/workflow_package.py
+  - src/cobalt_wren/api/plugins.py
+  - src/cobalt_wren/api/workflow.py
+  - src/cobalt_wren/api/stores.py
+  - src/cobalt_wren/api/errors.py
+  - src/cobalt_wren/testing
+  - src/cobalt_wren/scaffold/workflow_package.py
 test_refs:
   - tests/unit/api/test_public_plugins_imports.py
   - tests/unit/api/test_plugin_api_version.py
@@ -25,7 +25,7 @@ verified:
 
 ## Stable surface
 
-The intended stable external surface consists of `langgraph_automation.api.workflow`, `.plugins`, `.stores`, `.events`, `.errors`, `.engine`, `langgraph_automation.testing`, the `langgraph_automation.plugins` entry-point group, the deployment JSON schema, and the command-line interface documented for external consumers. Django models, application services, renderer internals, and integration implementations remain implementation details unless separately documented.
+The intended stable external surface consists of `cobalt_wren.api.workflow`, `.plugins`, `.stores`, `.events`, `.errors`, `.engine`, `cobalt_wren.testing`, the `cobalt_wren.plugins` entry-point group, the deployment JSON schema, and the command-line interface documented for external consumers. Django models, application services, renderer internals, and integration implementations remain implementation details unless separately documented.
 
 ## Versioning
 

@@ -37,12 +37,12 @@ def test_separate_distribution_installs_and_executes_via_entry_point(
     script = """
 import json
 from importlib import metadata
-from langgraph_automation.api.engine import create_engine
+from cobalt_wren.api.engine import create_engine
 distributions = {dist.metadata["Name"] for dist in metadata.distributions()}
-entries = metadata.entry_points().select(group="langgraph_automation.plugins")
+entries = metadata.entry_points().select(group="cobalt_wren.plugins")
 prepared = create_engine({"version": 1, "environment": "test"}, discover_plugins=True).prepare_workflow("acme.installed_review", config={"prefix": "wheel"})
 result = prepared.execute({"request_id": "REQ-9"})
-print(json.dumps({"foundation_installed": "langgraph-automation" in distributions, "external_installed": "acme-workflows" in distributions, "entry_points": sorted(entry.name for entry in entries), "output": dict(result.output)}))
+print(json.dumps({"foundation_installed": "cobalt-wren" in distributions, "external_installed": "acme-workflows" in distributions, "entry_points": sorted(entry.name for entry in entries), "output": dict(result.output)}))
 """
     env = dict(os.environ)
     env["PYTHONPATH"] = os.pathsep.join(site.getsitepackages())

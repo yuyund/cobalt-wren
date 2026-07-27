@@ -1,11 +1,11 @@
 # api.errors Minimal Facade
 
-This document defines the minimal public facade policy for `langgraph_automation.api.errors`.
+This document defines the minimal public facade policy for `cobalt_wren.api.errors`.
 
 Implementation status:
 
 - minimal facade is implemented
-- public error classes are exported from `src/langgraph_automation/api/errors.py`
+- public error classes are exported from `src/cobalt_wren/api/errors.py`
 
 Purpose:
 
@@ -419,7 +419,7 @@ Phase E1:
 
 Phase E2:
 
-- `src/langgraph_automation/api/errors.py`
+- `src/cobalt_wren/api/errors.py`
 - minimal import tests
 
 Phase E3:

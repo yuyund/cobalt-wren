@@ -4,13 +4,13 @@ status: current
 authority: explanatory
 summary: S3-compatible artifact storage and PostgreSQL checkpoint storage for shared production deployments.
 code_refs:
-  - src/langgraph_automation/integrations/artifact/s3_store.py
-  - src/langgraph_automation/integrations/checkpoint/postgres_store.py
-  - src/langgraph_automation/config/artifact_store.py
-  - src/langgraph_automation/config/checkpoint_store.py
-  - src/langgraph_automation/config/models.py
-  - src/langgraph_automation/runtime/artifact_store.py
-  - src/langgraph_automation/runtime/checkpoint_store.py
+  - src/cobalt_wren/integrations/artifact/s3_store.py
+  - src/cobalt_wren/integrations/checkpoint/postgres_store.py
+  - src/cobalt_wren/config/artifact_store.py
+  - src/cobalt_wren/config/checkpoint_store.py
+  - src/cobalt_wren/config/models.py
+  - src/cobalt_wren/runtime/artifact_store.py
+  - src/cobalt_wren/runtime/checkpoint_store.py
   - pyproject.toml
 test_refs:
   - tests/contract/persistence/test_persistence_backend_registration.py

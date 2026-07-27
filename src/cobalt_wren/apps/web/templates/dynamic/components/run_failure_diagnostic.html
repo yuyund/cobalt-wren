@@ -1,0 +1,16 @@
+{% if live.failure %}
+<div class="card mb-4 border-danger" data-component="run.failure_diagnostic">
+  <div class="card-header"><div><h2 class="card-title mb-1">Failure diagnostics</h2><div class="text-secondary">Human-readable context from the failed control-plane records</div></div></div>
+  <div class="card-body">
+    <div class="alert alert-danger mb-4" role="alert"><div class="fw-semibold">{{ live.failure.error_message }}</div></div>
+    <div class="row g-3 mb-4">
+      <div class="col-12 col-md-6 col-xl-3"><div class="datagrid-item"><div class="datagrid-title">Failed activity</div><div class="datagrid-content"><a href="{{ live.failure.failed_span_url }}">{{ live.failure.failed_activity }}</a></div></div></div>
+      <div class="col-12 col-md-6 col-xl-3"><div class="datagrid-item"><div class="datagrid-title">Span type</div><div class="datagrid-content">{{ live.failure.span_type }}</div></div></div>
+      <div class="col-12 col-md-6 col-xl-3"><div class="datagrid-item"><div class="datagrid-title">Attempt</div><div class="datagrid-content">{{ live.failure.attempt }}</div></div></div>
+      <div class="col-12 col-md-6 col-xl-3"><div class="datagrid-item"><div class="datagrid-title">Last successful activity</div><div class="datagrid-content">{{ live.failure.last_successful_activity }}</div></div></div>
+    </div>
+    {% if live.failure.input_value %}<section class="failure-diagnostic-section mb-4"><h3 class="h4 mb-2">Input at failure</h3>{% include 'dynamic/components/value.html' with value=live.failure.input_value compact=False only %}</section>{% endif %}
+    <section class="failure-diagnostic-section"><h3 class="h4 mb-2">Failure event</h3><div class="mb-2"><span class="badge bg-red-lt text-red">{{ live.failure.event_type }}</span>{% if live.failure.event_message %}<span class="ms-2">{{ live.failure.event_message }}</span>{% endif %}</div>{% if live.failure.event_value %}{% include 'dynamic/components/value.html' with value=live.failure.event_value compact=False only %}{% endif %}</section>
+  </div>
+</div>
+{% endif %}

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 
-from langgraph_automation.core.redaction import REDACTED_VALUE, TRUNCATED_VALUE, redact_mapping, redact_text, redact_value
+from cobalt_wren.core.redaction import REDACTED_VALUE, TRUNCATED_VALUE, redact_mapping, redact_text, redact_value
 
 
 def test_redact_text_handles_bearer_and_key_value_patterns() -> None:

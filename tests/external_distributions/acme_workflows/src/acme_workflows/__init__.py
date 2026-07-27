@@ -2,8 +2,8 @@
 from __future__ import annotations
 from collections.abc import Mapping
 from dataclasses import dataclass
-from langgraph_automation.api.plugins import Plugin, PluginContributions, PluginMetadata
-from langgraph_automation.api.workflow import WorkflowBuildContext, WorkflowContribution, WorkflowDefinition, WorkflowMetadata, WorkflowRequirements
+from cobalt_wren.api.plugins import Plugin, PluginContributions, PluginMetadata
+from cobalt_wren.api.workflow import WorkflowBuildContext, WorkflowContribution, WorkflowDefinition, WorkflowMetadata, WorkflowRequirements
 
 WORKFLOW_KIND = "acme.installed_review"
 

@@ -4,8 +4,12 @@ from __future__ import annotations
 
 import pytest
 
-from langgraph_automation.api.engine import create_engine
-from langgraph_automation.api.errors import RuntimeAssemblyError
+from cobalt_wren.api.engine import create_engine
+from cobalt_wren.api.errors import RuntimeAssemblyError
+from tests.support.native_workflow_fixtures import (
+    TEST_NATIVE_WORKFLOW_KIND,
+    create_test_native_plugin,
+)
 
 
 def _reference_config() -> dict[str, object]:
@@ -35,7 +39,7 @@ def test_create_engine_wraps_arbitrary_runtime_failures_without_leaking_raw_mess
         raise ValueError("password=secret-value")
 
     monkeypatch.setenv("OPENAI_API_KEY", "test-key")
-    monkeypatch.setattr("langgraph_automation.api.engine.RuntimeAssembler.assemble", boom)
+    monkeypatch.setattr("cobalt_wren.api.engine.RuntimeAssembler.assemble", boom)
 
     with pytest.raises(RuntimeAssemblyError) as excinfo:
         create_engine(_reference_config())
@@ -47,15 +51,19 @@ def test_create_engine_wraps_arbitrary_runtime_failures_without_leaking_raw_mess
 
 def test_prepare_workflow_wraps_arbitrary_failures_without_leaking_raw_message(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("OPENAI_API_KEY", "test-key")
-    engine = create_engine(_reference_config())
+    engine = create_engine(
+        _reference_config(),
+        plugins=(create_test_native_plugin(),),
+        discover_plugins=False,
+    )
 
     def boom(*args, **kwargs):
         raise ValueError("password=secret-value")
 
-    monkeypatch.setattr("langgraph_automation.api.engine.WorkflowPreparer.prepare", boom)
+    monkeypatch.setattr("cobalt_wren.api.engine.WorkflowPreparer.prepare", boom)
 
     with pytest.raises(RuntimeAssemblyError) as excinfo:
-        engine.prepare_workflow("reference.llm_echo_summary")
+        engine.prepare_workflow(TEST_NATIVE_WORKFLOW_KIND)
 
     assert excinfo.value.code == "ENGINE_WORKFLOW_PREPARATION_FAILED"
     assert "secret-value" not in excinfo.value.safe_message

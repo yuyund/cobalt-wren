@@ -17,7 +17,7 @@ def test_package_facade_design_docs_exist_and_cover_core_terms() -> None:
     adr_text = adr.read_text()
 
     for token in (
-        'langgraph_automation.api.engine',
+        'cobalt_wren.api.engine',
         'create_engine',
         'AutomationEngine',
         'EnginePreparedWorkflow',

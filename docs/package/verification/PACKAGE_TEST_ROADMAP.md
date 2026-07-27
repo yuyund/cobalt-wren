@@ -13,7 +13,7 @@ Status update:
 
 Purpose:
 
-- enforce a package-wide boundary for `src/langgraph_automation/apps/automation/**/*.py`
+- enforce a package-wide boundary for `src/cobalt_wren/apps/automation/**/*.py`
 
 Allowed changes:
 
@@ -156,7 +156,7 @@ Target checks:
 - graph execution public API
 - worker / queue / outbox
 - true resume
-- external plugin discovery
-- entry point discovery
+- plugin API version migration
+- broken-plugin partial-startup policy
 - `company_agent`
 - production application workflow

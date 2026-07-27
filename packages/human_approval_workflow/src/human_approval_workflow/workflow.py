@@ -12,8 +12,8 @@ from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.graph import END, START, StateGraph
 from langgraph.types import Command, interrupt
 
-from langgraph_automation.api.stores import ArtifactStore, ArtifactWriteRequest, CheckpointStore, CheckpointWriteRequest, StoredArtifact, StoredCheckpoint
-from langgraph_automation.api.workflow import WorkflowExecutionContext, WorkflowExecutionResult, WorkflowResumeRequest
+from cobalt_wren.api.stores import ArtifactStore, ArtifactWriteRequest, CheckpointStore, CheckpointWriteRequest, StoredArtifact, StoredCheckpoint
+from cobalt_wren.api.workflow import WorkflowExecutionContext, WorkflowExecutionResult, WorkflowResumeRequest
 
 _NAMESPACE = "human-approval"
 _PAUSE_CHECKPOINT_ID = "approval-pause"

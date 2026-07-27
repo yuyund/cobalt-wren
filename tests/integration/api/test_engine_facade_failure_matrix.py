@@ -6,10 +6,10 @@ from collections.abc import Callable
 
 import pytest
 
-from langgraph_automation.api.engine import create_engine
-from langgraph_automation.api.errors import ConfigError, PluginRegistrationError, PluginResolutionError, RuntimeAssemblyError
-from langgraph_automation.api.plugins import EventSinkContribution, Plugin, PluginContributions, PluginMetadata, ProviderContribution, ToolContribution
-from langgraph_automation.api.workflow import WorkflowContribution, WorkflowDefinition, WorkflowMetadata, WorkflowRequirements
+from cobalt_wren.api.engine import create_engine
+from cobalt_wren.api.errors import ConfigError, PluginRegistrationError, PluginResolutionError, RuntimeAssemblyError
+from cobalt_wren.api.plugins import EventSinkContribution, Plugin, PluginContributions, PluginMetadata, ProviderContribution, ToolContribution
+from cobalt_wren.api.workflow import WorkflowContribution, WorkflowDefinition, WorkflowMetadata, WorkflowRequirements
 
 
 def _minimal_config() -> dict[str, object]:
@@ -120,7 +120,7 @@ def _forbid_runtime_execution(monkeypatch: pytest.MonkeyPatch) -> None:
         raise AssertionError("tool execution should not happen during preparation")
 
     monkeypatch.setattr("litellm.completion", forbid_completion)
-    monkeypatch.setattr("langgraph_automation.integrations.tools.safe_tools.EchoTool.__call__", forbid_tool_call)
+    monkeypatch.setattr("cobalt_wren.integrations.tools.safe_tools.EchoTool.__call__", forbid_tool_call)
 
 
 def test_unknown_workflow_kind_is_safe() -> None:
@@ -135,10 +135,16 @@ def test_unknown_workflow_kind_is_safe() -> None:
 
 
 def test_missing_provider_requirement_is_safe() -> None:
-    engine = create_engine(_minimal_config())
+    plugin = _workflow_plugin(
+        plugin_name="tests.needs-provider",
+        workflow_kind="test.needs-provider",
+        requirements=WorkflowRequirements(provider_profiles=("default",)),
+        build=lambda: object(),
+    )
+    engine = create_engine(_minimal_config(), plugins=(plugin,))
 
     with pytest.raises(RuntimeAssemblyError) as excinfo:
-        engine.prepare_workflow("reference.llm_echo_summary")
+        engine.prepare_workflow("test.needs-provider")
 
     assert excinfo.value.code == "WORKFLOW_REQUIREMENT_MISSING"
     assert excinfo.value.component == "workflow_requirements"
@@ -149,10 +155,19 @@ def test_missing_provider_requirement_is_safe() -> None:
 @pytest.mark.usefixtures("monkeypatch")
 def test_missing_tool_requirement_is_safe(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("OPENAI_API_KEY", "test-key")
-    engine = create_engine(_reference_config(include_tool=False))
+    plugin = _workflow_plugin(
+        plugin_name="tests.needs-tool",
+        workflow_kind="test.needs-tool",
+        requirements=WorkflowRequirements(tools=("echo",)),
+        build=lambda: object(),
+    )
+    engine = create_engine(
+        _reference_config(include_tool=False),
+        plugins=(plugin,),
+    )
 
     with pytest.raises(RuntimeAssemblyError) as excinfo:
-        engine.prepare_workflow("reference.llm_echo_summary")
+        engine.prepare_workflow("test.needs-tool")
 
     assert excinfo.value.code == "WORKFLOW_REQUIREMENT_MISSING"
     assert excinfo.value.metadata["requirement_type"] == "tool"

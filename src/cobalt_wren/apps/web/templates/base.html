@@ -1,0 +1,18 @@
+{% load static %}
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}Automation Control Plane{% endblock %}</title>
+<link rel="stylesheet" href="{% static 'cobalt_wren/vendor/tabler/tabler.min.css' %}">
+<link rel="stylesheet" href="{% static 'cobalt_wren/theme-tokens.css' %}">
+<link rel="stylesheet" href="{% static 'cobalt_wren/components.css' %}">
+<script defer src="{% static 'cobalt_wren/vendor/tabler/tabler.min.js' %}"></script>
+<script defer src="{% static 'cobalt_wren/vendor/htmx/htmx.min.js' %}"></script>
+<script defer src="{% static 'cobalt_wren/live-run.js' %}"></script>
+</head><body><div class="page">
+<header class="navbar navbar-expand-md d-print-none"><div class="container-xl">
+<a class="navbar-brand navbar-brand-autodark" href="/ui/runs/">Automation Control Plane</a>
+<nav class="navbar-nav flex-row order-md-last" aria-label="Primary">
+<a class="nav-link" href="/ui/runs/">Runs</a><a class="nav-link" href="/ui/workflows/">Workflows</a><a class="nav-link" href="/ui/integrations/">Integrations</a><a class="nav-link" href="/ui/artifacts/">Artifacts</a><a class="nav-link" href="/ui/checkpoints/">Checkpoints</a><a class="nav-link" href="/ui/events/">Events</a><a class="nav-link" href="/ui/spans/">Spans</a>
+</nav></div></header>
+<main class="page-wrapper"><div class="page-body"><div class="container-xl">{% block content %}{% endblock %}</div></div></main>
+</div></body></html>

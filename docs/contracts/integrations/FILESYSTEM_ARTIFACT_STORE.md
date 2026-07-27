@@ -4,7 +4,7 @@ status: current
 authority: normative
 summary: Filesystem artifact store immutability, integrity, and durability contract.
 code_refs:
-  - src/langgraph_automation/integrations/artifact
+  - src/cobalt_wren/integrations/artifact
 test_refs:
   - tests/unit/integrations
   - tests/unit/architecture/test_filesystem_artifact_store_boundary.py

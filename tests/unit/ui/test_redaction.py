@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from langgraph_automation.apps.automation.ui.redaction import redact_payload, redact_value
-from langgraph_automation.core.redaction import REDACTED_VALUE
+from cobalt_wren.apps.automation.ui.redaction import redact_payload, redact_value
+from cobalt_wren.core.redaction import REDACTED_VALUE
 
 
 def test_redact_value_hides_sensitive_fields() -> None:

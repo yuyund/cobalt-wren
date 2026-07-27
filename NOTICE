@@ -1,0 +1,10 @@
+Cobalt Wren
+Copyright 2026 Yudai Maruyama
+
+This product includes Tabler assets licensed under the MIT License.
+The original license is distributed at:
+src/cobalt_wren/apps/web/static/cobalt_wren/vendor/tabler/LICENSE
+
+This product includes htmx 2.0.4 assets licensed under the Zero-Clause BSD
+License. The original license is distributed at:
+src/cobalt_wren/apps/web/static/cobalt_wren/vendor/htmx/LICENSE

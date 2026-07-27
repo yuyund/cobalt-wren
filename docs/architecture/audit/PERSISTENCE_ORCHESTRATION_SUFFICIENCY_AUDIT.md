@@ -32,7 +32,7 @@ Recommended target model:
 Configuration ownership note:
 
 - physical persistence configuration is bound once at application composition
-- the production deployment source is `LANGGRAPH_AUTOMATION` in Django settings, loaded once by `AutomationConfig.ready()`
+- the production deployment source is `COBALT_WREN` in Django settings, loaded once by `AutomationConfig.ready()`
 - `NormalizedPackageConfig` is not accepted as a per-run override on `start_run()` / `retry_run()`
 - `AutomationConfig.ready()` binds the normalized startup configuration, then publishes `RunExecutionServices` with a bound runtime factory
 - runtime assembly constructs the concrete artifact and checkpoint stores once per runtime build
@@ -85,30 +85,30 @@ Out of scope:
 
 ### Package execution and runtime
 
-- `src/langgraph_automation/apps/automation/services/runs.py`
-- `src/langgraph_automation/apps/automation/services/execution.py`
-- `src/langgraph_automation/apps/automation/services/runtime.py`
-- `src/langgraph_automation/workflows/prepare.py`
-- `src/langgraph_automation/workflows/adapter.py`
-- `src/langgraph_automation/graphs/builders.py`
-- `src/langgraph_automation/graphs/runner.py`
-- `src/langgraph_automation/graphs/runtime.py`
-- `src/langgraph_automation/runtime/assembly.py`
-- `src/langgraph_automation/runtime/dependencies.py`
-- `src/langgraph_automation/runtime/artifact_store.py`
-- `src/langgraph_automation/runtime/checkpoint_store.py`
+- `src/cobalt_wren/apps/automation/services/runs.py`
+- `src/cobalt_wren/apps/automation/services/execution.py`
+- `src/cobalt_wren/apps/automation/services/runtime.py`
+- `src/cobalt_wren/workflows/prepare.py`
+- `src/cobalt_wren/workflows/adapter.py`
+- `src/cobalt_wren/graphs/builders.py`
+- `src/cobalt_wren/graphs/runner.py`
+- `src/cobalt_wren/graphs/runtime.py`
+- `src/cobalt_wren/runtime/assembly.py`
+- `src/cobalt_wren/runtime/dependencies.py`
+- `src/cobalt_wren/runtime/artifact_store.py`
+- `src/cobalt_wren/runtime/checkpoint_store.py`
 
 ### Application and control-plane
 
-- `src/langgraph_automation/apps/automation/models/run.py`
-- `src/langgraph_automation/apps/automation/models/execution.py`
-- `src/langgraph_automation/apps/automation/models/artifact.py`
-- `src/langgraph_automation/apps/automation/models/checkpoint.py`
-- `src/langgraph_automation/apps/automation/models/event.py`
-- `src/langgraph_automation/apps/automation/policies/runs.py`
-- `src/langgraph_automation/integrations/observability/base.py`
-- `src/langgraph_automation/integrations/observability/django_event_sink.py`
-- `src/langgraph_automation/integrations/observability/types.py`
+- `src/cobalt_wren/apps/automation/models/run.py`
+- `src/cobalt_wren/apps/automation/models/execution.py`
+- `src/cobalt_wren/apps/automation/models/artifact.py`
+- `src/cobalt_wren/apps/automation/models/checkpoint.py`
+- `src/cobalt_wren/apps/automation/models/event.py`
+- `src/cobalt_wren/apps/automation/policies/runs.py`
+- `src/cobalt_wren/integrations/observability/base.py`
+- `src/cobalt_wren/integrations/observability/django_event_sink.py`
+- `src/cobalt_wren/integrations/observability/types.py`
 
 ### Installed LangGraph source
 
@@ -120,22 +120,22 @@ Out of scope:
 ### Primary production path
 
 `application composition`
-  -> `src/langgraph_automation/apps/automation/services/runtime.py:build_run_execution_services`
-  -> `src/langgraph_automation/apps/automation/services/runtime.py:ApplicationRuntimeFactory`
-  -> `src/langgraph_automation/apps/automation/services/runtime.py:RunExecutionServices`
-  -> `src/langgraph_automation/apps/automation/services/runs.py:start_run`
-  -> `src/langgraph_automation/apps/automation/services/runs.py:_make_runtime`
-  -> `src/langgraph_automation/apps/automation/services/runtime.py:RunExecutionServices.build_graph_runtime`
-  -> `src/langgraph_automation/apps/automation/services/runtime.py:ApplicationRuntimeFactory.build_graph_runtime`
-  -> `src/langgraph_automation/apps/automation/services/runtime.py:build_graph_runtime`
-  -> `src/langgraph_automation/apps/automation/services/runtime.py:build_event_sink`
-  -> `src/langgraph_automation/apps/automation/services/runtime.py:build_artifact_store`
-  -> `src/langgraph_automation/apps/automation/services/runtime.py:build_checkpoint_store`
-  -> `src/langgraph_automation/apps/automation/services/execution.py:dispatch_run_execution`
-  -> `src/langgraph_automation/graphs/runner.py:LangGraphRunner.run_graph_once`
-  -> `src/langgraph_automation/graphs/runner.py:LangGraphRunner._invoke_graph`
+  -> `src/cobalt_wren/apps/automation/services/runtime.py:build_run_execution_services`
+  -> `src/cobalt_wren/apps/automation/services/runtime.py:ApplicationRuntimeFactory`
+  -> `src/cobalt_wren/apps/automation/services/runtime.py:RunExecutionServices`
+  -> `src/cobalt_wren/apps/automation/services/runs.py:start_run`
+  -> `src/cobalt_wren/apps/automation/services/runs.py:_make_runtime`
+  -> `src/cobalt_wren/apps/automation/services/runtime.py:RunExecutionServices.build_graph_runtime`
+  -> `src/cobalt_wren/apps/automation/services/runtime.py:ApplicationRuntimeFactory.build_graph_runtime`
+  -> `src/cobalt_wren/apps/automation/services/runtime.py:build_graph_runtime`
+  -> `src/cobalt_wren/apps/automation/services/runtime.py:build_event_sink`
+  -> `src/cobalt_wren/apps/automation/services/runtime.py:build_artifact_store`
+  -> `src/cobalt_wren/apps/automation/services/runtime.py:build_checkpoint_store`
+  -> `src/cobalt_wren/apps/automation/services/execution.py:dispatch_run_execution`
+  -> `src/cobalt_wren/graphs/runner.py:LangGraphRunner.run_graph_once`
+  -> `src/cobalt_wren/graphs/runner.py:LangGraphRunner._invoke_graph`
   -> `langgraph graph.invoke(...)`
-  -> `src/langgraph_automation/apps/automation/services/runs.py:_finalize_from_execution`
+  -> `src/cobalt_wren/apps/automation/services/runs.py:_finalize_from_execution`
 
 Classification:
 
@@ -152,12 +152,12 @@ Observed characteristics:
 
 ### Alternate production path
 
-`src/langgraph_automation/apps/automation/services/workflow_preparation.py`
-  -> `langgraph_automation.api.engine`
-  -> `src/langgraph_automation/api/engine.py:create_engine`
-  -> `src/langgraph_automation/runtime/assembly.py:RuntimeAssembler.assemble`
-  -> `src/langgraph_automation/runtime/dependencies.py:RuntimeDependencies`
-  -> `src/langgraph_automation/workflows/prepare.py:WorkflowPreparer.prepare`
+`src/cobalt_wren/apps/automation/services/workflow_preparation.py`
+  -> `cobalt_wren.api.engine`
+  -> `src/cobalt_wren/api/engine.py:create_engine`
+  -> `src/cobalt_wren/runtime/assembly.py:RuntimeAssembler.assemble`
+  -> `src/cobalt_wren/runtime/dependencies.py:RuntimeDependencies`
+  -> `src/cobalt_wren/workflows/prepare.py:WorkflowPreparer.prepare`
 
 Classification:
 
@@ -172,8 +172,8 @@ Observed characteristics:
 
 ### Test and future paths
 
-- `src/langgraph_automation/graphs/runner.py:resume_graph_once` -> `NotImplementedError`
-- `src/langgraph_automation/apps/automation/services/runs.py:resume_run` -> `NotImplementedError`
+- `src/cobalt_wren/graphs/runner.py:resume_graph_once` -> `NotImplementedError`
+- `src/cobalt_wren/apps/automation/services/runs.py:resume_run` -> `NotImplementedError`
 
 Classification:
 
@@ -185,18 +185,18 @@ Classification:
 
 Propagation path:
 
-`src/langgraph_automation/runtime/assembly.py:RuntimeAssembler.assemble`
-  -> `src/langgraph_automation/runtime/dependencies.py:RuntimeDependencies`
-  -> `src/langgraph_automation/api/engine.py:AutomationEngine`
-  -> `src/langgraph_automation/workflows/prepare.py:WorkflowPreparer.prepare`
-  -> `src/langgraph_automation/workflows/requirements.py:check_workflow_requirements`
+`src/cobalt_wren/runtime/assembly.py:RuntimeAssembler.assemble`
+  -> `src/cobalt_wren/runtime/dependencies.py:RuntimeDependencies`
+  -> `src/cobalt_wren/api/engine.py:AutomationEngine`
+  -> `src/cobalt_wren/workflows/prepare.py:WorkflowPreparer.prepare`
+  -> `src/cobalt_wren/workflows/requirements.py:check_workflow_requirements`
 
 For the execution plane, the actual owner is `GraphRuntime`, but its store selection is now owned by a composition-bound runtime services object:
 
-`src/langgraph_automation/apps/automation/services/runtime.py:build_graph_runtime`
-  -> `src/langgraph_automation/graphs/runtime.py:GraphRuntime`
-  -> `src/langgraph_automation/apps/automation/services/execution.py:dispatch_run_execution`
-  -> `src/langgraph_automation/graphs/runner.py:LangGraphRunner`
+`src/cobalt_wren/apps/automation/services/runtime.py:build_graph_runtime`
+  -> `src/cobalt_wren/graphs/runtime.py:GraphRuntime`
+  -> `src/cobalt_wren/apps/automation/services/execution.py:dispatch_run_execution`
+  -> `src/cobalt_wren/graphs/runner.py:LangGraphRunner`
 
 The application runtime selects artifact and checkpoint stores from trusted normalized package settings that were bound once into `RunExecutionServices`, and delegates construction to the canonical runtime builders before handing the exact instances to `GraphRuntime`.
 Workflow payload physical persistence config is rejected at validation time, so it cannot source backend selection or filesystem roots.
@@ -601,20 +601,20 @@ The execution layer currently surfaces run failures through `safe_run_error_mess
 
 Current public store facade:
 
-- `src/langgraph_automation/api/stores.py`
+- `src/cobalt_wren/api/stores.py`
 
 Current concrete integration exports:
 
-- `src/langgraph_automation/integrations/checkpoint/__init__.py`
-- `src/langgraph_automation/integrations/artifact/__init__.py`
+- `src/cobalt_wren/integrations/checkpoint/__init__.py`
+- `src/cobalt_wren/integrations/artifact/__init__.py`
 
 Current boundary posture:
 
 - no public execution API
 - no `api.runtime`
 - no generic persistence orchestrator
-- no top-level `langgraph_automation.CheckpointStore` re-export
-- no top-level `langgraph_automation.ArtifactStore` re-export
+- no top-level `cobalt_wren.CheckpointStore` re-export
+- no top-level `cobalt_wren.ArtifactStore` re-export
 
 Execution persistence should remain behind a package-internal orchestrator and a future LangGraph adapter.
 

@@ -4,7 +4,11 @@ from __future__ import annotations
 
 import pytest
 
-from langgraph_automation.api.engine import AutomationEngine, EnginePreparedWorkflow, create_engine
+from cobalt_wren.api.engine import AutomationEngine, EnginePreparedWorkflow, create_engine
+from tests.support.native_workflow_fixtures import (
+    TEST_REQUIRED_WORKFLOW_KIND,
+    create_required_native_plugin,
+)
 
 
 def _reference_config() -> dict[str, object]:
@@ -43,14 +47,18 @@ def test_api_engine_headless_prepare_does_not_execute_provider_or_tool(monkeypat
 
     monkeypatch.setenv("OPENAI_API_KEY", "test-key")
     monkeypatch.setattr("litellm.completion", forbid_completion)
-    monkeypatch.setattr("langgraph_automation.integrations.tools.safe_tools.EchoTool.__call__", forbid_tool_call)
+    monkeypatch.setattr("cobalt_wren.integrations.tools.safe_tools.EchoTool.__call__", forbid_tool_call)
 
-    engine = create_engine(_reference_config())
+    engine = create_engine(
+        _reference_config(),
+        plugins=(create_required_native_plugin(),),
+        discover_plugins=False,
+    )
     assert isinstance(engine, AutomationEngine)
 
-    prepared = engine.prepare_workflow("reference.llm_echo_summary")
+    prepared = engine.prepare_workflow(TEST_REQUIRED_WORKFLOW_KIND)
 
     assert isinstance(prepared, EnginePreparedWorkflow)
-    assert prepared.kind == "reference.llm_echo_summary"
+    assert prepared.kind == TEST_REQUIRED_WORKFLOW_KIND
     assert prepared.executable is not None
     assert calls == {"provider": 0, "tool": 0}

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from langgraph_automation.api.workflow import (
+from cobalt_wren.api.workflow import (
     WorkflowContribution,
     WorkflowDefinition,
     WorkflowMetadata,

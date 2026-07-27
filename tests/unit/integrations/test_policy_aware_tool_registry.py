@@ -4,11 +4,11 @@ from __future__ import annotations
 
 import pytest
 
-from langgraph_automation.integrations.observability.types import ObservabilityContext
-from langgraph_automation.integrations.tools.base import ToolResult
-from langgraph_automation.integrations.tools.policy import AllowlistToolPolicy, POLICY_DENIED_EXIT_CODE, ToolPolicyContext
-from langgraph_automation.integrations.tools.policy_registry import PolicyAwareToolRegistry
-from langgraph_automation.integrations.tools.registry import InMemoryToolRegistry
+from cobalt_wren.integrations.observability.types import ObservabilityContext
+from cobalt_wren.integrations.tools.base import ToolResult
+from cobalt_wren.integrations.tools.policy import AllowlistToolPolicy, POLICY_DENIED_EXIT_CODE, ToolPolicyContext
+from cobalt_wren.integrations.tools.policy_registry import PolicyAwareToolRegistry
+from cobalt_wren.integrations.tools.registry import InMemoryToolRegistry
 from tests.support.recording_event_sink import RecordingEventSink
 from tests.support.tool_doubles import FailingToolCallable, RecordingToolCallable
 
@@ -65,7 +65,7 @@ def test_policy_aware_tool_registry_propagates_policy_exceptions() -> None:
 
 
 def test_policy_aware_tool_registry_composes_with_observed_registry() -> None:
-    from langgraph_automation.integrations.tools.observed_registry import ObservedToolRegistry
+    from cobalt_wren.integrations.tools.observed_registry import ObservedToolRegistry
 
     sink = RecordingEventSink()
     inner = InMemoryToolRegistry()

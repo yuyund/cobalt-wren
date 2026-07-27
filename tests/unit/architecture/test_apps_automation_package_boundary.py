@@ -6,20 +6,20 @@ from pathlib import Path
 
 from tests.support.import_scan import collect_import_targets
 
-APPS_AUTOMATION_ROOT = Path("src/langgraph_automation/apps/automation")
+APPS_AUTOMATION_ROOT = Path("src/cobalt_wren/apps/automation")
 
 ALLOWED_FORBIDDEN_IMPORTS: dict[Path, set[str]] = {}
 
 FORBIDDEN_PREFIXES = (
-    "langgraph_automation.graphs",
-    "langgraph_automation.runtime.assembly",
-    "langgraph_automation.runtime.dependencies",
-    "langgraph_automation.workflows.prepare",
-    "langgraph_automation.workflows.catalog",
-    "langgraph_automation.workflows.adapter",
-    "langgraph_automation.workflows.requirements",
-    "langgraph_automation.plugins.registry",
-    "langgraph_automation.config.validator",
+    "cobalt_wren.graphs",
+    "cobalt_wren.runtime.assembly",
+    "cobalt_wren.runtime.dependencies",
+    "cobalt_wren.workflows.prepare",
+    "cobalt_wren.workflows.catalog",
+    "cobalt_wren.workflows.adapter",
+    "cobalt_wren.workflows.requirements",
+    "cobalt_wren.plugins.registry",
+    "cobalt_wren.config.validator",
 )
 
 
@@ -38,15 +38,15 @@ def test_apps_automation_package_does_not_import_package_internals_outside_exact
 
 
 def test_workflow_preparation_bridge_imports_only_the_package_facing_engine_facade() -> None:
-    bridge = Path("src/langgraph_automation/apps/automation/services/workflow_preparation.py")
+    bridge = Path("src/cobalt_wren/apps/automation/services/workflow_preparation.py")
     modules = collect_import_targets(bridge)
 
     offenders = [module for module in modules if module.startswith(FORBIDDEN_PREFIXES)]
     assert offenders == [], f"{bridge} imports forbidden modules: {offenders}"
 
     for expected in (
-        "langgraph_automation.api.engine",
-        "langgraph_automation.api.plugins",
+        "cobalt_wren.api.engine",
+        "cobalt_wren.api.plugins",
     ):
         assert expected in modules
 

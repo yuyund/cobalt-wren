@@ -26,7 +26,7 @@ The implementation is now in place, and Block M verifies the preparation path th
 
 The facade module name is:
 
-- `langgraph_automation.api.engine`
+- `cobalt_wren.api.engine`
 
 Status:
 
@@ -52,34 +52,34 @@ Why not `api.package`:
 
 Public-facing provisional:
 
-- `langgraph_automation.api.engine`
+- `cobalt_wren.api.engine`
 - `create_engine`
 - `AutomationEngine`
 - `EnginePreparedWorkflow`
 
 Existing public facades:
 
-- `langgraph_automation.api.errors`
-- `langgraph_automation.api.plugins`
-- `langgraph_automation.api.workflow`
-- `langgraph_automation.api.llm`
-- `langgraph_automation.api.tools`
-- `langgraph_automation.api.stores`
-- `langgraph_automation.api.events`
+- `cobalt_wren.api.errors`
+- `cobalt_wren.api.plugins`
+- `cobalt_wren.api.workflow`
+- `cobalt_wren.api.llm`
+- `cobalt_wren.api.tools`
+- `cobalt_wren.api.stores`
+- `cobalt_wren.api.events`
 
 Internal and hidden behind the facade:
 
-- `langgraph_automation.plugins.registry`
-- `langgraph_automation.config.*`
-- `langgraph_automation.runtime.*`
-- `langgraph_automation.workflows.prepare`
-- `langgraph_automation.workflows.catalog`
-- `langgraph_automation.workflows.adapter`
-- `langgraph_automation.workflows.requirements`
+- `cobalt_wren.plugins.registry`
+- `cobalt_wren.config.*`
+- `cobalt_wren.runtime.*`
+- `cobalt_wren.workflows.prepare`
+- `cobalt_wren.workflows.catalog`
+- `cobalt_wren.workflows.adapter`
+- `cobalt_wren.workflows.requirements`
 
 Internal foundation:
 
-- legacy `langgraph_automation.graphs.*` package: removed; no compatibility import is provided
+- legacy `cobalt_wren.graphs.*` package: removed; no compatibility import is provided
 
 ## API Shape
 
@@ -161,12 +161,12 @@ Public secret resolver injection is deferred until the runtime and secret bounda
 
 ## Migration Direction
 
-The existing service-layer workflow preparation bridge now routes through `langgraph_automation.api.engine`.
+The existing service-layer workflow preparation bridge now routes through `cobalt_wren.api.engine`.
 
 Current path:
 
 - `apps/automation/services/workflow_preparation.py`
-- calls `langgraph_automation.api.engine`
+- calls `cobalt_wren.api.engine`
 
 The bridge remains thin, but it is no longer the package-internal transitional exception.
 
@@ -175,13 +175,13 @@ The bridge remains thin, but it is no longer the package-internal transitional e
 The first package-facade verification target should be:
 
 - `create_engine(config_mapping)`
-- `engine.prepare_workflow("reference.llm_echo_summary")`
+- `engine.prepare_workflow("acme.document_summary")`
 - `EnginePreparedWorkflow`
 
 Verification levels:
 
 - L3: config -> runtime -> workflow preparation through `api.engine`
-- L4: reference workflow headless prepare through `api.engine`
+- L4: explicit test workflow headless prepare through `api.engine`
 - L5: facade-level safe failures verified through `api.engine`
 
 Headless smoke tests should only prepare workflows.
@@ -196,8 +196,8 @@ Deferred until later design blocks:
 - graph runner public API
 - checkpoint / resume
 - worker / queue
-- external plugin discovery
-- entry point discovery
+- plugin API version migration
+- broken-plugin partial-startup policy
 
 ## Boundary Hardening Note
 

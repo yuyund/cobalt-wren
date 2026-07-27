@@ -9,8 +9,8 @@ from typing import Annotated, TypedDict, cast
 from langgraph.graph import END, START, StateGraph
 from langgraph.types import Send
 
-from langgraph_automation.api.stores import ArtifactStore, ArtifactWriteRequest, CheckpointStore, CheckpointWriteRequest, StoredArtifact, StoredCheckpoint
-from langgraph_automation.api.workflow import WorkflowExecutionContext, WorkflowExecutionResult, WorkflowResumeRequest
+from cobalt_wren.api.stores import ArtifactStore, ArtifactWriteRequest, CheckpointStore, CheckpointWriteRequest, StoredArtifact, StoredCheckpoint
+from cobalt_wren.api.workflow import WorkflowExecutionContext, WorkflowExecutionResult, WorkflowResumeRequest
 
 _NAMESPACE = "saga-order-fulfillment"
 _OPERATIONS = ("reserve_inventory", "charge_payment", "provision_access")

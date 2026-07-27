@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any, Mapping
 
-from langgraph_automation.integrations.observability.types import SpanRef
+from cobalt_wren.integrations.observability.types import SpanRef
 
 
 @dataclass(slots=True)
@@ -40,6 +40,7 @@ class RecordingEventSink:
         self.run_events: list[RecordedEvent] = []
         self.spans: dict[str, RecordedSpan] = {}
         self._counter = 0
+        self.integration_projections: list[dict[str, object]] = []
 
     def _next_span_id(self) -> str:
         self._counter += 1
@@ -132,3 +133,24 @@ class RecordingEventSink:
 
     def checkpoint_saved(self, run_id: int, thread_id: str, checkpoint_id: str, backend: str, span: SpanRef | None = None, state_summary: str | None = None, checkpoint_namespace: str = '') -> RecordedEvent:
         return self._record_event(run_id, "checkpoint.saved", checkpoint_id, {"thread_id": thread_id, "backend": backend, "state_summary": state_summary or "", "checkpoint_namespace": checkpoint_namespace})
+
+    def integration_projection(self, run_id: int, *, integration_id: str, schema_id: str, owner_kind: str, payload: Mapping[str, object], span: SpanRef | None = None, owner_external_id: str = "", title: str = "", retention_class: str = "execution_detail", classification: str = "internal", projection_kind: str = "event", subject_kind: str = "run", subject_external_id: str = "", sequence: int = 0, occurred_at: object | None = None) -> dict[str, object]:
+        record = {
+            "run_id": run_id,
+            "integration_id": integration_id,
+            "schema_id": schema_id,
+            "owner_kind": owner_kind,
+            "payload": dict(payload),
+            "span_id": None if span is None else span.span_id,
+            "owner_external_id": owner_external_id,
+            "title": title,
+            "retention_class": retention_class,
+            "classification": classification,
+            "projection_kind": projection_kind,
+            "subject_kind": subject_kind,
+            "subject_external_id": subject_external_id,
+            "sequence": sequence,
+            "occurred_at": occurred_at,
+        }
+        self.integration_projections.append(record)
+        return record

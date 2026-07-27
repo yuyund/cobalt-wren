@@ -5,8 +5,8 @@ authority: explanatory
 summary: External complex workflow example that researches evidence-backed revenue opportunities using LLM and SearXNG.
 code_refs:
   - packages/opportunity_research_workflow
-  - src/langgraph_automation/py.typed
-  - src/langgraph_automation/testing
+  - src/cobalt_wren/py.typed
+  - src/cobalt_wren/testing
   - pyproject.toml
   - .github/workflows/ci.yml
 test_refs:

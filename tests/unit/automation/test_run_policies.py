@@ -4,9 +4,9 @@ from __future__ import annotations
 
 import pytest
 
-from langgraph_automation.apps.automation.models.run import Run, RunStatus
-from langgraph_automation.apps.automation.models.workflow import Workflow
-from langgraph_automation.apps.automation.policies.runs import can_cancel_run, can_resume_run, can_retry_run, can_start_run
+from cobalt_wren.apps.automation.models.run import Run, RunStatus
+from cobalt_wren.apps.automation.models.workflow import Workflow
+from cobalt_wren.apps.automation.policies.runs import can_cancel_run, can_resume_run, can_retry_run, can_start_run
 
 
 @pytest.mark.django_db

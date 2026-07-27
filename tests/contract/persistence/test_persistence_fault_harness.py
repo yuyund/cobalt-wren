@@ -4,10 +4,10 @@ from __future__ import annotations
 
 import pytest
 
-from langgraph_automation.integrations.artifact.base import ArtifactWriteRequest
-from langgraph_automation.integrations.artifact.memory_store import MemoryArtifactStore
-from langgraph_automation.integrations.checkpoint.base import CheckpointWriteRequest
-from langgraph_automation.integrations.checkpoint.memory_store import MemoryCheckpointStore
+from cobalt_wren.integrations.artifact.base import ArtifactWriteRequest
+from cobalt_wren.integrations.artifact.memory_store import MemoryArtifactStore
+from cobalt_wren.integrations.checkpoint.base import CheckpointWriteRequest
+from cobalt_wren.integrations.checkpoint.memory_store import MemoryCheckpointStore
 from tests.support.persistence import FaultPlan, FaultTiming, FaultingArtifactStore, FaultingCheckpointStore
 
 

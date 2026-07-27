@@ -4,9 +4,9 @@ from __future__ import annotations
 
 from dataclasses import fields
 
-from langgraph_automation.config.models import LimitsConfig, SafetyConfig
-from langgraph_automation.runtime.context import FactoryContext
-from langgraph_automation.runtime.secrets import EnvSecretResolver
+from cobalt_wren.config.models import LimitsConfig, SafetyConfig
+from cobalt_wren.runtime.context import FactoryContext
+from cobalt_wren.runtime.secrets import EnvSecretResolver
 
 
 def test_factory_context_contains_expected_fields_only() -> None:

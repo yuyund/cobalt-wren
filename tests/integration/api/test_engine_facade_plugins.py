@@ -4,10 +4,10 @@ from __future__ import annotations
 
 import pytest
 
-from langgraph_automation.api.engine import AutomationEngine, EnginePreparedWorkflow, create_engine
-from langgraph_automation.api.errors import PluginRegistrationError
-from langgraph_automation.api.plugins import Plugin, PluginContributions, PluginMetadata, ProviderContribution
-from langgraph_automation.api.workflow import WorkflowContribution, WorkflowDefinition, WorkflowMetadata, WorkflowRequirements
+from cobalt_wren.api.engine import AutomationEngine, EnginePreparedWorkflow, create_engine
+from cobalt_wren.api.errors import PluginRegistrationError
+from cobalt_wren.api.plugins import Plugin, PluginContributions, PluginMetadata, ProviderContribution
+from cobalt_wren.api.workflow import WorkflowContribution, WorkflowDefinition, WorkflowMetadata, WorkflowRequirements
 
 
 def _engine_config() -> dict[str, object]:
@@ -99,14 +99,14 @@ def test_duplicate_explicit_workflow_kind_raises_plugin_registration_error() -> 
 
 def test_optional_discovery_registers_installed_plugins(monkeypatch: pytest.MonkeyPatch) -> None:
     discovered = _workflow_only_plugin("integration.discovered", "integration.discovered_workflow")
-    monkeypatch.setattr("langgraph_automation.api.engine.load_discovered_plugins", lambda: (discovered,))
+    monkeypatch.setattr("cobalt_wren.api.engine.load_discovered_plugins", lambda: (discovered,))
     prepared = create_engine({"version": 1, "environment": "test"}, discover_plugins=True).prepare_workflow("integration.discovered_workflow")
     assert prepared.executable == {"graph": "integration.discovered_workflow"}
 
 def test_explicit_plugin_wins_over_discovered_plugin_with_same_name(monkeypatch: pytest.MonkeyPatch) -> None:
     explicit = _workflow_only_plugin("integration.same", "integration.explicit_workflow")
     discovered = _workflow_only_plugin("integration.same", "integration.discovered_workflow")
-    monkeypatch.setattr("langgraph_automation.api.engine.load_discovered_plugins", lambda: (discovered,))
+    monkeypatch.setattr("cobalt_wren.api.engine.load_discovered_plugins", lambda: (discovered,))
     engine = create_engine({"version": 1, "environment": "test"}, plugins=(explicit,), discover_plugins=True)
     assert engine.prepare_workflow("integration.explicit_workflow").kind == "integration.explicit_workflow"
     with pytest.raises(Exception) as excinfo:

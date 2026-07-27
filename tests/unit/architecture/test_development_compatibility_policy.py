@@ -3,10 +3,10 @@ from pathlib import Path
 
 
 def test_removed_public_aliases_do_not_return() -> None:
-    engine = Path("src/langgraph_automation/api/engine.py").read_text()
-    prepared = Path("src/langgraph_automation/workflows/prepare.py").read_text()
+    engine = Path("src/cobalt_wren/api/engine.py").read_text()
+    prepared = Path("src/cobalt_wren/workflows/prepare.py").read_text()
     result = Path(
-        "src/langgraph_automation/apps/automation/services/execution_result.py"
+        "src/cobalt_wren/apps/automation/services/execution_result.py"
     ).read_text()
     assert "def graph(" not in engine
     assert "def graph(" not in prepared
@@ -14,7 +14,7 @@ def test_removed_public_aliases_do_not_return() -> None:
 
 
 def test_run_api_has_no_explicit_prepared_workflow_injection() -> None:
-    text = Path("src/langgraph_automation/apps/automation/services/runs.py").read_text()
+    text = Path("src/cobalt_wren/apps/automation/services/runs.py").read_text()
     start_signature = text[text.index("def start_run("):text.index(") -> RunActionResult:", text.index("def start_run("))]
     retry_signature = text[text.index("def retry_run("):text.index(") -> RunActionResult:", text.index("def retry_run("))]
     assert "prepared_workflow:" not in start_signature

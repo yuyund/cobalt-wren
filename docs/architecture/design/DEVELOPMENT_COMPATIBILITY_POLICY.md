@@ -23,4 +23,4 @@ The following remain mandatory because they are correctness properties rather th
 
 ## Current Execution Path
 
-The Django Run lifecycle uses only the public executable contract. LangGraph remains an internal implementation detail of the built-in reference workflow and graph-layer tests; it is not a control-plane fallback.
+The Django Run lifecycle uses only the public executable contract. The built-in workflow catalog is empty, and no workflow framework is a control-plane fallback. LangGraph, LlamaIndex Workflows, Native, and plain Python connect through explicit workflow contributions and opaque executables.

@@ -2,9 +2,9 @@
 
 ## 1. Roadmap Premises
 
-This repository is building a foundation for LangGraph execution, not an application workflow product.
+This repository is building an OSS-neutral workflow execution and control-plane foundation, not a LangGraph-specific runtime or an application workflow product.
 
-The current priority is to keep the execution foundation stable, keep reference workflows isolated, and avoid mixing future application logic into the core packages.
+The current priority is to keep the execution foundation stable, keep examples and application workflows outside the foundation catalog, prove useful official OSS integrations, and avoid mixing future application logic into the core packages.
 
 ## 2. Foundation Roadmap
 
@@ -24,7 +24,7 @@ Foundation work is the execution substrate shared by multiple workflows.
 ### Foundation Complete
 
 - registry composition boundary が安定している
-- reference workflow が foundation から隔離されている
+- built-in workflow catalog が空で、examples/application workflows が foundation registration から隔離されている
 - validation / runtime assembly / graph execution の責務境界が安定している
 - boundary contracts が docs と tests で固定されている
 
@@ -168,7 +168,7 @@ After Block G:
 ## 8. Design Principles
 
 - Keep foundation generic.
-- Keep reference workflows diagnostic.
+- Keep examples non-product and explicitly registered.
 - Keep application workflows out of the foundation package.
 - Prefer registry/catalog composition over direct imports in foundation code.
 - Prefer explicit boundary contracts over implicit conventions.
@@ -393,8 +393,8 @@ Package Complete+ future work:
 - graph execution public API
 - worker / queue / outbox
 - true resume
-- external plugin discovery
-- entry point discovery
+- plugin API version migration and compatibility matrix
+- partial-startup policy for broken third-party entry points
 - `company_agent`
 - production application workflow
 
@@ -442,3 +442,70 @@ Audit focus:
 - traceability
 - risk-ranked gap closure
 - docs/code/test reconciliation
+
+## 11. OSS-Neutral Integration And Native Authoring Direction
+
+Planned architectural sequence:
+
+1. define an integration provider protocol and centrally managed supported-OSS definitions;
+2. keep the generic `execute` / `invoke` / callable / `resume` adapter framework-neutral;
+3. add official semantic helpers that maximize lifecycle, observability, managed actions, and dynamic presentation through public OSS hooks;
+4. establish canonical control-plane records plus bounded versioned integration projections;
+5. validate equivalent vertical scenarios across generic Python and materially different OSS integrations;
+6. only then define a lightweight native authoring MVP on the same integration contracts.
+
+Integration code will be packaged with the foundation while target OSS distributions remain optional and are detected from the deployment environment. Explicit integration selection remains the stable path; automatic detection belongs to a separate convenience layer.
+
+The built-in workflow catalog is empty. Examples are explicitly registered outside the foundation catalog, and external distribution tests provide integration evidence. LangGraph is not the Native authoring backend; Native uses the selected plain-Python execution model.
+
+See `../../architecture/design/OSS_NEUTRAL_WORKFLOW_INTEGRATION.md`.
+
+## 12. Native Authoring Roadmap
+
+Native Authoring is now use-case-defined rather than backend-defined. The selected direction is ordinary async-first Python control flow with explicit named step boundaries and a plain Python backend. LangGraph remains an optional advanced integration for durable stateful graph semantics.
+
+Native Design Block NATIVE-D1:
+
+- status: complete
+- primary use cases and non-goals: defined
+- progressive disclosure levels: defined
+- LangGraph capability boundary: defined
+- provisional public API: defined
+- MVP acceptance scenarios: defined
+- design artifact: `../../workflows/authoring/NATIVE_AUTHORING_USE_CASE_DESIGN.md`
+
+Native block NATIVE-P1:
+
+- status: complete
+- provisional public Native vocabulary: complete
+- async-first executor with sync callable support: complete
+- named step spans and `native.step.v1` snapshots: complete
+- cancellation checks: complete
+- ordinary `WorkflowContribution` and plugin conversion: complete
+- Django control-plane and common UI vertical proof: complete
+
+Native block NATIVE-P2A:
+
+- status: complete
+- retry policy and attempt semantics: complete
+- step timeout semantics: complete
+- stable occurrence keys and bounded loop identity: complete
+- Django retry persistence and timed-out Run proof: complete
+
+Native examples separation:
+
+- status: complete
+- no product workflows are bundled or implicitly registered
+- Native examples moved to `examples/native/`
+- example workflow kinds carry no product compatibility promise
+- engine and control-plane tests use explicit test plugins
+- plain Python executable compatibility remains an independent contract
+
+Next Native block, NATIVE-P2B:
+
+1. artifact convenience API;
+2. progress and metric projections;
+3. clean-room external Native wheel proof;
+4. reusable configured step definitions after the convenience APIs stabilize.
+
+Native MVP explicitly excludes durable resume, timers, time travel, exactly-once guarantees, arbitrary distributed fan-out, and transparent mid-call process recovery.

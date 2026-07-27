@@ -8,10 +8,10 @@ import json
 
 import pytest
 
-from langgraph_automation.integrations.observability.types import ObservabilityContext, SpanRef
-from langgraph_automation.integrations.tools.base import ToolResult
-from langgraph_automation.integrations.tools.observed_registry import ObservedToolRegistry
-from langgraph_automation.integrations.tools.registry import InMemoryToolRegistry
+from cobalt_wren.integrations.observability.types import ObservabilityContext, SpanRef
+from cobalt_wren.integrations.tools.base import ToolResult
+from cobalt_wren.integrations.tools.observed_registry import ObservedToolRegistry
+from cobalt_wren.integrations.tools.registry import InMemoryToolRegistry
 from tests.support.failing_event_sink import FailingSpanFailedEventSink
 from tests.support.recording_event_sink import RecordingEventSink
 from tests.support.tool_doubles import FailingToolCallable, RecordingToolCallable

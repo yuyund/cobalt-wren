@@ -4,13 +4,13 @@ This file keeps the non-code operational hygiene rules in one place.
 
 ## Generated / Ignored Files
 
-- `../../src/langgraph_automation.egg-info/` is generated metadata.
+- `../../src/cobalt_wren.egg-info/` is generated metadata.
 - If stale references appear there, note the finding in the report.
 - Do not create or expand generated files unless they are needed to restore consistency.
 
 ## Stale egg-info Rule
 
-- If `../../src/langgraph_automation.egg-info/SOURCES.txt` or related generated metadata references removed files, report it explicitly.
+- If `../../src/cobalt_wren.egg-info/SOURCES.txt` or related generated metadata references removed files, report it explicitly.
 - If the generated metadata is ignored, do not promote it into normal source control as part of routine work.
 
 ## Reporting Template

@@ -5,9 +5,9 @@ from __future__ import annotations
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 
-from langgraph_automation.api.plugins import Plugin, PluginContributions, PluginMetadata
-from langgraph_automation.api.stores import ArtifactWriteRequest, CheckpointWriteRequest
-from langgraph_automation.api.workflow import (
+from cobalt_wren.api.plugins import Plugin, PluginContributions, PluginMetadata
+from cobalt_wren.api.stores import ArtifactWriteRequest, CheckpointWriteRequest
+from cobalt_wren.api.workflow import (
     WorkflowBuildContext,
     WorkflowContribution,
     WorkflowDefinition,

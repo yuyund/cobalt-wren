@@ -1,6 +1,6 @@
 # Plugin API Facade
 
-This document defines the plugin API facade staging policy for `langgraph-automation`.
+This document defines the plugin API facade staging policy for `cobalt-wren`.
 
 Purpose:
 
@@ -15,13 +15,13 @@ Purpose:
 
 Current implemented public facade:
 
-- `langgraph_automation.api.llm`
-- `langgraph_automation.api.tools`
-- `langgraph_automation.api.stores`
-- `langgraph_automation.api.events`
-- `langgraph_automation.api.errors`
-- `langgraph_automation.api.plugins`
-- `langgraph_automation.api.workflow`
+- `cobalt_wren.api.llm`
+- `cobalt_wren.api.tools`
+- `cobalt_wren.api.stores`
+- `cobalt_wren.api.events`
+- `cobalt_wren.api.errors`
+- `cobalt_wren.api.plugins`
+- `cobalt_wren.api.workflow`
 
 Roles:
 
@@ -35,12 +35,12 @@ Roles:
 
 Not implemented yet:
 
-- `langgraph_automation.api.runtime`
+- `cobalt_wren.api.runtime`
 
 ## Facade hierarchy
 
 ```text
-langgraph_automation.api
+cobalt_wren.api
   ├─ llm.py        # implemented
   ├─ tools.py      # implemented
   ├─ stores.py     # implemented
@@ -70,7 +70,7 @@ Stages:
 - `StoreContribution`
 - `EventSinkContribution`
 
-`PluginContributions` aggregates workflow contributions via `workflows`, but `WorkflowContribution` itself is defined in `langgraph_automation.api.workflow`.
+`PluginContributions` aggregates workflow contributions via `workflows`, but `WorkflowContribution` itself is defined in `cobalt_wren.api.workflow`.
 
 ### Deferred from api.plugins
 
@@ -97,7 +97,7 @@ Why deferred:
 
 ### Internal mechanism
 
-- `PluginRegistry` remains internal at `langgraph_automation.plugins.registry`
+- `PluginRegistry` remains internal at `cobalt_wren.plugins.registry`
 - `api.plugins` does not export `PluginRegistry`
 
 ## Why PluginRegistry is not public yet
@@ -213,6 +213,6 @@ Future facade:
 
 Built-in workflow wiring:
 
-- built-in/reference workflows are represented as ordinary `Plugin` objects
+- the built-in catalog is empty; any future bundled workflows are represented as ordinary `Plugin` objects
 - `WorkflowContribution` is staged through `api.workflow` and registered with `PluginRegistry`
 - `WorkflowDefinition.build` is called only by the internal workflow adapter

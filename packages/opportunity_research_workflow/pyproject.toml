@@ -7,11 +7,11 @@ name = "opportunity-research-workflow"
 version = "0.1.0"
 requires-python = ">=3.12"
 dependencies = [
-  "langgraph-automation>=0.1.0",
-  "langgraph>=0.2",
+  "cobalt-wren>=0.1.0rc1",
+  "langgraph>=1.0,<2",
 ]
 
-[project.entry-points."langgraph_automation.plugins"]
+[project.entry-points."cobalt_wren.plugins"]
 opportunity-research = "opportunity_research_workflow:create_plugin"
 
 [tool.setuptools]

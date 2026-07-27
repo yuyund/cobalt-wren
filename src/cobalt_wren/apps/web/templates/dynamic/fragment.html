@@ -1,0 +1,25 @@
+<section>
+  <h2>{{ section.title }}</h2>
+  {% if section.table.rows %}
+  <table>
+    <thead>
+      <tr>
+        {% for column in section.table.columns %}
+        <th>{{ column.label }}</th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in section.table.rows %}
+      <tr>
+        {% for field in row %}
+        <td>{% include 'dynamic/components/field_value.html' with field=field compact=True only %}</td>
+        {% endfor %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p>{{ section.table.empty_message }}</p>
+  {% endif %}
+</section>

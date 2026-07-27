@@ -8,7 +8,7 @@ from tests.support.import_scan import collect_import_targets
 
 
 def test_artifact_emission_module_does_not_import_concrete_stores_or_django() -> None:
-    targets = collect_import_targets(Path('src/langgraph_automation/integrations/artifact/emission.py'))
+    targets = collect_import_targets(Path('src/cobalt_wren/integrations/artifact/emission.py'))
 
     offenders = [
         target
@@ -16,11 +16,11 @@ def test_artifact_emission_module_does_not_import_concrete_stores_or_django() ->
         if target.startswith(
             (
                 'django',
-                'langgraph_automation.apps.automation',
-                'langgraph_automation.graphs',
-                'langgraph_automation.runtime.assembly',
-                'langgraph_automation.integrations.artifact.memory_store',
-                'langgraph_automation.integrations.artifact.filesystem_store',
+                'cobalt_wren.apps.automation',
+                'cobalt_wren.graphs',
+                'cobalt_wren.runtime.assembly',
+                'cobalt_wren.integrations.artifact.memory_store',
+                'cobalt_wren.integrations.artifact.filesystem_store',
             )
         )
     ]
@@ -28,7 +28,7 @@ def test_artifact_emission_module_does_not_import_concrete_stores_or_django() ->
 
 
 def test_artifact_emission_module_stays_free_of_store_call_sites() -> None:
-    text = Path('src/langgraph_automation/integrations/artifact/emission.py').read_text()
+    text = Path('src/cobalt_wren/integrations/artifact/emission.py').read_text()
 
     for token in (
         'ArtifactStore(',
@@ -42,10 +42,10 @@ def test_artifact_emission_module_stays_free_of_store_call_sites() -> None:
 
 
 def test_artifact_emission_contract_is_not_publicly_reexported() -> None:
-    import langgraph_automation as package_root
-    import langgraph_automation.api as api_package
-    import langgraph_automation.api.stores as stores_api
-    import langgraph_automation.api.plugins as plugins_api
+    import cobalt_wren as package_root
+    import cobalt_wren.api as api_package
+    import cobalt_wren.api.stores as stores_api
+    import cobalt_wren.api.plugins as plugins_api
 
     for module in (package_root, api_package, stores_api, plugins_api):
         assert not hasattr(module, 'ArtifactEmissionRequest')

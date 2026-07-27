@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from langgraph_automation.api.errors import (
+from cobalt_wren.api.errors import (
     ConfigError,
     FrameworkError,
     CheckpointConflictError,
